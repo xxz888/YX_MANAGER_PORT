@@ -55,7 +55,7 @@
 
 
                 <el-form-item label="广告文字">
-                        <quill-editor   ref="myTextEditor" v-model="form.adver_character" :options="editorOption"></quill-editor>
+                        <quill-editor   ref="myTextEditor" v-model="form.adver_character" ></quill-editor>
                 </el-form-item>
                 <el-form-item label="广告图片">
                     <template  slot-scope="scope">
@@ -118,6 +118,7 @@
                 imgSrc: p_img,
                 cropImg: '',
                 dialogVisible: false,
+                token:localStorage.getItem('token')
             }
         },
         created() {
@@ -154,7 +155,7 @@
                 if (process.env.NODE_ENV === 'development') {
                     this.url = '/ms/table/list';
                 };
-                this.$axios.get('/api/pub/advertising/1/', {
+                this.$axios.get('/api/pub/advertising/1/',{
                     page: this.cur_page
                 }).then((res) => {
                     this.tableData = res.data;
@@ -219,14 +220,36 @@
             },
             // 保存编辑
             saveEdit() {
-                this.$set(this.tableData, this.idx, this.form);
+                var dic = {
+                    'advertising_id':this.form.adver_id,
+                    'photo':'http://pic.58pic.com/58pic/15/68/59/71X58PICNjx_1024.jpg',
+                    'character':this.form.adver_character,
+                    'type_advertising':1,
+                    'type':1
+                };
+                this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then(res=>{
+                    this.$message.success('修改成功');
+                    this.getData();
+                });
                 this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx+1} 行成功`);
             },
             // 确定删除
             deleteRow(){
-                this.tableData.splice(this.idx, 1);
-                this.$message.success('删除成功');
+                var dic = {
+                    'advertising_id':this.form.adver_id,
+                    'photo':'',
+                    'character':'',
+                    'type_advertising':'',
+                    'type':3
+                };
+                this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then(res=>{
+                    this.$message.success('删除成功');
+                    this.getData();
+                });
                 this.delVisible = false;
             },
             setImage(e){

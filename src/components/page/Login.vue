@@ -13,6 +13,11 @@
                         <el-button slot="prepend" icon="el-icon-lx-lock"></el-button>
                     </el-input>
                 </el-form-item>
+
+                <el-form-item prop="password" align="right">
+                        <el-button type="success"  @click="sendPhoneCode">获取验证码</el-button>
+                </el-form-item>
+
                 <div class="login-btn">
                     <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
                 </div>
@@ -27,39 +32,41 @@
         data: function(){
             return {
                 ruleForm: {
-                    username: 'admin',
-                    password: '123123'
+                    username: '13383773800',
+                    password: ''
                 },
                 rules: {
                     username: [
                         { required: true, message: '请输入用户名', trigger: 'blur' }
                     ],
                     password: [
-                        { required: true, message: '请输入密码', trigger: 'blur' }
+                        { required: true, message: '请输入验证码', trigger: 'blur' }
                     ]
                 }
             }
         },
         methods: {
+            //发送验证码
+            sendPhoneCode() {
+                console.log(this.ruleForm.username);
+                this.$axios.get('/api/pub/smscode/'+this.ruleForm.username+'/').then(res=>{
+                    this.$message({
+                        message: '验证码已发送',
+                        type: 'success'
+                    });
+                    this.ruleForm.password = '666666';
+                })
+            },
+            //提交
             submitForm(formName) {
-                fetch('/api/pub/information/1/').then(response => response.json())
-                    .then(data => {
-                        console.log(data);
+                this.$axios.post('/api/users/register/',
+                    {'mobile':this.ruleForm.username,'sms_code':this.ruleForm.password})
+                    .then(res=>{
+                        console.log(res.data.token);
+                        localStorage.setItem('token',res.data.token);
                         localStorage.setItem('ms_username',this.ruleForm.username);
-                        this.$router.push('/');
-                    })
-                    .catch(e => console.log("Oops, error", e))
-                /*
-                this.$refs[formName].validate((valid) => {
-                    if (valid) {
-                        localStorage.setItem('ms_username',this.ruleForm.username);
-                        this.$router.push('/');
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                });
-                */
+                    this.$router.push('/');
+                })
             }
         }
     }
