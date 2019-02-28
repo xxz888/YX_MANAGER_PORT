@@ -34,10 +34,6 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <div class="pagination">
-                <el-pagination background @current-change="handleCurrentChange" layout="prev, pager, next" :total="1000">
-                </el-pagination>
-            </div>
         </div>
 
         <!-- 编辑弹出框 -->
@@ -142,7 +138,6 @@
             quillEditor
         },
         methods: {
-            // 获取 easy-mock 的模拟数据
             getData() {
                 this.$axios.get('/api/pub/advertising/1/',{
                     page: this.cur_page

@@ -41,10 +41,6 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <div class="pagination">
-                <el-pagination background @current-change="handleCurrentChange" layout="prev, pager, next" :total="1000">
-                </el-pagination>
-            </div>
         </div>
 
         <!-- 编辑弹出框 -->
@@ -156,47 +152,14 @@ import { quillEditor } from 'vue-quill-editor';
             quillEditor
         },
         methods: {
-            // 分页导航
-            handleCurrentChange(val) {
-                this.cur_page = val;
-                this.getData();
-            },
-            // 获取 easy-mock 的模拟数据
             getData() {
-                // 开发环境使用 easy-mock 数据，正式环境使用 json 文件
-                if (process.env.NODE_ENV === 'development') {
-                    this.url = '/ms/table/list';
-                };
                 this.$axios.get('/api/pub/information/1/', {
                     page: this.cur_page
                 }).then((res) => {
                     this.tableData = res.data;
                 })
             },
-            search() {
-                this.is_search = true;
-            },
-            formatter(row, column) {
-                return row.address;
-            },
-            type_formatter(value){
-                value = value.type;
-                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
-            },
-            photo_formatter(value){
-                console.log(value);
-                value = value.type;
-                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
-            },
-            data_formatter(value){
-                return this.getLocalTime(value.date);
-            },
-            dateFormatter(value){
-                console.log(value);
-            },
-            filterTag(value, row) {
-                return row.tag === value;
-            },
+            //编辑按钮,弹出框
             handleEdit(index, row) {
                 this.idx = index;
                 const item = this.tableData[index];
@@ -208,10 +171,10 @@ import { quillEditor } from 'vue-quill-editor';
                     author: item.author,
                     date: this.getLocalTime(item.date),
                     details: item.details,
-
                 }
                 this.editVisible = true;
             },
+            //增加按钮，弹出框
             addnews(){
                 this.form = {
                     id: '',
@@ -225,34 +188,68 @@ import { quillEditor } from 'vue-quill-editor';
                 }
                 this.editVisible = true;
             },
+
+            // 新增和保存编辑，请求
+            saveEdit() {
+                this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res) {
+                    var dic = {
+                        'information_id':this.form.id,          //资讯id(修改/删除传,新增不传)
+                        'photo':res,                            //资讯展示图片
+                        'title':this.form.title,                //资讯标题
+                        'type_information':'1',                 //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
+                        'author':this.form.title,               //作者
+                        'details':this.form.details,            //资讯详情
+                        'type':this.form.id.length == 0 ? 2 :1  //操作类型(1/修改，2/新增，3/删除)
+                    };
+                    this.$axios.post('/api/pub/information/6/',dic,{headers:{
+                            "Authorization":"JWT " + localStorage.getItem('token')
+                        }}).then(res=>{
+                        this.$message.success(res.msg);
+                        this.getData();
+                    });
+                    this.editVisible = false;
+                })
+            },
+            //确定删除,请求
+            deleteRow(){
+                var dic = {
+                    'advertising_id':this.form.adver_id,
+                    'photo':'',
+                    'character':'',
+                    'type_advertising':'',
+                    'type':3
+                };
+                this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then(res=>{
+                    this.$message.success('删除成功');
+                    this.getData();
+                });
+                this.delVisible = false;
+            },
+
+
+
+
+
+
+
+
+
+            //单个删除,弹出框
             handleDelete(index, row) {
                 this.idx = index;
                 this.delVisible = true;
             },
+            //全部删除
             delAll() {
-                const length = this.multipleSelection.length;
-                let str = '';
-                this.del_list = this.del_list.concat(this.multipleSelection);
-                for (let i = 0; i < length; i++) {
-                    str += this.multipleSelection[i].name + ' ';
-                }
-                this.$message.error('删除了' + str);
-                this.multipleSelection = [];
+                this.$message.info('功能开发中');
             },
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
-            // 保存编辑
-            saveEdit() {
-                this.$set(this.tableData, this.idx, this.form);
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx+1} 行成功`);
-            },
-            // 确定删除
-            deleteRow(){
-                this.tableData.splice(this.idx, 1);
-                this.$message.success('删除成功');
-                this.delVisible = false;
+            search() {
+                this.is_search = true;
             },
             setImage(e){
                 const file = e.target.files[0];
@@ -278,7 +275,20 @@ import { quillEditor } from 'vue-quill-editor';
             },
             getLocalTime(nS) {
                 return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
-            }
+            },
+            type_formatter(value){
+                value = value.type;
+                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
+            },
+            photo_formatter(value){
+                console.log(value);
+                value = value.type;
+                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
+            },
+            data_formatter(value){
+                return this.getLocalTime(value.date);
+            },
+
         },
     }
 
