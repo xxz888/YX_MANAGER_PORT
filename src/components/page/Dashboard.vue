@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-row :gutter="20">
-            <el-col :span="8">
+            <el-col :span="10">
                 <el-card shadow="hover" class="mgb20" style="height:252px;">
                     <div class="user-info">
                         <img src="../../assets/img/img.jpg" class="user-avator" alt="">
@@ -14,6 +14,7 @@
                     <div class="user-info-list">上次登录地点：<span>杭州</span></div>
                 </el-card>
             </el-col>
+
         </el-row>
     </div>
 </template>
@@ -135,8 +136,8 @@
                 }, 300);
             },
             renderChart(){
-                this.$refs.bar.renderChart();
-                this.$refs.line.renderChart();
+                // this.$refs.bar.renderChart();
+                // this.$refs.line.renderChart();
             }
         }
     }

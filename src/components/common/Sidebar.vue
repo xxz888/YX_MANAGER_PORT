@@ -66,27 +66,27 @@
                                 index: '2',
                                 title: '非古'
                             },
-
-                            {
-                                index: '3-2',
-                                title: '三级菜单',
-                                subs: [
-                                    {
-                                        index: 'editor',
-                                        title: '富文本编辑器'
-                                    },
-                                    {
-                                        index: 'markdown',
-                                        title: 'markdown编辑器'
-                                    },
-                                ]
-                            },
                             /*
-                          {
-                              index: 'upload',
-                              title: '文件上传'
-                          }
-                          */
+                                                       {
+                                                           index: '3-2',
+                                                           title: '三级菜单',
+                                                           subs: [
+                                                               {
+                                                                   index: 'editor',
+                                                                   title: '富文本编辑器'
+                                                               },
+                                                               {
+                                                                   index: 'markdown',
+                                                                   title: 'markdown编辑器'
+                                                               },
+                                                           ]
+                                                       },
+
+                                                     {
+                                                         index: 'upload',
+                                                         title: '文件上传'
+                                                     }
+                                                     */
                         ]
                     },
                     /*

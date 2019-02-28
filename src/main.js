@@ -8,6 +8,9 @@ import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
 import './assets/css/icon.css';
 import './components/common/directives';
 import "babel-polyfill";
+import upload_global from './router/upLoadQinNiuYun'
+Vue.prototype.$uploadQiNiuYun = upload_global;
+
 
 Vue.config.productionTip = false
 Vue.use(ElementUI, {

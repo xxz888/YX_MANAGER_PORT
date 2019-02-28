@@ -48,7 +48,6 @@
         methods: {
             //发送验证码
             sendPhoneCode() {
-                console.log(this.ruleForm.username);
                 this.$axios.get('/api/pub/smscode/'+this.ruleForm.username+'/').then(res=>{
                     this.$message({
                         message: '验证码已发送',
@@ -62,7 +61,8 @@
                 this.$axios.post('/api/users/register/',
                     {'mobile':this.ruleForm.username,'sms_code':this.ruleForm.password})
                     .then(res=>{
-                        console.log(res.data.token);
+                        console.log(res.data);
+                        localStorage.setItem('id',res.data.id);
                         localStorage.setItem('token',res.data.token);
                         localStorage.setItem('ms_username',this.ruleForm.username);
                     this.$router.push('/');

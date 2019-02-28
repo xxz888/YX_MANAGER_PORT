@@ -66,14 +66,12 @@
                             </div>
                         </div>
                     </template>
-
                 </el-form-item>
-
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
-            </span>
+                    <el-button @click="editVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="saveEdit">确 定</el-button>
+                </span>
         </el-dialog>
 
         <!-- 删除提示框 -->
@@ -118,7 +116,7 @@
                 imgSrc: p_img,
                 cropImg: '',
                 dialogVisible: false,
-                token:localStorage.getItem('token')
+
             }
         },
         created() {
@@ -144,98 +142,34 @@
             quillEditor
         },
         methods: {
-            // 分页导航
-            handleCurrentChange(val) {
-                this.cur_page = val;
-                this.getData();
-            },
             // 获取 easy-mock 的模拟数据
             getData() {
-                // 开发环境使用 easy-mock 数据，正式环境使用 json 文件
-                if (process.env.NODE_ENV === 'development') {
-                    this.url = '/ms/table/list';
-                };
                 this.$axios.get('/api/pub/advertising/1/',{
                     page: this.cur_page
                 }).then((res) => {
                     this.tableData = res.data;
                 })
             },
-            search() {
-                this.is_search = true;
-            },
-            formatter(row, column) {
-                return row.address;
-            },
-            type_formatter(value){
-                value = value.type;
-                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
-            },
-            photo_formatter(value){
-                console.log(value);
-                value = value.type;
-                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
-            },
-            filterTag(value, row) {
-                return row.tag === value;
-            },
-            handleEdit(index, row) {
-                this.idx = index;
-                const item = this.tableData[index];
-                this.form = {
-                    adver_id: item.id,
-                    adver_type: item.type == 0 ? '推荐' : item.type == 1 ? '雪茄' : item.type == 2 ? '红酒' :'高尔夫',
-                    adver_character: item.character,
-                    adver_photo: item.photo
-
-                }
-                this.editVisible = true;
-            },
-            addnews(){
-                this.form = {
-                    adver_id: "",
-                    adver_type: "雪茄",
-                    adver_character: "",
-                    adver_photo: "",
-
-                }
-                this.editVisible = true;
-            },
-            handleDelete(index, row) {
-                this.idx = index;
-                this.delVisible = true;
-            },
-            delAll() {
-                const length = this.multipleSelection.length;
-                let str = '';
-                this.del_list = this.del_list.concat(this.multipleSelection);
-                for (let i = 0; i < length; i++) {
-                    str += this.multipleSelection[i].name + ' ';
-                }
-                this.$message.error('删除了' + str);
-                this.multipleSelection = [];
-            },
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-            // 保存编辑
+            // 新增和保存编辑，请求
             saveEdit() {
-                var dic = {
-                    'advertising_id':this.form.adver_id,
-                    'photo':'http://pic.58pic.com/58pic/15/68/59/71X58PICNjx_1024.jpg',
-                    'character':this.form.adver_character,
-                    'type_advertising':1,
-                    'type':1
-                };
-                this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
-                        "Authorization":"JWT " + localStorage.getItem('token')
-                    }}).then(res=>{
-                    this.$message.success('修改成功');
-                    this.getData();
-                });
-                this.editVisible = false;
+                this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res) {
+                    var dic = {
+                        'advertising_id':this.form.adver_id,         //广告id(修改/删除传,新增不传)
+                        'photo':res,                                 //广告展示图片
+                        'character':this.form.adver_character,       //广告内容
+                        'type_advertising':1,                        //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
+                        'type':this.form.adver_id.length == 0 ? 2 :1 //操作类型(1/修改，2/新增，3/删除)
+                    };
+                    this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
+                            "Authorization":"JWT " + localStorage.getItem('token')
+                        }}).then(res=>{
+                        this.$message.success(res.msg);
+                        this.getData();
+                    });
+                    this.editVisible = false;
+                })
             },
-            // 确定删除
+            //确定删除,请求
             deleteRow(){
                 var dic = {
                     'advertising_id':this.form.adver_id,
@@ -251,6 +185,57 @@
                     this.getData();
                 });
                 this.delVisible = false;
+            },
+
+
+
+
+
+            //增加按钮，弹出框
+            addnews(){
+                this.form = {
+                    adver_id: "",
+                    adver_type: "雪茄",
+                    adver_character: "",
+                    adver_photo: "",
+                }
+                this.editVisible = true;
+            },
+            //编辑按钮,弹出框
+            handleEdit(index, row) {
+                this.idx = index;
+                const item = this.tableData[index];
+                this.form = {
+                    adver_id: item.id,
+                    adver_type: item.type == 0 ? '推荐' : item.type == 1 ? '雪茄' : item.type == 2 ? '红酒' :'高尔夫',
+                    adver_character: item.character,
+                    adver_photo: item.photo
+                }
+                this.editVisible = true;
+            },
+            //单个删除,弹出框
+            handleDelete(index, row) {
+                this.idx = index;
+                this.delVisible = true;
+            },
+            //全部删除
+            delAll() {
+                this.$message.info('功能开发中');
+            },
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            search() {
+                this.is_search = true;
+            },
+            type_formatter(value){
+                value = value.type;
+                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
+            },
+            photo_formatter(value){
+                console.log(value);
+                value = value.type;
+                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
             },
             setImage(e){
                 const file = e.target.files[0];
@@ -274,9 +259,10 @@
                     message: '图片上传接口上传失败，可更改为自己的服务器接口'
                 });
             },
-    },      getLocalTime(nS) {
+            getLocalTime(nS) {
                 return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
-            }
+            },
+        },
     }
 
 </script>
