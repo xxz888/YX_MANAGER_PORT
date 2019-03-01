@@ -51,7 +51,7 @@
 
 
                 <el-form-item label="广告文字">
-                        <quill-editor   ref="myTextEditor" v-model="form.adver_character" ></quill-editor>
+                        <quill-editor   ref="myTextEditor" v-model="form.adver_character" @change="onEditorChange"></quill-editor>
                 </el-form-item>
                 <el-form-item label="广告图片">
                     <template  slot-scope="scope">
@@ -112,7 +112,8 @@
                 imgSrc: p_img,
                 cropImg: '',
                 dialogVisible: false,
-
+                content:'',
+                base64Array:[],
             }
         },
         created() {
@@ -138,6 +139,11 @@
             quillEditor
         },
         methods: {
+            onEditorChange({ editor, html, text }) {
+                var t = this;
+                t.content = html;
+
+            },
             getData() {
                 this.$axios.get('/api/pub/advertising/1/',{
                     page: this.cur_page
@@ -147,6 +153,42 @@
             },
             // 新增和保存编辑，请求
             saveEdit() {
+                var t = this;
+                t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
+                     t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
+                        var item = {};
+                        item[capture] = res;
+                        t.base64Array.push(item);
+                        for (var i = 0 ; i < t.base64Array.length;i++){
+                            var key = Object.keys(t.base64Array[i])[0];
+                            var value = t.base64Array[i][key];
+                            t.content = t.content.replace(key,value);
+                        }
+                         console.log(t.content);
+                     });
+                });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+                return;
                 this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res) {
                     var dic = {
                         'advertising_id':this.form.adver_id,         //广告id(修改/删除传,新增不传)

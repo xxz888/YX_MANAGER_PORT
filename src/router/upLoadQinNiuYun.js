@@ -45,7 +45,7 @@ function uploadqiniuyun(params,fun) {
                 processData: false,
                 contentType: false
             }).done((res) => {
-                fun(addr+res.key)
+                fun(addr+res.key,key)
             }).fail(function(err) {
                 console.log('error');
             });
