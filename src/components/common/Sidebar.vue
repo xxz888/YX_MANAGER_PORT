@@ -54,7 +54,7 @@
                         title: '资讯列表'
                     },
                     {
-                        icon: 'el-icon-tickets',
+                        icon: 'el-icon-goods',
                         index: 'CigarInfo',
                         title: '雪茄品牌'
                     }

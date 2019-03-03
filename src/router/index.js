@@ -35,6 +35,12 @@ export default new Router({
                     meta: {title: '雪茄品牌'}
                 },
                 {
+                    path: '/CigarDetailsChange',
+                    component: resolve => require(['../components/page/CigarDetailsChange.vue'], resolve),
+                    meta: {title: '雪茄详情修改'}
+                },
+
+                {
                     path: '/dashboard',
                     component: resolve => require(['../components/other/Dashboard.vue'], resolve),
                     meta: { title: '系统首页' }

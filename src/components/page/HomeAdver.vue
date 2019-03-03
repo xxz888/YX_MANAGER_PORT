@@ -88,7 +88,7 @@
     import 'quill/dist/quill.bubble.css';
     import { quillEditor } from 'vue-quill-editor';
     export default {
-        name: 'basetable',
+        name: 'HomeAdver',
         data() {
             return {
                 url: './vuetable.json',

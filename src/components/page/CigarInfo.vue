@@ -34,7 +34,7 @@
                     </el-table-column>
                 <el-table-column  label="详情" width="80" align="center">
                     <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-message" @click="handleEdit(scope.$index, scope.row)">详情</el-button>
+                        <el-button type="primary" round @click="handleDetails(scope.$index, scope.row)">详情</el-button>
                     </template>
                 </el-table-column>
                 <el-table-column label="操作" width="150" align="center">
@@ -266,15 +266,15 @@
                 });
                 this.delVisible = false;
             },
-
-
-
-
-
-
-
-
-
+            handleDetails(index,row){
+                var t = this;
+                this.$router.push({
+                    path:'/CigarDetails',
+                    query:{
+                        'id':t.tableData[index].id
+                    }
+                })
+            },
             //单个删除,弹出框
             handleDelete(index, row) {
                 this.idx = index;
@@ -357,6 +357,9 @@
     }
     .red{
         color: #ff0000;
+    }
+    .green{
+        color: #58B92D;
     }
     .mr10{
         margin-right: 10px;
