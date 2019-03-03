@@ -12,17 +12,16 @@
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
                 <el-button type="success" icon="search" @click="addnews">新增</el-button>
             </div>
-            <el-table :data="data" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+            <el-table v-loading="Loading" :data="data" border tooltip-effect="dark" class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
                 <el-table-column prop="type" label="类型" width="80"align="center"  :formatter = 'type_formatter'>
                 </el-table-column>
-                <el-table-column prop="character" label="广告文字"  align="center">
-                    <template slot-scope="scope">
-                        <p v-html='scope.row.character'></p>
-                    </template>
+                <el-table-column prop="character" show-overflow-tooltip label="广告文字"  align="center">
+
                 </el-table-column>
+
                 <el-table-column prop="photo" label="广告图片" width="150" align="center">
                     <!-- 图片的显示 -->
                     <template  slot-scope="scope">
@@ -39,7 +38,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="60%">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="60%" v-loading = 'editLoading'>
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
                     <el-select v-model="form.type" placeholder="form.type">
@@ -48,13 +47,12 @@
                         <el-option key="2" label="红酒" value="2"></el-option>
                         <el-option key="3" label="高尔夫" value="3"></el-option>
                     </el-select>
-
                 </el-form-item>
-
 
                 <el-form-item label="广告文字">
                         <quill-editor   ref="myTextEditor" v-model="form.character" @change="onEditorChange"></quill-editor>
                 </el-form-item>
+
                 <el-form-item label="广告图片">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
@@ -105,19 +103,22 @@
                 delVisible: false,
                 form: {
                     id: '',
-                    date: '',
-                    address: ''
+                    photo: '',
+                    character: '',
+                    type:''
                 },
                 idx: -1,
                 fileList: [],
-                imgSrc: p_img,
+                imgSrc: '',
                 cropImg: '',
                 dialogVisible: false,
                 content:'',
                 base64Array:[],
                 key:'',
                 capture:'',
-                finishUp:0
+                Loading:'true',
+                editLoading:false,
+
             }
         },
         created() {
@@ -138,44 +139,59 @@
             onEditorChange({html}) {
                 var t = this;
                 t.content = html;
-                t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
-                    t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
-                        t.key = key;
-                        var item = {};
-                        item[capture] = res;
-                        t.base64Array.push(item);
-                        for (var i = 0 ; i < t.base64Array.length;i++){
-                            var key = Object.keys(t.base64Array[i])[0];
-                            var value = t.base64Array[i][key];
-                            t.content = t.content.replace(key,value);
-                        }});
-                })
+                if (html.indexOf('img') != -1){
+                    t.editLoading = true;
+                    t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
+                        t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
+                            t.key = key;
+                            var item = {};
+                            item[capture] = res;
+                            t.base64Array.push(item);
+                            for (var i = 0 ; i < t.base64Array.length;i++){
+                                var key = Object.keys(t.base64Array[i])[0];
+                                var value = t.base64Array[i][key];
+                                t.content = t.content.replace(key,value);
+                            }});
+                        t.editLoading = false;
+                    })
+                }
+
             },
             //请求
             getData() {
+                var t = this;
                 this.$axios.get('/api/pub/advertising/1/',{
                     page: this.cur_page
                 }).then((res) => {
-                    console.log(res);
-                    this.tableData = res.data;
+                    t.Loading = false;
+                    t.tableData = res.data;
                 })
             },
             // 新增和保存编辑，请求
             saveEdit(){
-                this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res) {
-                    var t = this;
-                var dic = {
+                var t = this;
+                t.Loading = true;
+                if (this.imgSrc=''){
+                    t.$message.warning('请上传图片');
+                    return;
+                }else if(this.content.length > 2000){
+                    t.$message.warning('内容字符太长');
+                    return;
+                }
+                this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
+                    var dic = {
                         'advertising_id':t.form.id,          //广告id(修改/删除传,新增不传)
                         'photo':res,                         //广告展示图片
                         'character':t.content,               //广告内容
                         'type_advertising':1,                //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
                         'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
-                        'key':t.key                          //七牛key
+                        'qiniu_key':key                          //七牛key
                     };
                     console.log(dic);
                     t.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then(res=>{
+                        t.Loading = false;
                         t.$message.success(res.data.message);
                         t.getData();
                     });
@@ -184,19 +200,22 @@
             },
             //确定删除,请求
             deleteRow(){
+                var t = this;
+                t.Loading = true;
                 var dic = {
-                    'advertising_id':t.form.id,          //广告id(修改/删除传,新增不传)
+                    'advertising_id':this.tableData[this.idx].id,          //广告id(修改/删除传,新增不传)
                     'photo':'',                //广告展示图片
                     'character':'',               //广告内容
                     'type_advertising':1,                //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
                     'type':'3',                          //操作类型(1/修改，2/新增，3/删除)
-                    'key':t.key                          //七牛key
+                    'qiniu_key':''                         //七牛key
                 };
                 this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    this.$message.success('删除成功');
-                    this.getData();
+                    t.Loading = false;
+                    t.$message.success(res.data.msg);
+                    t.getData();
                 });
                 this.delVisible = false;
             },

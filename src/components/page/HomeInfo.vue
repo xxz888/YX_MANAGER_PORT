@@ -14,7 +14,7 @@
 
             </div>
             <el-table :data="data"  tooltip-effect="dark"
-                      border  class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+                      border v-loading="Loading" class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
@@ -34,11 +34,6 @@
                         <img :src="scope.row.photo"  width="120" height="70" class="pre-img"/>
                     </template>
                 </el-table-column>
-                <el-table-column label="详情" width="80" align="center">
-                    <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-message" @click="handleEdit(scope.$index, scope.row)">详情</el-button>
-                    </template>
-                </el-table-column>
                 <el-table-column label="操作" width="150" align="center">
                     <template slot-scope="scope">
                         <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -49,7 +44,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="60%">
+        <el-dialog title="编辑" v-loading='editLoading' :visible.sync="editVisible" width="60%">
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
                     <el-select v-model="form.type" placeholder="form.type">
@@ -64,9 +59,6 @@
                 </el-form-item>
                 <el-form-item label="作者">
                     <el-input v-model="form.author"></el-input>
-                </el-form-item>
-                <el-form-item label="时间">
-                    <el-date-picker type="date" placeholder="选择日期" v-model="form.date"  value-format="yyyy/MM/dd hh:mm:ss" style="width: 100%;"></el-date-picker>
                 </el-form-item>
                 <el-form-item label="详情">
                     <quill-editor   ref="myTextEditor" v-model="form.details" @change="onEditorChange"></quill-editor>
@@ -123,15 +115,23 @@ import { quillEditor } from 'vue-quill-editor';
                 editVisible: false,
                 delVisible: false,
                 form: {
-                    name: '',
-                    date: '',
-                    address: ''
+                    id: '',
+                    photo: '',
+                    title: '',
+                    type:'',
+                    author:'',
+                    date:'',
+                    details:''
                 },
                 idx: -1,
                 fileList: [],
                 imgSrc: p_img,
                 cropImg: '',
                 dialogVisible: false,
+                Loading:true,
+                editLoading:false,
+                item:'',
+                base64Array:[]
             }
         },
         created() {
@@ -152,24 +152,31 @@ import { quillEditor } from 'vue-quill-editor';
                 this.$axios.get('/api/pub/information/1/', {
                     page: this.cur_page
                 }).then((res) => {
+                    this.Loading = false;
                     this.tableData = res.data;
+                    console.log(this.tableData);
                 })
             },
+            //动态改变富文本
             onEditorChange({html}) {
                 var t = this;
                 t.content = html;
-                t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
-                    t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
-                        t.key = key;
-                        var item = {};
-                        item[capture] = res;
-                        t.base64Array.push(item);
-                        for (var i = 0 ; i < t.base64Array.length;i++){
-                            var key = Object.keys(t.base64Array[i])[0];
-                            var value = t.base64Array[i][key];
-                            t.content = t.content.replace(key,value);
-                        }});
-                })
+                if (html.indexOf('img') != -1){
+                    t.editLoading = true;
+                    t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
+                        t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
+                            t.key = key;
+                            t.item = {};
+                            t.item[capture] = res;
+                            t.base64Array.push(t.item);
+                            for (var i = 0 ; i < t.base64Array.length;i++){
+                                var key = Object.keys(t.base64Array[i])[0];
+                                var value = t.base64Array[i][key];
+                                t.content = t.content.replace(key,value);
+                            }});
+                        t.editLoading = false;
+                    })
+                }
             },
             //编辑按钮,弹出框
             handleEdit(index, row) {
@@ -203,8 +210,16 @@ import { quillEditor } from 'vue-quill-editor';
 
             // 新增和保存编辑，请求
             saveEdit() {
-                var t  = this;
-                this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res) {
+                var t = this;
+                if (t.imgSrc=''){
+                    t.$message.warning('请上传图片');
+                    return;
+                }else if(t.content.length > 2000){
+                    t.$message.warning('内容字符太长');
+                    return;
+                }
+                t.Loading = true;
+                t.$uploadQiNiuYun.uploadqiniuyun(t.imgSrc,function (res,key) {
                     var dic = {
                         'information_id':t.form.id,             //资讯id(修改/删除传,新增不传)
                         'photo':res,                            //资讯展示图片
@@ -212,12 +227,14 @@ import { quillEditor } from 'vue-quill-editor';
                         'type_information':'1',                 //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
                         'author':t.form.title,                  //作者
                         'details':t.content,                    //资讯详情
-                        'type':t.form.id.length == 0 ? 2 :1     //操作类型(1/修改，2/新增，3/删除)
+                        'type':t.form.id.length == 0 ? 2 :1,     //操作类型(1/修改，2/新增，3/删除)
+                        'qiniu_key':key
                     };
                     t.$axios.post('/api/pub/information/6/',dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then(res=>{
-                        t.$message.success(res.msg);
+                        t.Loading = false;
+                        t.$message.success(res.data.message);
                         t.getData();
                     });
                     t.editVisible = false;
@@ -225,20 +242,24 @@ import { quillEditor } from 'vue-quill-editor';
             },
             //确定删除,请求
             deleteRow(){
+                var t = this;
+                t.Loading = true;
                 var dic = {
-                    'information_id':t.form.id,          //资讯id(修改/删除传,新增不传)
+                    'information_id':t.tableData[t.idx].id,          //资讯id(修改/删除传,新增不传)
                     'photo':'',                            //资讯展示图片
                     'title':'',                //资讯标题
                     'type_information':'1',                 //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
                     'author':'',               //作者
-                    'details':t.content,            //资讯详情
-                    'type':'3'  //操作类型(1/修改，2/新增，3/删除)
+                    'details':'',            //资讯详情
+                    'type':'3',  //操作类型(1/修改，2/新增，3/删除)
+                    'qiniu_key':t.tableData[t.idx].photo.split('http://photo.thegdlife.com/')[1]
                 };
-                this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
+                this.$axios.post('/api/pub/information/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    this.$message.success('删除成功');
-                    this.getData();
+                    t.Loading = false;
+                    t.$message.success(res.data.message);
+                    t.getData();
                 });
                 this.delVisible = false;
             },

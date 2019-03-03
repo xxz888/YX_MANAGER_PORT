@@ -27,12 +27,12 @@ export default new Router({
                 {
                     path: '/CigarDetails',
                     component: resolve => require(['../components/page/CigarDetails.vue'], resolve),
-                    meta: {title: '雪茄品牌'}
+                    meta: {title: '雪茄详情'}
                 },
                 {
                     path: '/CigarInfo',
                     component: resolve => require(['../components/page/CigarInfo.vue'], resolve),
-                    meta: {title: '雪茄详情'}
+                    meta: {title: '雪茄品牌'}
                 },
                 {
                     path: '/dashboard',
