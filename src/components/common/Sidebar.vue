@@ -45,49 +45,51 @@
                     },
                     {
                         icon: 'el-icon-lx-cascades',
-                        index: 'adver',
+                        index: 'HomeAdver',
                         title: '广告列表'
                     },
                     {
                         icon: 'el-icon-lx-copy',
-                        index: 'infor',
+                        index: 'HomeInfo',
                         title: '资讯列表'
                     },
                     {
-                        icon: 'el-icon-lx-favor',
-                        index: '3',
-                        title: '雪茄相关',
-                        subs: [
-                            {
-                                index: '1',
-                                title: '古巴'
-                            },
-                            {
-                                index: '2',
-                                title: '非古'
-                            },
-                            /*
-                                                       {
-                                                           index: '3-2',
-                                                           title: '三级菜单',
-                                                           subs: [
-                                                               {
-                                                                   index: 'editor',
-                                                                   title: '富文本编辑器'
-                                                               },
-                                                               {
-                                                                   index: 'markdown',
-                                                                   title: 'markdown编辑器'
-                                                               },
-                                                           ]
-                                                       },
+                        icon: 'el-icon-tickets',
+                        index: 'CigarInfo',
+                        title: '雪茄品牌'
+                    /*
+                    subs: [
+                     {
+                         index: '1',
+                         title: '古巴'
+                     },
+                     {
+                         index: '2',
+                         title: '非古'
+                     },
 
-                                                     {
-                                                         index: 'upload',
-                                                         title: '文件上传'
-                                                     }
-                                                     */
+                                                {
+                                                    index: '3-2',
+                                                    title: '三级菜单',
+                                                    subs: [
+                                                        {
+                                                            index: 'editor',
+                                                            title: '富文本编辑器'
+                                                        },
+                                                        {
+                                                            index: 'markdown',
+                                                            title: 'markdown编辑器'
+                                                        },
+                                                    ]
+                                                },
+
+                                              {
+                                                  index: 'upload',
+                                                  title: '文件上传'
+                                              }
+
                         ]
+                           */
                     },
                     /*
                     {

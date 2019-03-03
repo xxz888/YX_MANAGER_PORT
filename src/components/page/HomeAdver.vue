@@ -11,23 +11,25 @@
                 <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
                 <el-button type="success" icon="search" @click="addnews">新增</el-button>
-
             </div>
             <el-table :data="data" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="id" label="广告ID"  width="80">
+                <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
-                <el-table-column prop="type" label="广告类型" width="100" :formatter = 'type_formatter'>
+                <el-table-column prop="type" label="类型" width="80"align="center"  :formatter = 'type_formatter'>
                 </el-table-column>
-                <el-table-column prop="character" label="广告文字" width="300">
-            </el-table-column>
-                <el-table-column prop="photo" label="广告图片" >
+                <el-table-column prop="character" label="广告文字"  align="center">
+                    <template slot-scope="scope">
+                        <p v-html='scope.row.character'></p>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="photo" label="广告图片" width="150" align="center">
                     <!-- 图片的显示 -->
                     <template  slot-scope="scope">
                         <img :src="scope.row.photo"  width="120" height="70" class="pre-img"/>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column label="操作" width="180" align="center" >
                     <template slot-scope="scope">
                         <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                         <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -40,7 +42,7 @@
         <el-dialog title="编辑" :visible.sync="editVisible" width="60%">
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
-                    <el-select v-model="form.adver_type" placeholder="form.adver_type">
+                    <el-select v-model="form.type" placeholder="form.type">
                         <el-option key="0" label="推荐" value="0"></el-option>
                         <el-option key="1" label="雪茄" value="1"></el-option>
                         <el-option key="2" label="红酒" value="2"></el-option>
@@ -51,12 +53,12 @@
 
 
                 <el-form-item label="广告文字">
-                        <quill-editor   ref="myTextEditor" v-model="form.adver_character" @change="onEditorChange"></quill-editor>
+                        <quill-editor   ref="myTextEditor" v-model="form.character" @change="onEditorChange"></quill-editor>
                 </el-form-item>
                 <el-form-item label="广告图片">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
-                            <img :src="imgSrc" v-model="form.adver_photo" class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
+                            <img :src="imgSrc" v-model="form.photo" class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
                             <div class="crop-demo-btn">选择图片
                                 <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
                             </div>
@@ -101,9 +103,8 @@
                 is_search: false,
                 editVisible: false,
                 delVisible: false,
-                adver_type_items:['推荐','雪茄','红酒','高尔夫'],
                 form: {
-                    name: '',
+                    id: '',
                     date: '',
                     address: ''
                 },
@@ -114,6 +115,9 @@
                 dialogVisible: false,
                 content:'',
                 base64Array:[],
+                key:'',
+                capture:'',
+                finishUp:0
             }
         },
         created() {
@@ -122,16 +126,7 @@
         computed: {
             data() {
                 return this.tableData.filter((d) => {
-                    let is_del = false;
-                    for (let i = 0; i < this.del_list.length; i++) {
-                        if (d.name === this.del_list[i].name) {
-                            is_del = true;
-                            break;
-                        }
-                    }
-                    if (!is_del) {
-                        return d;
-                    }
+                    return d;
                 })
             }
         },
@@ -139,23 +134,13 @@
             quillEditor
         },
         methods: {
-            onEditorChange({ editor, html, text }) {
+            //动态改变富文本
+            onEditorChange({html}) {
                 var t = this;
                 t.content = html;
-
-            },
-            getData() {
-                this.$axios.get('/api/pub/advertising/1/',{
-                    page: this.cur_page
-                }).then((res) => {
-                    this.tableData = res.data;
-                })
-            },
-            // 新增和保存编辑，请求
-            saveEdit() {
-                var t = this;
                 t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
-                     t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
+                    t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
+                        t.key = key;
                         var item = {};
                         item[capture] = res;
                         t.base64Array.push(item);
@@ -163,57 +148,49 @@
                             var key = Object.keys(t.base64Array[i])[0];
                             var value = t.base64Array[i][key];
                             t.content = t.content.replace(key,value);
-                        }
-                         console.log(t.content);
-                     });
-                });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                return;
+                        }});
+                })
+            },
+            //请求
+            getData() {
+                this.$axios.get('/api/pub/advertising/1/',{
+                    page: this.cur_page
+                }).then((res) => {
+                    console.log(res);
+                    this.tableData = res.data;
+                })
+            },
+            // 新增和保存编辑，请求
+            saveEdit(){
                 this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res) {
-                    var dic = {
-                        'advertising_id':this.form.adver_id,         //广告id(修改/删除传,新增不传)
-                        'photo':res,                                 //广告展示图片
-                        'character':this.form.adver_character,       //广告内容
-                        'type_advertising':1,                        //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
-                        'type':this.form.adver_id.length == 0 ? 2 :1 //操作类型(1/修改，2/新增，3/删除)
+                    var t = this;
+                var dic = {
+                        'advertising_id':t.form.id,          //广告id(修改/删除传,新增不传)
+                        'photo':res,                         //广告展示图片
+                        'character':t.content,               //广告内容
+                        'type_advertising':1,                //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
+                        'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
+                        'key':t.key                          //七牛key
                     };
-                    this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
+                    console.log(dic);
+                    t.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then(res=>{
-                        this.$message.success(res.msg);
-                        this.getData();
+                        t.$message.success(res.data.message);
+                        t.getData();
                     });
-                    this.editVisible = false;
+                    t.editVisible = false;
                 })
             },
             //确定删除,请求
             deleteRow(){
                 var dic = {
-                    'advertising_id':this.form.adver_id,
-                    'photo':'',
-                    'character':'',
-                    'type_advertising':'',
-                    'type':3
+                    'advertising_id':t.form.id,          //广告id(修改/删除传,新增不传)
+                    'photo':'',                //广告展示图片
+                    'character':'',               //广告内容
+                    'type_advertising':1,                //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
+                    'type':'3',                          //操作类型(1/修改，2/新增，3/删除)
+                    'key':t.key                          //七牛key
                 };
                 this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
@@ -231,10 +208,10 @@
             //增加按钮，弹出框
             addnews(){
                 this.form = {
-                    adver_id: "",
-                    adver_type: "雪茄",
-                    adver_character: "",
-                    adver_photo: "",
+                    id: "",
+                    type: "雪茄",
+                    character: "",
+                    photo: "",
                 }
                 this.editVisible = true;
             },
@@ -243,10 +220,10 @@
                 this.idx = index;
                 const item = this.tableData[index];
                 this.form = {
-                    adver_id: item.id,
-                    adver_type: item.type == 0 ? '推荐' : item.type == 1 ? '雪茄' : item.type == 2 ? '红酒' :'高尔夫',
-                    adver_character: item.character,
-                    adver_photo: item.photo
+                    id: item.id,
+                    type: item.type == 0 ? '推荐' : item.type == 1 ? '雪茄' : item.type == 2 ? '红酒' :'高尔夫',
+                    character: item.character,
+                    photo: item.photo
                 }
                 this.editVisible = true;
             },

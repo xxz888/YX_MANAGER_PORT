@@ -16,25 +16,30 @@
             <el-table :data="data"  tooltip-effect="dark"
                       border  class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="id" label="资讯ID"  width="80">
+                <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
-                <el-table-column prop="type" label="资讯类型" width="100" :formatter = 'type_formatter'>
+                <el-table-column prop="type" label="类型" width="80" align="center" :formatter = 'type_formatter'>
                 </el-table-column>
-                <el-table-column prop="title" label="标题" width="100">
+                <el-table-column prop="title" label="标题" width="150" align="center">
                 </el-table-column>
-                <el-table-column prop="author" label="作者" width="100">
+                <el-table-column prop="author" label="作者" width="80" align="center">
                 </el-table-column>
-                <el-table-column prop="date" label="发布时间戳" width="100" :formatter = 'data_formatter'>
+                <el-table-column prop="date" label="时间" width="100" align="center":formatter = 'data_formatter'>
                 </el-table-column>
-                <el-table-column prop="details" show-overflow-tooltip label="详情" width="200" >
+                <el-table-column prop="details" show-overflow-tooltip  align="center" label="详情"  >
                 </el-table-column>
-                <el-table-column prop="photo" label="展示图" >
+                <el-table-column prop="photo" label="展示图" align="center" width="150">
                     <!-- 图片的显示 -->
                     <template  slot-scope="scope">
                         <img :src="scope.row.photo"  width="120" height="70" class="pre-img"/>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="180" align="center">
+                <el-table-column label="详情" width="80" align="center">
+                    <template slot-scope="scope">
+                        <el-button type="text" icon="el-icon-message" @click="handleEdit(scope.$index, scope.row)">详情</el-button>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="150" align="center">
                     <template slot-scope="scope">
                         <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                         <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -54,17 +59,17 @@
                         <el-option key="3" label="高尔夫" value="3"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="作者">
-                    <el-input v-model="form.author"></el-input>
-                </el-form-item>
                 <el-form-item label="标题">
                     <el-input v-model="form.title"></el-input>
+                </el-form-item>
+                <el-form-item label="作者">
+                    <el-input v-model="form.author"></el-input>
                 </el-form-item>
                 <el-form-item label="时间">
                     <el-date-picker type="date" placeholder="选择日期" v-model="form.date"  value-format="yyyy/MM/dd hh:mm:ss" style="width: 100%;"></el-date-picker>
                 </el-form-item>
-                <el-form-item label="详情" >
-                    <quill-editor   ref="myTextEditor" v-model="form.details" :options="editorOption"></quill-editor>
+                <el-form-item label="详情">
+                    <quill-editor   ref="myTextEditor" v-model="form.details" @change="onEditorChange"></quill-editor>
                 </el-form-item>
                 <el-form-item label="展示图">
                     <template  slot-scope="scope">
@@ -135,16 +140,7 @@ import { quillEditor } from 'vue-quill-editor';
         computed: {
             data() {
                 return this.tableData.filter((d) => {
-                    let is_del = false;
-                    for (let i = 0; i < this.del_list.length; i++) {
-                        if (d.name === this.del_list[i].name) {
-                            is_del = true;
-                            break;
-                        }
-                    }
-                    if (!is_del) {
-                        return d;
-                    }
+                    return d;
                 })
             }
         },
@@ -157,6 +153,22 @@ import { quillEditor } from 'vue-quill-editor';
                     page: this.cur_page
                 }).then((res) => {
                     this.tableData = res.data;
+                })
+            },
+            onEditorChange({html}) {
+                var t = this;
+                t.content = html;
+                t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
+                    t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
+                        t.key = key;
+                        var item = {};
+                        item[capture] = res;
+                        t.base64Array.push(item);
+                        for (var i = 0 ; i < t.base64Array.length;i++){
+                            var key = Object.keys(t.base64Array[i])[0];
+                            var value = t.base64Array[i][key];
+                            t.content = t.content.replace(key,value);
+                        }});
                 })
             },
             //编辑按钮,弹出框
@@ -191,33 +203,36 @@ import { quillEditor } from 'vue-quill-editor';
 
             // 新增和保存编辑，请求
             saveEdit() {
+                var t  = this;
                 this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res) {
                     var dic = {
-                        'information_id':this.form.id,          //资讯id(修改/删除传,新增不传)
+                        'information_id':t.form.id,             //资讯id(修改/删除传,新增不传)
                         'photo':res,                            //资讯展示图片
-                        'title':this.form.title,                //资讯标题
+                        'title':t.form.title,                   //资讯标题
                         'type_information':'1',                 //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
-                        'author':this.form.title,               //作者
-                        'details':this.form.details,            //资讯详情
-                        'type':this.form.id.length == 0 ? 2 :1  //操作类型(1/修改，2/新增，3/删除)
+                        'author':t.form.title,                  //作者
+                        'details':t.content,                    //资讯详情
+                        'type':t.form.id.length == 0 ? 2 :1     //操作类型(1/修改，2/新增，3/删除)
                     };
-                    this.$axios.post('/api/pub/information/6/',dic,{headers:{
+                    t.$axios.post('/api/pub/information/6/',dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then(res=>{
-                        this.$message.success(res.msg);
-                        this.getData();
+                        t.$message.success(res.msg);
+                        t.getData();
                     });
-                    this.editVisible = false;
+                    t.editVisible = false;
                 })
             },
             //确定删除,请求
             deleteRow(){
                 var dic = {
-                    'advertising_id':this.form.adver_id,
-                    'photo':'',
-                    'character':'',
-                    'type_advertising':'',
-                    'type':3
+                    'information_id':t.form.id,          //资讯id(修改/删除传,新增不传)
+                    'photo':'',                            //资讯展示图片
+                    'title':'',                //资讯标题
+                    'type_information':'1',                 //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
+                    'author':'',               //作者
+                    'details':t.content,            //资讯详情
+                    'type':'3'  //操作类型(1/修改，2/新增，3/删除)
                 };
                 this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
