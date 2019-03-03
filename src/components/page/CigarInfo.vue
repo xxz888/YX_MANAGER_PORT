@@ -51,22 +51,20 @@
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
                     <el-select v-model="form.type" placeholder="form.type">
-                        <el-option key="0" label="推荐" value="0"></el-option>
-                        <el-option key="1" label="雪茄" value="1"></el-option>
-                        <el-option key="2" label="红酒" value="2"></el-option>
-                        <el-option key="3" label="高尔夫" value="3"></el-option>
+                        <el-option key="1" label="古巴" value="1"></el-option>
+                        <el-option key="2" label="非古" value="2"></el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item label="标题">
-                    <el-input v-model="form.title"></el-input>
+                <el-form-item label="雪茄名">
+                    <el-input v-model="form.cigar_brand"></el-input>
                 </el-form-item>
-                <el-form-item label="作者">
-                    <el-input v-model="form.author"></el-input>
+                <el-form-item label="热门">
+                    <el-checkbox v-model="checked">热门</el-checkbox>
                 </el-form-item>
                 <el-form-item label="详情">
-                    <quill-editor   ref="myTextEditor" v-model="form.details" @change="onEditorChange"></quill-editor>
+                    <quill-editor   ref="myTextEditor" v-model="form.intro" @change="onEditorChange"></quill-editor>
                 </el-form-item>
-                <el-form-item label="展示图">
+                <el-form-item label="品牌logo">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
                             <img :src="imgSrc" v-model="form.photo" class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
@@ -97,14 +95,13 @@
 </template>
 
 <script>
-    import p_img from '../../assets/img/img.jpg'
     import 'quill/dist/quill.core.css';
     import 'quill/dist/quill.snow.css';
     import 'quill/dist/quill.bubble.css';
     import { quillEditor } from 'vue-quill-editor';
 
     export default {
-        name: '雪茄品牌',
+        name: 'CigarInfo',
         data() {
             return {
                 url: './vuetable.json',
@@ -118,15 +115,21 @@
                 editVisible: false,
                 delVisible: false,
                 form: {
-                    name: '',
-                    date: '',
-                    address: ''
+                    id: '',
+                    cigar_brand: '',
+                    photo: '',
+                    intro: '',
+                    concern_number: '',
+                    sort: '',
+                    is_concern: ''
                 },
                 idx: -1,
                 fileList: [],
-                imgSrc: p_img,
+                imgSrc: '',
                 cropImg: '',
                 dialogVisible: false,
+                checked:true,
+                base64Array:[]
             }
         },
         created() {
@@ -157,6 +160,7 @@
                             }
                         }
                     }
+                    console.log(res);
                     this.tableData = arr1;
                 })
             },
@@ -183,11 +187,10 @@
                 this.form = {
                     id: item.id,
                     photo: item.photo,
-                    title: item.title,
-                    type: item.type == 0 ? '推荐' : item.type == 1 ? '雪茄' : item.type == 2 ? '红酒' :'高尔夫',
-                    author: item.author,
-                    date: this.getLocalTime(item.date),
-                    details: item.details,
+                    cigar_brand:item.cigar_brand,
+                    intro:item.intro,
+                    concern_number:item.concern_number,
+                    type:item.type
                 }
                 this.editVisible = true;
             },
@@ -195,34 +198,46 @@
             addnews(){
                 this.form = {
                     id: '',
-                    photo: p_img,
+                    photo: '',
                     title: '',
-                    type:  '雪茄',
+                    type:  '古巴',
                     author: '',
                     date: new Date(),
                     details: '',
+
 
                 }
                 this.editVisible = true;
             },
 
             // 新增和保存编辑，请求
-            saveEdit() {
-                var t  = this;
-                this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res) {
+            saveEdit(){
+                var t = this;
+                t.Loading = true;
+                if (this.imgSrc=''){
+                    t.$message.warning('请上传图片');
+                    return;
+                }else if(this.content.length > 2000){
+                    t.$message.warning('内容字符太长');
+                    return;
+                }
+                this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
                     var dic = {
-                        'information_id':t.form.id,             //资讯id(修改/删除传,新增不传)
-                        'photo':res,                            //资讯展示图片
-                        'title':t.form.title,                   //资讯标题
-                        'type_information':'1',                 //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
-                        'author':t.form.title,                  //作者
-                        'details':t.content,                    //资讯详情
-                        'type':t.form.id.length == 0 ? 2 :1     //操作类型(1/修改，2/新增，3/删除)
+                        'cigar_brand_id':t.form.id,          //广告id(修改/删除传,新增不传)
+                        'cigar_brand':t.form.cigar_brand,
+                        'photo':res,                         //广告展示图片
+                        'type_cigar_brand':'1',
+                        'is_hot':t.checked?'1':'0',
+                        'intro':t.content,               //广告内容
+                        'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
+                        'qiniu_key':key                          //七牛key
                     };
-                    t.$axios.post('/api/pub/information/6/',dic,{headers:{
+                    console.log(dic);
+                    t.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then(res=>{
-                        t.$message.success(res.msg);
+                        t.Loading = false;
+                        t.$message.success(res.data.message);
                         t.getData();
                     });
                     t.editVisible = false;
@@ -230,20 +245,24 @@
             },
             //确定删除,请求
             deleteRow(){
+                var t = this;
+                t.Loading = true;
                 var dic = {
-                    'information_id':t.form.id,          //资讯id(修改/删除传,新增不传)
-                    'photo':'',                            //资讯展示图片
-                    'title':'',                //资讯标题
-                    'type_information':'1',                 //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
-                    'author':'',               //作者
-                    'details':t.content,            //资讯详情
-                    'type':'3'  //操作类型(1/修改，2/新增，3/删除)
+                    'cigar_brand_id':this.tableData[this.idx].id,   //广告id(修改/删除传,新增不传)
+                    'cigar_brand':'',
+                    'photo':'',                         //广告展示图片
+                    'type_cigar_brand':'1',
+                    'is_hot':'',
+                    'intro':'',               //广告内容
+                    'type':'3', //操作类型(1/修改，2/新增，3/删除)
+                    'qiniu_key':t.tableData[t.idx].photo.split('http://photo.thegdlife.com/')[1]                          //七牛key
                 };
-                this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
+                this.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    this.$message.success('删除成功');
-                    this.getData();
+                    t.Loading = false;
+                    t.$message.success(res.data.message);
+                    t.getData();
                 });
                 this.delVisible = false;
             },
