@@ -18,7 +18,7 @@
                 </el-table-column>
                 <el-table-column prop="type" label="类型" width="80"align="center"  :formatter = 'type_formatter'>
                 </el-table-column>
-                <el-table-column prop="character" show-overflow-tooltip label="广告文字"  align="center">
+                <el-table-column prop="character" v-html="character" show-overflow-tooltip label="广告文字"  align="center">
 
                 </el-table-column>
 
@@ -56,7 +56,7 @@
                 <el-form-item label="广告图片">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
-                            <img :src="imgSrc" v-model="form.photo" class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
+                            <img :src="imgSrc" class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
                             <div class="crop-demo-btn">选择图片
                                 <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
                             </div>
@@ -171,32 +171,39 @@
             saveEdit(){
                 var t = this;
                 t.Loading = true;
-                if (this.imgSrc=''){
+                if (this.imgSrc.length == 0){
                     t.$message.warning('请上传图片');
                     return;
                 }else if(this.content.length > 2000){
                     t.$message.warning('内容字符太长');
                     return;
                 }
-                this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                    var dic = {
-                        'advertising_id':t.form.id,          //广告id(修改/删除传,新增不传)
-                        'photo':res,                         //广告展示图片
-                        'character':t.content,               //广告内容
-                        'type_advertising':1,                //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
-                        'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
-                        'qiniu_key':key                          //七牛key
-                    };
-                    console.log(dic);
-                    t.$axios.post('/api/pub/advertising/6/',dic,{headers:{
-                            "Authorization":"JWT " + localStorage.getItem('token')
-                        }}).then(res=>{
-                        t.Loading = false;
-                        t.$message.success(res.data.message);
-                        t.getData();
-                    });
-                    t.editVisible = false;
-                })
+                if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
+                    this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
+                        t.saveAndEditCommon(res,key);
+                    })
+                }else{
+                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
+                }
+            },
+            saveAndEditCommon(photo_res,key){
+                var t = this;
+                var dic = {
+                    'advertising_id':t.form.id,          //广告id(修改/删除传,新增不传)
+                    'photo':photo_res,                         //广告展示图片
+                    'character':t.content,               //广告内容
+                    'type_advertising':1,                //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
+                    'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
+                    'qiniu_key':key                          //七牛key
+                };
+                t.$axios.post('/api/pub/advertising/6/',dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then(res=>{
+                    t.Loading = false;
+                    t.$message.success(res.data.message);
+                    t.getData();
+                });
+                t.editVisible = false;
             },
             //确定删除,请求
             deleteRow(){
@@ -214,7 +221,7 @@
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     t.Loading = false;
-                    t.$message.success(res.data.msg);
+                    t.$message.success(res.data.message);
                     t.getData();
                 });
                 this.delVisible = false;
@@ -244,6 +251,8 @@
                     character: item.character,
                     photo: item.photo
                 }
+                this.imgSrc = item.photo;
+                this.content = item.character;
                 this.editVisible = true;
             },
             //单个删除,弹出框
@@ -276,10 +285,11 @@
                     return;
                 }
                 const reader = new FileReader();
+                var t = this;
                 reader.onload = (event) => {
-                    this.dialogVisible = true;
-                    this.imgSrc = event.target.result;
-                    this.$refs.cropper && this.$refs.cropper.replace(event.target.result);
+                    t.dialogVisible = true;
+                    t.imgSrc = event.target.result;
+                    t.$refs.cropper && this.$refs.cropper.replace(event.target.result);
                 };
                 reader.readAsDataURL(file);
             },

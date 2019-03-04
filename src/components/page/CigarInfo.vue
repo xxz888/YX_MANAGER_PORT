@@ -128,7 +128,7 @@
                 imgSrc: '',
                 cropImg: '',
                 dialogVisible: false,
-                checked:true,
+                checked:'',
                 base64Array:[]
             }
         },
@@ -190,8 +190,11 @@
                     cigar_brand:item.cigar_brand,
                     intro:item.intro,
                     concern_number:item.concern_number,
-                    type:item.type
+                    type:  '古巴',
                 }
+                this.checked = item.is_hot == '是' ? true : false;
+                this.content = item.intro;
+                this.imgSrc = item.photo;
                 this.editVisible = true;
             },
             //增加按钮，弹出框
@@ -214,36 +217,44 @@
             saveEdit(){
                 var t = this;
                 t.Loading = true;
-                if (this.imgSrc=''){
+                if (this.imgSrc.length == 0){
                     t.$message.warning('请上传图片');
                     return;
                 }else if(this.content.length > 2000){
                     t.$message.warning('内容字符太长');
                     return;
                 }
-                this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                    var dic = {
-                        'cigar_brand_id':t.form.id,          //广告id(修改/删除传,新增不传)
-                        'cigar_brand':t.form.cigar_brand,
-                        'photo':res,                         //广告展示图片
-                        'type_cigar_brand':'1',
-                        'is_hot':t.checked?'1':'0',
-                        'intro':t.content,               //广告内容
-                        'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
-                        'qiniu_key':key                          //七牛key
-                    };
-                    console.log(dic);
-                    t.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
-                            "Authorization":"JWT " + localStorage.getItem('token')
-                        }}).then(res=>{
-                        t.Loading = false;
-                        t.$message.success(res.data.message);
-                        t.getData();
-                    });
-                    t.editVisible = false;
-                })
+                if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
+                    this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
+                        t.saveAndEditCommon(res,key);
+                    })
+                }else{
+                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
+                }
             },
-            //确定删除,请求
+            saveAndEditCommon(res,key) {
+                var t = this;
+                var dic = {
+                    'cigar_brand_id':t.form.id,          //广告id(修改/删除传,新增不传)
+                    'cigar_brand':t.form.cigar_brand,
+                    'photo':res,                         //广告展示图片
+                    'type_cigar_brand':'1',
+                    'is_hot':t.checked?'1':'0',
+                    'intro':t.content,               //广告内容
+                    'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
+                    'qiniu_key':key                          //七牛key
+                };
+                console.log(dic);
+                t.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then(res=>{
+                    t.Loading = false;
+                    t.$message.success(res.data.message);
+                    t.getData();
+                });
+                t.editVisible = false;
+            },
+                //确定删除,请求
             deleteRow(){
                 var t = this;
                 t.Loading = true;
@@ -271,7 +282,8 @@
                 this.$router.push({
                     path:'/CigarDetails',
                     query:{
-                        'id':t.tableData[index].id
+                        'id':t.tableData[index].id,
+                        'cigar_name':t.tableData[index].cigar_brand
                     }
                 })
             },
@@ -296,10 +308,11 @@
                     return;
                 }
                 const reader = new FileReader();
+                var t = this;
                 reader.onload = (event) => {
-                    this.dialogVisible = true;
-                    this.imgSrc = event.target.result;
-                    this.$refs.cropper && this.$refs.cropper.replace(event.target.result);
+                    t.dialogVisible = true;
+                    t.imgSrc = event.target.result;
+                    t.$refs.cropper && this.$refs.cropper.replace(event.target.result);
                 };
                 reader.readAsDataURL(file);
             },

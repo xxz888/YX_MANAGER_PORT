@@ -21,7 +21,6 @@
                 <div class="login-btn">
                     <el-button type="primary" @click="submitForm('ruleForm')">登录</el-button>
                 </div>
-                <p class="login-tips">Tips : 用户名和密码随便填。</p>
             </el-form>
         </div>
     </div>
@@ -61,11 +60,15 @@
                 this.$axios.post('/api/users/register/',
                     {'mobile':this.ruleForm.username,'sms_code':this.ruleForm.password})
                     .then(res=>{
-                        console.log(res.data);
-                        localStorage.setItem('id',res.data.id);
-                        localStorage.setItem('token',res.data.token);
-                        localStorage.setItem('ms_username',this.ruleForm.username);
-                    this.$router.push('/');
+                        if (res.data.id){
+                            localStorage.setItem('id',res.data.id);
+                            localStorage.setItem('token',res.data.token);
+                            localStorage.setItem('ms_username',this.ruleForm.username);
+                            this.$router.push('/');
+                        }else {
+                            this.$message.warning(res.data.message);
+                        }
+
                 })
             }
         }

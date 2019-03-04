@@ -191,6 +191,8 @@ import { quillEditor } from 'vue-quill-editor';
                     date: this.getLocalTime(item.date),
                     details: item.details,
                 }
+                this.imgSrc = item.photo;
+                this.content =  item.details;
                 this.editVisible = true;
             },
             //增加按钮，弹出框
@@ -211,7 +213,7 @@ import { quillEditor } from 'vue-quill-editor';
             // 新增和保存编辑，请求
             saveEdit() {
                 var t = this;
-                if (t.imgSrc=''){
+                if (t.imgSrc.length == 0){
                     t.$message.warning('请上传图片');
                     return;
                 }else if(t.content.length > 2000){
@@ -219,28 +221,36 @@ import { quillEditor } from 'vue-quill-editor';
                     return;
                 }
                 t.Loading = true;
-                t.$uploadQiNiuYun.uploadqiniuyun(t.imgSrc,function (res,key) {
-                    var dic = {
-                        'information_id':t.form.id,             //资讯id(修改/删除传,新增不传)
-                        'photo':res,                            //资讯展示图片
-                        'title':t.form.title,                   //资讯标题
-                        'type_information':'1',                 //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
-                        'author':t.form.title,                  //作者
-                        'details':t.content,                    //资讯详情
-                        'type':t.form.id.length == 0 ? 2 :1,     //操作类型(1/修改，2/新增，3/删除)
-                        'qiniu_key':key
-                    };
-                    t.$axios.post('/api/pub/information/6/',dic,{headers:{
-                            "Authorization":"JWT " + localStorage.getItem('token')
-                        }}).then(res=>{
-                        t.Loading = false;
-                        t.$message.success(res.data.message);
-                        t.getData();
-                    });
-                    t.editVisible = false;
-                })
+                if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
+                    this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
+                        t.saveAndEditCommon(res,key);
+                    })
+                }else{
+                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
+                }
             },
-            //确定删除,请求
+            saveAndEditCommon(res,key) {
+                var t = this;
+                var dic = {
+                    'information_id':t.form.id,             //资讯id(修改/删除传,新增不传)
+                    'photo':res,                            //资讯展示图片
+                    'title':t.form.title,                   //资讯标题
+                    'type_information':'1',                 //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
+                    'author':t.form.title,                  //作者
+                    'details':t.content,                    //资讯详情
+                    'type':t.form.id.length == 0 ? 2 :1,     //操作类型(1/修改，2/新增，3/删除)
+                    'qiniu_key':key
+                };
+                t.$axios.post('/api/pub/information/6/',dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then(res=>{
+                    t.Loading = false;
+                    t.$message.success(res.data.message);
+                    t.getData();
+                });
+                t.editVisible = false;
+            },
+                //确定删除,请求
             deleteRow(){
                 var t = this;
                 t.Loading = true;
@@ -293,10 +303,11 @@ import { quillEditor } from 'vue-quill-editor';
                     return;
                 }
                 const reader = new FileReader();
+                var t = this;
                 reader.onload = (event) => {
-                    this.dialogVisible = true;
-                    this.imgSrc = event.target.result;
-                    this.$refs.cropper && this.$refs.cropper.replace(event.target.result);
+                    t.dialogVisible = true;
+                    t.imgSrc = event.target.result;
+                    t.$refs.cropper && t.$refs.cropper.replace(event.target.result);
                 };
                 reader.readAsDataURL(file);
             },

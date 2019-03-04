@@ -56,22 +56,13 @@
                 </el-form-item>
             </el-col>
         </el-row>
-
-
-
-
     </el-form>
+        <div style="margin: 20px;"></div>
 
-        <el-upload
-                action="https://jsonplaceholder.typicode.com/posts/"
-                list-type="picture-card"
-                :on-preview="handlePictureCardPreview"
-                :on-remove="handleRemove">
-            <i class="el-icon-plus"></i>
-        </el-upload>
-        <el-dialog :visible.sync="dialogVisible">
-            <img width="100%" :src="dialogImageUrl" alt="">
-        </el-dialog>
+        <div align="center">
+            <el-button size="medium" type="primary" @click="saveInfo">保存</el-button>
+        </div>
+
     </div>
 </template>
 
@@ -84,6 +75,7 @@
               labelPosition: 'left',
               form: {
                   cigar_name: '',
+                  cigar_brand_id:'',
                   origin: '',
                   shape: '',
                   ring_gauge: '',
@@ -98,14 +90,16 @@
                   price_single_overseas: '',
                   price_box_overswas: '',
                   box_size: '',
-                  collect_number: '',
+                  id:''
               },
               dialogImageUrl: '',
               dialogVisible: false
           }
         },
         created(){
-            this.getParams();
+            if (!this.$route.query.whereCome){
+                this.getParams();
+            }
         },
         methods:{
             getParams(){
@@ -117,11 +111,33 @@
             handlePictureCardPreview(file) {
                 this.dialogImageUrl = file.url;
                 this.dialogVisible = true;
+            },
+            saveInfo(){
+                var t = this;
+                var dic = t.form;
+                if (this.$route.query.whereCome){
+                    dic['type'] = '2';
+                    dic['cigar_brand_id'] =this.$route.query.cigar_brand_id;
+                }else{
+                    dic['type'] = '1';
+                    dic['cigar_id'] = t.form.id;
+                }
+                t.$axios.post('/api/cigar/ad_cigar/',dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then(res=>{
+                    if (res.data.status == 1){
+                        this.$router.go(-1);
+                    }else {
+                        this.$message.warning(res.data.message);
+                    }
+                });
             }
         }
     }
 </script>
 
 <style scoped>
-
+    .red{
+        color: #ff0000;
+    }
 </style>
