@@ -111,8 +111,6 @@
                 this.$router.push({
                     path:'/CigarDetailsChange',
                     query: {'cigar_brand_id':this.id,
-                            'cigar_name':this.cigar_name,
-                            'whereCome':'1'
                     }
                 })
             }

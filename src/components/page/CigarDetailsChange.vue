@@ -58,10 +58,12 @@
         </el-row>
     </el-form>
         <div style="margin: 20px;"></div>
-
         <div align="center">
             <el-button size="medium" type="primary" @click="saveInfo">保存</el-button>
         </div>
+
+
+
 
     </div>
 </template>
@@ -90,20 +92,23 @@
                   price_single_overseas: '',
                   price_box_overswas: '',
                   box_size: '',
-                  id:''
+                  id:'',
+                  photo_list:[]
               },
               dialogImageUrl: '',
-              dialogVisible: false
+              dialogVisible: false,
+              imgSrc:'',
           }
         },
         created(){
-            if (!this.$route.query.whereCome){
+            if (this.$route.query.cigar_name){
                 this.getParams();
             }
         },
         methods:{
             getParams(){
                 this.form = this.$route.query;
+                this.imgSrc = this.form.photo_list[0].photo_url;
             },
             handleRemove(file, fileList) {
                 console.log(file, fileList);
@@ -115,12 +120,13 @@
             saveInfo(){
                 var t = this;
                 var dic = t.form;
-                if (this.$route.query.whereCome){
-                    dic['type'] = '2';
-                    dic['cigar_brand_id'] =this.$route.query.cigar_brand_id;
-                }else{
+                if (this.$route.query.cigar_name){
                     dic['type'] = '1';
                     dic['cigar_id'] = t.form.id;
+                }else{
+                    dic['type'] = '2';
+                    dic['cigar_brand_id'] =this.$route.query.cigar_brand_id;
+
                 }
                 t.$axios.post('/api/cigar/ad_cigar/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
@@ -139,5 +145,56 @@
 <style scoped>
     .red{
         color: #ff0000;
+    }
+    .crop-demo{
+        display: flex;
+        align-items: flex-end;
+    }
+    .crop-demo-btn{
+        position: relative;
+        width: 100px;
+        height: 40px;
+        line-height: 40px;
+        padding: 0 20px;
+        margin-left: 30px;
+        background-color: #409eff;
+        color: #fff;
+        font-size: 14px;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .crop-input{
+        position: absolute;
+        width: 100px;
+        height: 40px;
+        left: 0;
+        top: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+
+    .pre-img{
+        width: 100px;
+        height: 100px;
+        background: #f8f8f8;
+        border: 1px solid #eee;
+        border-radius: 5px;
+    }
+    .spanname{
+        text-align: left;
+        vertical-align: middle;
+
+    }
+    .button {
+        padding: 0;
+        float: right;
+        vertical-align: middle;
+    }
+    .image {
+        width: 100%;
+        display: block;
+    }
+    .namediv{
+        text-align:left
     }
 </style>
