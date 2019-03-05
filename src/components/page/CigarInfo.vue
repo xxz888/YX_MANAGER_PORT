@@ -6,6 +6,12 @@
             </el-breadcrumb>
         </div>
         <div class="container">
+            <el-tabs v-model="activeName" @tab-click="handleClick">
+                <el-tab-pane label="古巴" name="first"></el-tab-pane>
+                <el-tab-pane label="非古" name="second"></el-tab-pane>
+            </el-tabs>
+            <div style="margin: 20px;"></div>
+
             <div class="handle-box">
                 <el-button type="primary" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>
                 <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
@@ -47,7 +53,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="60%">
+        <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="60%" >
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
                     <el-select v-model="form.type" placeholder="form.type">
@@ -129,7 +135,10 @@
                 cropImg: '',
                 dialogVisible: false,
                 checked:'',
-                base64Array:[]
+                base64Array:[],
+                activeName: 'first',
+                tab_index:'1',
+
             }
         },
         created() {
@@ -147,7 +156,7 @@
         },
         methods: {
             getData() {
-                this.$axios.get('/api/cigar/cigar_brand/1/', {
+                this.$axios.get('/api/cigar/cigar_brand/'+this.tab_index+'/', {
                     page: this.cur_page
                 }).then((res) => {
                     var arr1 = res.data.brand_list;
@@ -167,22 +176,29 @@
             onEditorChange({html}) {
                 var t = this;
                 t.content = html;
-                if (t.content.indexOf('http') == -1){
+                if (t.content.indexOf('img') != -1){
                     t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
                         (function () {
-                            t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
-                                t.key = key;
-                                var item = {};
-                                item[capture] = res;
-                                t.base64Array.push(item);
-                                for (var i = 0 ; i < t.base64Array.length;i++){
-                                    var key = Object.keys(t.base64Array[i])[0];
-                                    var value = t.base64Array[i][key];
-                                    t.content = t.content.replace(key,value);
-                                }});
+                            if (capture.indexOf('data:image/jpeg;base64') != -1) {
+                                t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
+                                    t.key = key;
+                                    var item = {};
+                                    item[capture] = res;
+                                    t.base64Array.push(item);
+                                    for (var i = 0 ; i < t.base64Array.length;i++){
+                                        var key = Object.keys(t.base64Array[i])[0];
+                                        var value = t.base64Array[i][key];
+                                        t.content = t.content.replace(key,value);
+                                    }});
+                            }
                         })(capture)
                     })
                 }
+            },
+            handleClick(tab, event) {
+                console.log(tab, event);
+                this.tab_index = event.target.getAttribute('id') == 'tab-second' ? 2:1;
+                this.getData();
             },
             //编辑按钮,弹出框
             handleEdit(index, row) {
@@ -194,7 +210,7 @@
                     cigar_brand:item.cigar_brand,
                     intro:item.intro,
                     concern_number:item.concern_number,
-                    type:  '古巴',
+                    type:  this.tab_index==1 ? '古巴' : '非古',
                 }
                 this.checked = item.is_hot == '是' ? true : false;
                 this.content = item.intro;
@@ -207,7 +223,7 @@
                     id: '',
                     photo: '',
                     title: '',
-                    type:  '古巴',
+                    type:  this.tab_index==1 ? '古巴' : '非古',
                     author: '',
                     date: new Date(),
                     details: '',
@@ -245,7 +261,7 @@
                     'cigar_brand_id':t.form.id,          //广告id(修改/删除传,新增不传)
                     'cigar_brand':t.form.cigar_brand,
                     'photo':res,                         //广告展示图片
-                    'type_cigar_brand':'1',
+                    'type_cigar_brand':t.form.type =='古巴' ? '1' : '2',
                     'is_hot':t.checked?'1':'0',
                     'intro':t.content,               //广告内容
                     'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
@@ -269,7 +285,7 @@
                     'cigar_brand_id':this.tableData[this.idx].id,   //广告id(修改/删除传,新增不传)
                     'cigar_brand':'',
                     'photo':'',                         //广告展示图片
-                    'type_cigar_brand':'1',
+                    'type_cigar_brand':this.tab_index,
                     'is_hot':'',
                     'intro':'',               //广告内容
                     'type':'3', //操作类型(1/修改，2/新增，3/删除)

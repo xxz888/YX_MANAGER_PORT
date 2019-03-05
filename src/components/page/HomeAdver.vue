@@ -18,6 +18,9 @@
                 </el-table-column>
                 <el-table-column prop="type" label="类型" width="80"align="center"  :formatter = 'type_formatter'>
                 </el-table-column>
+                <el-table-column prop="title" width="150" show-overflow-tooltip label="标题"  align="center">
+
+                </el-table-column>
                 <el-table-column prop="character" v-html="character" show-overflow-tooltip label="广告文字"  align="center">
 
                 </el-table-column>
@@ -38,7 +41,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog v-loading="Loading" title="编辑" :visible.sync="editVisible" width="60%">
+        <el-dialog v-loading="Loading" title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="60%">
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
                     <el-select v-model="form.type" placeholder="form.type">
@@ -48,7 +51,9 @@
                         <el-option key="3" label="高尔夫" value="3"></el-option>
                     </el-select>
                 </el-form-item>
-
+                <el-form-item label="标题">
+                    <el-input v-model="form.title"></el-input>
+                </el-form-item>
                 <el-form-item label="广告文字">
                         <quill-editor   ref="myTextEditor" v-model="form.character" @change="onEditorChange"></quill-editor>
                 </el-form-item>
@@ -105,7 +110,8 @@
                     id: '',
                     photo: '',
                     character: '',
-                    type:''
+                    type:'',
+                    title:''
                 },
                 idx: -1,
                 fileList: [],
@@ -139,19 +145,21 @@
             onEditorChange({html}) {
                 var t = this;
                 t.content = html;
-                if (t.content.indexOf('http') == -1){
+                if (t.content.indexOf('img') != -1){
                     t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
                         (function () {
-                            t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
-                                t.key = key;
-                                var item = {};
-                                item[capture] = res;
-                                t.base64Array.push(item);
-                                for (var i = 0 ; i < t.base64Array.length;i++){
-                                    var key = Object.keys(t.base64Array[i])[0];
-                                    var value = t.base64Array[i][key];
-                                    t.content = t.content.replace(key,value);
-                                }});
+                            if (capture.indexOf('data:image/jpeg;base64') != -1){
+                                t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
+                                    t.key = key;
+                                    var item = {};
+                                    item[capture] = res;
+                                    t.base64Array.push(item);
+                                    for (var i = 0 ; i < t.base64Array.length;i++){
+                                        var key = Object.keys(t.base64Array[i])[0];
+                                        var value = t.base64Array[i][key];
+                                        t.content = t.content.replace(key,value);
+                                    }});
+                            }
                         })(capture)
                     })
                 }
@@ -195,7 +203,8 @@
                     'character':t.content,               //广告内容
                     'type_advertising':1,                //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
                     'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':key                          //七牛key
+                    'qiniu_key':key,                          //七牛key
+                    'title':t.form.title
                 };
                 t.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
@@ -216,7 +225,8 @@
                     'character':'',               //广告内容
                     'type_advertising':1,                //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
                     'type':'3',                          //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':''                         //七牛key
+                    'qiniu_key':'',                      //七牛key
+                    'title':''
                 };
                 this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
@@ -239,9 +249,11 @@
                     type: "雪茄",
                     character: "",
                     photo: "",
+                    title:''
                 }
                 this.content = '';
                 this.imgSrc = '';
+                this.title = '';
                 this.editVisible = true;
             },
             //编辑按钮,弹出框
@@ -252,10 +264,12 @@
                     id: item.id,
                     type: item.type == 0 ? '推荐' : item.type == 1 ? '雪茄' : item.type == 2 ? '红酒' :'高尔夫',
                     character: item.character,
-                    photo: item.photo
+                    photo: item.photo,
+                    title:item.title
                 }
                 this.imgSrc = item.photo;
                 this.content = item.character;
+                this.title = item.title;
                 this.editVisible = true;
             },
             //单个删除,弹出框

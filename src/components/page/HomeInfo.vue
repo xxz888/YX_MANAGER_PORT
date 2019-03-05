@@ -44,7 +44,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" v-loading='B_Loading' :visible.sync="editVisible" width="60%">
+        <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="60%">
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
                     <el-select v-model="form.type" placeholder="form.type">
@@ -128,7 +128,6 @@ import { quillEditor } from 'vue-quill-editor';
                 imgSrc: p_img,
                 cropImg: '',
                 dialogVisible: false,
-                Loading:true,
                 item:'',
                 base64Array:[]
             }
@@ -151,7 +150,6 @@ import { quillEditor } from 'vue-quill-editor';
                 this.$axios.get('/api/pub/information/1/', {
                     page: this.cur_page
                 }).then((res) => {
-                    this.Loading = false;
                     this.tableData = res.data;
                     console.log(this.tableData);
                 })
@@ -160,19 +158,22 @@ import { quillEditor } from 'vue-quill-editor';
             onEditorChange({html}) {
                 var t = this;
                 t.content = html;
-                if (t.content.indexOf('http') == -1){
+                if (t.content.indexOf('img') != -1){
                     t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
                         (function () {
-                            t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
-                                t.key = key;
-                                var item = {};
-                                item[capture] = res;
-                                t.base64Array.push(item);
-                                for (var i = 0 ; i < t.base64Array.length;i++){
-                                    var key = Object.keys(t.base64Array[i])[0];
-                                    var value = t.base64Array[i][key];
-                                    t.content = t.content.replace(key,value);
-                                }});
+                            if (capture.indexOf('data:image/jpeg;base64') != -1) {
+                                t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
+                                    t.key = key;
+                                    var item = {};
+                                    item[capture] = res;
+                                    t.base64Array.push(item);
+                                    for (var i = 0 ; i < t.base64Array.length;i++){
+                                        var key = Object.keys(t.base64Array[i])[0];
+                                        var value = t.base64Array[i][key];
+                                        t.content = t.content.replace(key,value);
+                                    }});
+                            }
+
                         })(capture)
                     })
                 }
@@ -214,7 +215,6 @@ import { quillEditor } from 'vue-quill-editor';
             // 新增和保存编辑，请求
             saveEdit() {
                 var t = this;
-                t.Loading = true;
                 if (this.imgSrc.length == 0){
                     t.$message.warning('请上传图片');
                     return;
@@ -246,7 +246,6 @@ import { quillEditor } from 'vue-quill-editor';
                 t.$axios.post('/api/pub/information/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    t.Loading = false;
                     t.$message.success(res.data.message);
                     t.getData();
                 });
@@ -255,7 +254,6 @@ import { quillEditor } from 'vue-quill-editor';
                 //确定删除,请求
             deleteRow(){
                 var t = this;
-                t.Loading = true;
                 var dic = {
                     'information_id':t.tableData[t.idx].id,          //资讯id(修改/删除传,新增不传)
                     'photo':'',                            //资讯展示图片
@@ -264,12 +262,11 @@ import { quillEditor } from 'vue-quill-editor';
                     'author':'',               //作者
                     'details':'',            //资讯详情
                     'type':'3',  //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':t.tableData[t.idx].photo.split('http://photo.thegdlife.com/')[1]
+                    'qiniu_key':''
                 };
                 this.$axios.post('/api/pub/information/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    t.Loading = false;
                     t.$message.success(res.data.message);
                     t.getData();
                 });
