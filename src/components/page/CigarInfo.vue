@@ -167,18 +167,22 @@
             onEditorChange({html}) {
                 var t = this;
                 t.content = html;
-                t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
-                    t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
-                        t.key = key;
-                        var item = {};
-                        item[capture] = res;
-                        t.base64Array.push(item);
-                        for (var i = 0 ; i < t.base64Array.length;i++){
-                            var key = Object.keys(t.base64Array[i])[0];
-                            var value = t.base64Array[i][key];
-                            t.content = t.content.replace(key,value);
-                        }});
-                })
+                if (t.content.indexOf('http') == -1){
+                    t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
+                        (function () {
+                            t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
+                                t.key = key;
+                                var item = {};
+                                item[capture] = res;
+                                t.base64Array.push(item);
+                                for (var i = 0 ; i < t.base64Array.length;i++){
+                                    var key = Object.keys(t.base64Array[i])[0];
+                                    var value = t.base64Array[i][key];
+                                    t.content = t.content.replace(key,value);
+                                }});
+                        })(capture)
+                    })
+                }
             },
             //编辑按钮,弹出框
             handleEdit(index, row) {
@@ -210,6 +214,8 @@
 
 
                 }
+                this.content = '';
+                this.imgSrc = '';
                 this.editVisible = true;
             },
 
@@ -226,10 +232,11 @@
                 }
                 if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                        t.saveAndEditCommon(res,key);
+                        setTimeout(t.saveAndEditCommon(res,key),2000);
                     })
                 }else{
-                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
+                    setTimeout(t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]),2000);
+
                 }
             },
             saveAndEditCommon(res,key) {

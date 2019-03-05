@@ -2,12 +2,13 @@
     <div >
         <el-button style="margin:20px 0px" size="medium" type="success" @click="addInfo">新增</el-button>
     <el-row>
-        <el-col align="right" :span="6" v-for="(item, items) in tableData">
+        <el-col align="right" :span="6" v-for="(item, index) in tableData">
             <el-card  :body-style="{ padding: '5px' }">
-                <img :src="item.photo_list[0].photo_url" class="image" :onerror="errorImg01" />
+                <img :src="item.photo_list[0].photo_url" class="image" />
                 <div class="namediv" style="padding: 0px;">
                     <p class="spanname">{{item.cigar_name}}</p>
-                    <el-button type="text" icon="el-icon-edit" @click="handleClick(item)">编辑</el-button>
+                    <el-button type="text" icon="el-icon-edit" @click="handleClick(index)">编辑信息</el-button>
+                    <el-button type="text" icon="el-icon-edit" @click="handleClickImage(index)">编辑图片</el-button>
                     <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(item)">删除</el-button>
                 </div>
             </el-card>
@@ -63,6 +64,9 @@
         created(){
             this.getParams()
         },
+        watch:{
+            '$route':'getParams'
+        },
         methods:{
             getParams(){
                 // 取到路由带过来的参数
@@ -85,12 +89,7 @@
                     }
                 });
             },
-            handleClick(item){
-                this.$router.push({
-                    path:'/CigarDetailsChange',
-                    query: item
-                })
-            },
+
             handleDelete(item){
 
                 var t = this;
@@ -101,17 +100,32 @@
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     if (res.data.status == 1){
-                        this.getData();
+                        t.$message.success(res.data.message);
+                        t.getData();
                     }else {
-                        this.$message.warning(res.data.message);
+                        t.$message.warning(res.data.message);
                     }
                 });
             },
-            addInfo(){
+            handleClick(index){
+                var t = this;
                 this.$router.push({
                     path:'/CigarDetailsChange',
-                    query: {'cigar_brand_id':this.id,
-                    }
+                    query: {'key':t.tableData[index]}
+                })
+            },
+            handleClickImage(index){
+                var t = this;
+                this.$router.push({
+                    path:'/CigarDetailsImage',
+                    query: {'key':t.tableData[index]}
+                })
+            },
+            addInfo(){
+                var t = this;
+                this.$router.push({
+                    path:'/CigarDetailsNewAdd',
+                    query: {'cigar_brand_id':t.id}
                 })
             }
         }

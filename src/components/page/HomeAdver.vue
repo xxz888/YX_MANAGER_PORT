@@ -12,7 +12,7 @@
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
                 <el-button type="success" icon="search" @click="addnews">新增</el-button>
             </div>
-            <el-table v-loading="Loading" :data="data" border tooltip-effect="dark" class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+            <el-table  :data="data" border tooltip-effect="dark" class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
@@ -38,7 +38,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :visible.sync="editVisible" width="60%" v-loading = 'editLoading'>
+        <el-dialog v-loading="Loading" title="编辑" :visible.sync="editVisible" width="60%">
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
                     <el-select v-model="form.type" placeholder="form.type">
@@ -139,20 +139,20 @@
             onEditorChange({html}) {
                 var t = this;
                 t.content = html;
-                if (html.indexOf('img') != -1){
-                    t.editLoading = true;
+                if (t.content.indexOf('http') == -1){
                     t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
-                        t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
-                            t.key = key;
-                            var item = {};
-                            item[capture] = res;
-                            t.base64Array.push(item);
-                            for (var i = 0 ; i < t.base64Array.length;i++){
-                                var key = Object.keys(t.base64Array[i])[0];
-                                var value = t.base64Array[i][key];
-                                t.content = t.content.replace(key,value);
-                            }});
-                        t.editLoading = false;
+                        (function () {
+                            t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
+                                t.key = key;
+                                var item = {};
+                                item[capture] = res;
+                                t.base64Array.push(item);
+                                for (var i = 0 ; i < t.base64Array.length;i++){
+                                    var key = Object.keys(t.base64Array[i])[0];
+                                    var value = t.base64Array[i][key];
+                                    t.content = t.content.replace(key,value);
+                                }});
+                        })(capture)
                     })
                 }
 
@@ -180,10 +180,11 @@
                 }
                 if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                        t.saveAndEditCommon(res,key);
+                        setTimeout(t.saveAndEditCommon(res,key),5000);
                     })
                 }else{
-                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
+                    setTimeout(t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]),5000);
+
                 }
             },
             saveAndEditCommon(photo_res,key){
@@ -239,6 +240,8 @@
                     character: "",
                     photo: "",
                 }
+                this.content = '';
+                this.imgSrc = '';
                 this.editVisible = true;
             },
             //编辑按钮,弹出框

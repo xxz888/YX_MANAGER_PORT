@@ -10,7 +10,7 @@
                             <div>{{role}}</div>
                         </div>
                     </div>
-                    <div class="user-info-list">上次登录时间：<span>2019-02-28</span></div>
+                    <div class="user-info-list">上次登录时间：<span>{{currentTime}}</span></div>
                     <div class="user-info-list">上次登录地点：<span>杭州</span></div>
                 </el-card>
             </el-col>
@@ -27,6 +27,7 @@
         data() {
             return {
                 name: localStorage.getItem('ms_username'),
+                currentTime: new Date(),
                 todoList: [{
                         title: '今天要修复100个bug',
                         status: false,

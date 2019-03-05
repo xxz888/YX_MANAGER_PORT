@@ -14,7 +14,7 @@
 
             </div>
             <el-table :data="data"  tooltip-effect="dark"
-                      border v-loading="Loading" class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+                      border  class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
@@ -44,7 +44,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" v-loading='editLoading' :visible.sync="editVisible" width="60%">
+        <el-dialog title="编辑" v-loading='B_Loading' :visible.sync="editVisible" width="60%">
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
                     <el-select v-model="form.type" placeholder="form.type">
@@ -129,7 +129,6 @@ import { quillEditor } from 'vue-quill-editor';
                 cropImg: '',
                 dialogVisible: false,
                 Loading:true,
-                editLoading:false,
                 item:'',
                 base64Array:[]
             }
@@ -161,20 +160,20 @@ import { quillEditor } from 'vue-quill-editor';
             onEditorChange({html}) {
                 var t = this;
                 t.content = html;
-                if (html.indexOf('img') != -1){
-                    t.editLoading = true;
+                if (t.content.indexOf('http') == -1){
                     t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
-                        t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
-                            t.key = key;
-                            t.item = {};
-                            t.item[capture] = res;
-                            t.base64Array.push(t.item);
-                            for (var i = 0 ; i < t.base64Array.length;i++){
-                                var key = Object.keys(t.base64Array[i])[0];
-                                var value = t.base64Array[i][key];
-                                t.content = t.content.replace(key,value);
-                            }});
-                        t.editLoading = false;
+                        (function () {
+                            t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
+                                t.key = key;
+                                var item = {};
+                                item[capture] = res;
+                                t.base64Array.push(item);
+                                for (var i = 0 ; i < t.base64Array.length;i++){
+                                    var key = Object.keys(t.base64Array[i])[0];
+                                    var value = t.base64Array[i][key];
+                                    t.content = t.content.replace(key,value);
+                                }});
+                        })(capture)
                     })
                 }
             },
@@ -207,26 +206,29 @@ import { quillEditor } from 'vue-quill-editor';
                     details: '',
 
                 }
+                this.content = '';
+                this.imgSrc = '';
                 this.editVisible = true;
             },
 
             // 新增和保存编辑，请求
             saveEdit() {
                 var t = this;
-                if (t.imgSrc.length == 0){
+                t.Loading = true;
+                if (this.imgSrc.length == 0){
                     t.$message.warning('请上传图片');
                     return;
-                }else if(t.content.length > 2000){
+                }else if(this.content.length > 2000){
                     t.$message.warning('内容字符太长');
                     return;
                 }
-                t.Loading = true;
                 if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                        t.saveAndEditCommon(res,key);
+                        setTimeout(t.saveAndEditCommon(res,key),5000);
                     })
                 }else{
-                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
+                    setTimeout(t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]),5000);
+
                 }
             },
             saveAndEditCommon(res,key) {

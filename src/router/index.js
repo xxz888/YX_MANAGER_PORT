@@ -39,6 +39,19 @@ export default new Router({
                     component: resolve => require(['../components/page/CigarDetailsChange.vue'], resolve),
                     meta: {title: '雪茄详情修改'}
                 },
+                {
+                    path: '/CigarDetailsNewAdd',
+                    component: resolve => require(['../components/page/CigarDetailsNewAdd.vue'], resolve),
+                    meta: {title: '雪茄详情新增'}
+                },
+
+                {
+                    path: '/CigarDetailsImage',
+                    component: resolve => require(['../components/page/CigarDetailsImage.vue'], resolve),
+                    meta: {title: '雪茄图片修改'}
+                },
+
+
 
                 {
                     path: '/dashboard',
