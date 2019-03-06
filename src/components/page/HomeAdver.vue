@@ -21,7 +21,7 @@
                 <el-table-column prop="title" width="150" show-overflow-tooltip label="标题"  align="center">
 
                 </el-table-column>
-                <el-table-column prop="character" v-html="character" show-overflow-tooltip label="广告文字"  align="center">
+                <el-table-column prop="character"  show-overflow-tooltip label="广告文字"  align="center">
 
                 </el-table-column>
 
