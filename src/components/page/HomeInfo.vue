@@ -238,7 +238,7 @@ import { quillEditor } from 'vue-quill-editor';
                     'photo':res,                            //资讯展示图片
                     'title':t.form.title,                   //资讯标题
                     'type_information':'1',                 //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
-                    'author':t.form.title,                  //作者
+                    'author':t.form.author,                  //作者
                     'details':t.content,                    //资讯详情
                     'type':t.form.id.length == 0 ? 2 :1,     //操作类型(1/修改，2/新增，3/删除)
                     'qiniu_key':key
