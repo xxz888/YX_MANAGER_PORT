@@ -44,7 +44,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="60%">
+        <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%">
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
                     <el-select v-model="form.type" placeholder="form.type">
@@ -61,8 +61,13 @@
                     <el-input v-model="form.author"></el-input>
                 </el-form-item>
                 <el-form-item label="详情">
-                    <quill-editor   ref="myTextEditor" v-model="form.details" @change="onEditorChange"></quill-editor>
-                </el-form-item>
+                    <editor id="abc" height="500px" width=100%
+                            :content="content"
+                            pluginsPath="/static/kindeditor/plugins/"
+                            :loadStyleMode="false"
+                            @on-content-change="onContentChange">
+                    </editor>
+                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />                </el-form-item>
                 <el-form-item label="展示图">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
@@ -77,7 +82,7 @@
 
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="cancleBtn">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
@@ -95,10 +100,6 @@
 
 <script>
 import p_img from '../../assets/img/img.jpg'
-import 'quill/dist/quill.core.css';
-import 'quill/dist/quill.snow.css';
-import 'quill/dist/quill.bubble.css';
-import { quillEditor } from 'vue-quill-editor';
 
     export default {
         name: 'HomeInfo',
@@ -129,7 +130,9 @@ import { quillEditor } from 'vue-quill-editor';
                 cropImg: '',
                 dialogVisible: false,
                 item:'',
-                base64Array:[]
+                base64Array:[],
+                tag:'0'
+
             }
         },
         created() {
@@ -143,9 +146,34 @@ import { quillEditor } from 'vue-quill-editor';
             }
         },
         components: {
-            quillEditor
+
         },
         methods: {
+            cancleBtn(){
+                this.editVisible = false;
+                window.editor.remove('abc');
+            },
+            //内容改变实时更新
+            onContentChange (val) {
+                this.content = val;
+            },
+            //内容上传图片
+            fileImage(e) {
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var t = this;
+                reader.onload = (event) => {
+                    t.dialogVisible = true;
+                    t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
+                        var img  = '<img src="'+ res  + '" alt="" />'
+                        window.editor.insertHtml(img);
+                    });
+                };
+                reader.readAsDataURL(file);
+            },
             getData() {
                 this.$axios.get('/api/pub/information/1/', {
                     page: this.cur_page
@@ -154,30 +182,7 @@ import { quillEditor } from 'vue-quill-editor';
                     console.log(this.tableData);
                 })
             },
-            //动态改变富文本
-            onEditorChange({html}) {
-                var t = this;
-                t.content = html;
-                if (t.content.indexOf('img') != -1){
-                    t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
-                        (function () {
-                            if (capture.indexOf('data:image/jpeg;base64') != -1) {
-                                t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
-                                    t.key = key;
-                                    var item = {};
-                                    item[capture] = res;
-                                    t.base64Array.push(item);
-                                    for (var i = 0 ; i < t.base64Array.length;i++){
-                                        var key = Object.keys(t.base64Array[i])[0];
-                                        var value = t.base64Array[i][key];
-                                        t.content = t.content.replace(key,value);
-                                    }});
-                            }
 
-                        })(capture)
-                    })
-                }
-            },
             //编辑按钮,弹出框
             handleEdit(index, row) {
                 this.idx = index;
@@ -194,6 +199,12 @@ import { quillEditor } from 'vue-quill-editor';
                 this.imgSrc = item.photo;
                 this.content =  item.details;
                 this.editVisible = true;
+
+                window.editor.create('#abc', {
+                    filterMode : true,
+                    langType : 'en',
+                });
+                window.editor.html(this.content);
             },
             //增加按钮，弹出框
             addnews(){
@@ -210,6 +221,13 @@ import { quillEditor } from 'vue-quill-editor';
                 this.content = '';
                 this.imgSrc = '';
                 this.editVisible = true;
+
+
+                window.editor.create('#abc', {
+                    filterMode : true,
+                    langType : 'en',
+                });
+                window.editor.html('');
             },
 
             // 新增和保存编辑，请求
@@ -224,10 +242,10 @@ import { quillEditor } from 'vue-quill-editor';
                 }
                 if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                        setTimeout(t.saveAndEditCommon(res,key),5000);
+                        t.saveAndEditCommon(res,key);
                     })
                 }else{
-                    setTimeout(t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]),5000);
+                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
 
                 }
             },

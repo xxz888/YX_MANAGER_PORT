@@ -62,7 +62,7 @@
                             :loadStyleMode="false"
                             @on-content-change="onContentChange">
                     </editor>
-                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
+                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="选择图片" />
                 </el-form-item>
 
                 <el-form-item label="广告图片">
@@ -77,7 +77,7 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                    <el-button @click="editVisible = false">取 消</el-button>
+                    <el-button @click="cancleBtn">取 消</el-button>
                     <el-button type="primary" @click="saveEdit">确 定</el-button>
                 </span>
         </el-dialog>
@@ -144,17 +144,16 @@
             }
         },
         components: {
-            quillEditor
+
         },
         methods: {
+            cancleBtn(){
+                this.editVisible = false;
+                window.editor.remove('abc');
+            },
             //内容改变实时更新
             onContentChange (val) {
-                if (this.tag == 0) {
-                    window.editor.insertHtml(this.content);
-                    this.tag = 1;
-                }else{
-                    this.content = val;
-                }
+                this.content = val;
             },
             //内容上传图片
             fileImage(e) {
@@ -217,7 +216,7 @@
                 t.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    window.editor.insertHtml('');
+                    t.cancleBtn();
                     t.$message.success(res.data.message);
                     t.getData();
                 });
@@ -239,7 +238,7 @@
                 this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    window.editor.insertHtml('');
+                    t.cancleBtn();
                     t.$message.success(res.data.message);
                     t.getData();
                 });
@@ -252,6 +251,7 @@
 
             //增加按钮，弹出框
             addnews(index, row){
+
                 this.idx = index;
                 this.form = {
                     id: "",
@@ -264,6 +264,12 @@
                 this.imgSrc = '';
                 this.title = '';
                 this.editVisible = true;
+
+                window.editor.create('#abc', {
+                    filterMode : true,
+                    langType : 'en',
+                });
+                window.editor.html('');
             },
             //编辑按钮,弹出框
             handleEdit(index, row) {
@@ -280,6 +286,12 @@
                 this.content = item.character;
                 this.title = item.title;
                 this.editVisible = true;
+
+                window.editor.create('#abc', {
+                    filterMode : true,
+                    langType : 'en',
+                });
+                window.editor.html(this.content);
             },
             //单个删除,弹出框
             handleDelete(index, row) {

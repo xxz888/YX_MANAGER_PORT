@@ -53,7 +53,7 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="60%" >
+        <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%" >
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
                     <el-select v-model="form.type" placeholder="form.type">
@@ -68,8 +68,13 @@
                     <el-checkbox v-model="checked">热门</el-checkbox>
                 </el-form-item>
                 <el-form-item label="详情">
-                    <quill-editor   ref="myTextEditor" v-model="form.intro" @change="onEditorChange"></quill-editor>
-                </el-form-item>
+                    <editor id="abc" height="500px" width=100%
+                            :content="content"
+                            pluginsPath="/static/kindeditor/plugins/"
+                            :loadStyleMode="false"
+                            @on-content-change="onContentChange">
+                    </editor>
+                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />                </el-form-item>
                 <el-form-item label="品牌logo">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
@@ -84,7 +89,7 @@
 
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="editVisible = false">取 消</el-button>
+                <el-button @click="cancleBtn">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
@@ -93,7 +98,7 @@
         <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="delVisible = false">取 消</el-button>
+                <el-button @click="cancleBtn">取 消</el-button>
                 <el-button type="primary" @click="deleteRow">确 定</el-button>
             </span>
         </el-dialog>
@@ -155,6 +160,14 @@
             quillEditor
         },
         methods: {
+            cancleBtn(){
+                this.editVisible = false;
+                window.editor.remove('abc');
+            },
+            //内容改变实时更新
+            onContentChange (val) {
+                this.content = val;
+            },
             getData() {
                 this.$axios.get('/api/cigar/cigar_brand/'+this.tab_index+'/', {
                     page: this.cur_page
@@ -173,27 +186,22 @@
                     this.tableData = arr1;
                 })
             },
-            onEditorChange({html}) {
-                var t = this;
-                t.content = html;
-                if (t.content.indexOf('img') != -1){
-                    t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
-                        (function () {
-                            if (capture.indexOf('data:image/jpeg;base64') != -1) {
-                                t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
-                                    t.key = key;
-                                    var item = {};
-                                    item[capture] = res;
-                                    t.base64Array.push(item);
-                                    for (var i = 0 ; i < t.base64Array.length;i++){
-                                        var key = Object.keys(t.base64Array[i])[0];
-                                        var value = t.base64Array[i][key];
-                                        t.content = t.content.replace(key,value);
-                                    }});
-                            }
-                        })(capture)
-                    })
+            //内容上传图片
+            fileImage(e) {
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
                 }
+                const reader = new FileReader();
+                var t = this;
+                reader.onload = (event) => {
+                    t.dialogVisible = true;
+                    t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
+                        var img  = '<img src="'+ res  + '" alt="" />'
+                        window.editor.insertHtml(img);
+                    });
+                };
+                reader.readAsDataURL(file);
             },
             handleClick(tab, event) {
                 console.log(tab, event);
@@ -216,6 +224,12 @@
                 this.content = item.intro;
                 this.imgSrc = item.photo;
                 this.editVisible = true;
+
+                window.editor.create('#abc', {
+                    filterMode : true,
+                    langType : 'en',
+                });
+                window.editor.html(this.content);
             },
             //增加按钮，弹出框
             addnews(){
@@ -233,6 +247,12 @@
                 this.content = '';
                 this.imgSrc = '';
                 this.editVisible = true;
+
+                window.editor.create('#abc', {
+                    filterMode : true,
+                    langType : 'en',
+                });
+                window.editor.html('');
             },
 
             // 新增和保存编辑，请求
@@ -271,7 +291,7 @@
                 t.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    t.Loading = false;
+                    t.cancleBtn();
                     t.$message.success(res.data.message);
                     t.getData();
                 });
@@ -294,7 +314,7 @@
                 this.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    t.Loading = false;
+                    t.cancleBtn();
                     t.$message.success(res.data.message);
                     t.getData();
                 });
