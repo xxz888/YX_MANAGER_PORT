@@ -10,9 +10,14 @@ import './components/common/directives';
 import "babel-polyfill";
 import upload_global from './router/upLoadQinNiuYun'
 Vue.prototype.$uploadQiNiuYun = upload_global;
-
+import VueKindEditor from 'vue-kindeditor'
+import 'kindeditor/kindeditor-all-min.js'
+import 'kindeditor/themes/default/default.css'
 
 Vue.config.productionTip = false
+/* eslint-disable no-new */
+Vue.use(VueKindEditor)
+
 Vue.use(ElementUI, {
     size: 'small'
 });

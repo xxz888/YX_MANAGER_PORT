@@ -55,7 +55,6 @@
             getParams(){
                 this.imgList = [];
                 this.dic = this.$route.query.key;
-
                 for (var i = 0 ; i <this.dic.photo_list.length;i++){
                     if (this.dic.photo_list[i].photo_url.length != 0) {
                         this.imgList.push(

@@ -41,21 +41,28 @@
         </div>
 
         <!-- 编辑弹出框 -->
-        <el-dialog v-loading="Loading" title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="60%">
+        <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%">
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
                     <el-select v-model="form.type" placeholder="form.type">
-                        <el-option key="0" label="推荐" value="0"></el-option>
+                        <!--<el-option key="0" label="推荐" value="0"></el-option>-->
                         <el-option key="1" label="雪茄" value="1"></el-option>
-                        <el-option key="2" label="红酒" value="2"></el-option>
-                        <el-option key="3" label="高尔夫" value="3"></el-option>
+                        <!--<el-option key="2" label="红酒" value="2"></el-option>-->
+                        <!--<el-option key="3" label="高尔夫" value="3"></el-option>-->
                     </el-select>
+
                 </el-form-item>
                 <el-form-item label="标题">
                     <el-input v-model="form.title"></el-input>
                 </el-form-item>
                 <el-form-item label="广告文字">
-                        <quill-editor   ref="myTextEditor" v-model="form.character" @change="onEditorChange"></quill-editor>
+                    <editor id="abc" height="500px" width=100%
+                            :content="content"
+                            pluginsPath="/static/kindeditor/plugins/"
+                            :loadStyleMode="false"
+                            @on-content-change="onContentChange">
+                    </editor>
+                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
                 </el-form-item>
 
                 <el-form-item label="广告图片">
@@ -74,6 +81,8 @@
                     <el-button type="primary" @click="saveEdit">确 定</el-button>
                 </span>
         </el-dialog>
+
+
 
         <!-- 删除提示框 -->
         <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
@@ -96,7 +105,6 @@
         name: 'HomeAdver',
         data() {
             return {
-                url: './vuetable.json',
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
@@ -122,9 +130,7 @@
                 base64Array:[],
                 key:'',
                 capture:'',
-                Loading:'true',
-                editLoading:false,
-
+                tag:'0'
             }
         },
         created() {
@@ -141,29 +147,31 @@
             quillEditor
         },
         methods: {
-            //动态改变富文本
-            onEditorChange({html}) {
-                var t = this;
-                t.content = html;
-                if (t.content.indexOf('img') != -1){
-                    t.content.replace(/<img [^>]*src=['"]([^'"]+)[^>]*>/gi, function (match, capture) {
-                        (function () {
-                            if (capture.indexOf('data:image/jpeg;base64') != -1){
-                                t.$uploadQiNiuYun.uploadqiniuyun(capture,function(res,key){
-                                    t.key = key;
-                                    var item = {};
-                                    item[capture] = res;
-                                    t.base64Array.push(item);
-                                    for (var i = 0 ; i < t.base64Array.length;i++){
-                                        var key = Object.keys(t.base64Array[i])[0];
-                                        var value = t.base64Array[i][key];
-                                        t.content = t.content.replace(key,value);
-                                    }});
-                            }
-                        })(capture)
-                    })
+            //内容改变实时更新
+            onContentChange (val) {
+                if (this.tag == 0) {
+                    window.editor.insertHtml(this.content);
+                    this.tag = 1;
+                }else{
+                    this.content = val;
                 }
-
+            },
+            //内容上传图片
+            fileImage(e) {
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var t = this;
+                reader.onload = (event) => {
+                    t.dialogVisible = true;
+                    t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
+                        var img  = '<img src="'+ res  + '" alt="" />'
+                        window.editor.insertHtml(img);
+                    });
+                };
+                reader.readAsDataURL(file);
             },
             //请求
             getData() {
@@ -183,18 +191,18 @@
                     t.$message.warning('请上传图片');
                     return;
                 }else if(this.content.length > 2000){
-                    t.$message.warning('内容字符太长');
+                    t.$message.warning('内容不能超过2000字符');
                     return;
                 }
                 if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                        setTimeout(t.saveAndEditCommon(res,key),5000);
+                        t.saveAndEditCommon(res,key);
                     })
                 }else{
-                    setTimeout(t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]),5000);
-
+                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
                 }
             },
+            //新增和储存公共方法
             saveAndEditCommon(photo_res,key){
                 var t = this;
                 var dic = {
@@ -209,7 +217,7 @@
                 t.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    t.Loading = false;
+                    window.editor.insertHtml('');
                     t.$message.success(res.data.message);
                     t.getData();
                 });
@@ -231,7 +239,7 @@
                 this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    t.Loading = false;
+                    window.editor.insertHtml('');
                     t.$message.success(res.data.message);
                     t.getData();
                 });
@@ -243,7 +251,8 @@
 
 
             //增加按钮，弹出框
-            addnews(){
+            addnews(index, row){
+                this.idx = index;
                 this.form = {
                     id: "",
                     type: "雪茄",

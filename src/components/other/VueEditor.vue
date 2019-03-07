@@ -23,7 +23,7 @@
     import 'quill/dist/quill.bubble.css';
     import { quillEditor } from 'vue-quill-editor';
     export default {
-        name: 'editor',
+        name: 'editor12',
         data: function(){
             return {
                 content: '',
