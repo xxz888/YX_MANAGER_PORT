@@ -74,7 +74,11 @@
                             :loadStyleMode="false"
                             @on-content-change="onContentChange">
                     </editor>
-                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />                </el-form-item>
+                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
+                    <span>{{count}}/2000</span>
+
+                </el-form-item>
+
                 <el-form-item label="品牌logo">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
@@ -143,7 +147,7 @@
                 base64Array:[],
                 activeName: 'first',
                 tab_index:'1',
-
+                count:''
             }
         },
         created() {
@@ -167,6 +171,10 @@
             //内容改变实时更新
             onContentChange (val) {
                 this.content = val;
+                this.count = this.content.length;
+                if (this.count > 2000){
+                    this.$message.warning('内容字符超过2000');
+                }
             },
             getData() {
                 this.$axios.get('/api/cigar/cigar_brand/'+this.tab_index+'/', {
@@ -263,7 +271,7 @@
                     t.$message.warning('请上传图片');
                     return;
                 }else if(this.content.length > 2000){
-                    t.$message.warning('内容字符太长');
+                    t.$message.warning('内容字符超过2000');
                     return;
                 }
                 if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){

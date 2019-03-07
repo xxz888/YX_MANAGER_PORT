@@ -62,7 +62,8 @@
                             :loadStyleMode="false"
                             @on-content-change="onContentChange">
                     </editor>
-                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="选择图片" />
+                        <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="选择图片" />
+                        <span>{{count}}/5000</span>
                 </el-form-item>
 
                 <el-form-item label="广告图片">
@@ -130,7 +131,8 @@
                 base64Array:[],
                 key:'',
                 capture:'',
-                tag:'0'
+                tag:'0',
+                count:'0'
             }
         },
         created() {
@@ -154,6 +156,10 @@
             //内容改变实时更新
             onContentChange (val) {
                 this.content = val;
+                this.count = this.content.length;
+                if (this.count > 5000){
+                    this.$message.warning('内容字符超过5000');
+                }
             },
             //内容上传图片
             fileImage(e) {
@@ -189,8 +195,8 @@
                 if (this.imgSrc.length == 0){
                     t.$message.warning('请上传图片');
                     return;
-                }else if(this.content.length > 2000){
-                    t.$message.warning('内容不能超过2000字符');
+                }else if(this.content.length > 5000){
+                    t.$message.warning('内容字符超过5000');
                     return;
                 }
                 if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
@@ -346,6 +352,10 @@
 </script>
 
 <style scoped>
+    .countSpan{
+        text-align: right;        display: block;
+
+    }
     .handle-box {
         margin-bottom: 20px;
     }

@@ -67,7 +67,11 @@
                             :loadStyleMode="false"
                             @on-content-change="onContentChange">
                     </editor>
-                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />                </el-form-item>
+                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
+                    <span>{{count}}/5000</span>
+
+                </el-form-item>
+
                 <el-form-item label="展示图">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
@@ -131,7 +135,8 @@ import p_img from '../../assets/img/img.jpg'
                 dialogVisible: false,
                 item:'',
                 base64Array:[],
-                tag:'0'
+                tag:'0',
+                count:'0'
 
             }
         },
@@ -152,10 +157,15 @@ import p_img from '../../assets/img/img.jpg'
             cancleBtn(){
                 this.editVisible = false;
                 window.editor.remove('abc');
+
             },
             //内容改变实时更新
             onContentChange (val) {
                 this.content = val;
+                this.count = this.content.length;
+                if (this.count > 5000){
+                    this.$message.warning('内容字符超过5000');
+                }
             },
             //内容上传图片
             fileImage(e) {
