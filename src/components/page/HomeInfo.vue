@@ -201,7 +201,7 @@ import p_img from '../../assets/img/img.jpg'
                 this.editVisible = true;
 
                 window.editor.create('#abc', {
-                    filterMode : true,
+                    filterMode : false,
                     langType : 'en',
                 });
                 window.editor.html(this.content);
@@ -224,7 +224,7 @@ import p_img from '../../assets/img/img.jpg'
 
 
                 window.editor.create('#abc', {
-                    filterMode : true,
+                    filterMode : false,
                     langType : 'en',
                 });
                 window.editor.html('');
@@ -267,6 +267,7 @@ import p_img from '../../assets/img/img.jpg'
                     t.$message.success(res.data.message);
                     t.getData();
                 });
+                t.cancleBtn();
                 t.editVisible = false;
             },
                 //确定删除,请求
@@ -288,6 +289,7 @@ import p_img from '../../assets/img/img.jpg'
                     t.$message.success(res.data.message);
                     t.getData();
                 });
+                t.cancleBtn();
                 this.delVisible = false;
             },
 

@@ -268,10 +268,10 @@
                 }
                 if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                        setTimeout(t.saveAndEditCommon(res,key),2000);
+                        t.saveAndEditCommon(res,key);
                     })
                 }else{
-                    setTimeout(t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]),2000);
+                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
 
                 }
             },
@@ -291,10 +291,10 @@
                 t.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    t.cancleBtn();
                     t.$message.success(res.data.message);
                     t.getData();
                 });
+                t.cancleBtn();
                 t.editVisible = false;
             },
                 //确定删除,请求
@@ -314,10 +314,10 @@
                 this.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    t.cancleBtn();
                     t.$message.success(res.data.message);
                     t.getData();
                 });
+                t.cancleBtn();
                 this.delVisible = false;
             },
             handleDetails(index,row){

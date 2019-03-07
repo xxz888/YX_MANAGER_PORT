@@ -216,10 +216,10 @@
                 t.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    t.cancleBtn();
                     t.$message.success(res.data.message);
                     t.getData();
                 });
+                t.cancleBtn();
                 t.editVisible = false;
             },
             //确定删除,请求
@@ -238,10 +238,10 @@
                 this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
-                    t.cancleBtn();
                     t.$message.success(res.data.message);
                     t.getData();
                 });
+                t.cancleBtn();
                 this.delVisible = false;
             },
 
@@ -287,10 +287,7 @@
                 this.title = item.title;
                 this.editVisible = true;
 
-                window.editor.create('#abc', {
-                    filterMode : true,
-                    langType : 'en',
-                });
+                window.editor.create('#abc');
                 window.editor.html(this.content);
             },
             //单个删除,弹出框
