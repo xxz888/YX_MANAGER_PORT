@@ -1,11 +1,13 @@
 <template>
     <div class="table">
         <div class="crumbs">
+
             <el-breadcrumb separator="/">
                 <el-breadcrumb-item><i class="el-icon-lx-cascades"></i> 雪茄品牌</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
+
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane label="古巴" name="first"></el-tab-pane>
                 <el-tab-pane label="非古" name="second"></el-tab-pane>
