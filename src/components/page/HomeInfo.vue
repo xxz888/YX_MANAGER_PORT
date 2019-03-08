@@ -278,10 +278,11 @@ import p_img from '../../assets/img/img.jpg'
                     t.getData();
                 });
                 t.cancleBtn();
-                t.editVisible = false;
             },
                 //确定删除,请求
             deleteRow(){
+                this.delVisible = false;
+
                 var t = this;
                 var dic = {
                     'information_id':t.tableData[t.idx].id,          //资讯id(修改/删除传,新增不传)
@@ -300,7 +301,6 @@ import p_img from '../../assets/img/img.jpg'
                     t.getData();
                 });
                 t.cancleBtn();
-                this.delVisible = false;
             },
 
 

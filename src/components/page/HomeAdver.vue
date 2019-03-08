@@ -242,10 +242,10 @@
                     t.getData();
                 });
                 t.cancleBtn();
-                t.editVisible = false;
             },
             //确定删除,请求
             deleteRow(){
+                this.delVisible = false;
                 var t = this;
                 t.Loading = true;
                 var dic = {
@@ -264,7 +264,6 @@
                     t.getData();
                 });
                 t.cancleBtn();
-                this.delVisible = false;
             },
 
 
