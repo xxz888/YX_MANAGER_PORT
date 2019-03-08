@@ -7,10 +7,13 @@
                 <el-form-item label="雪茄名">
                     <el-input v-model="form.cigar_name"></el-input>
                 </el-form-item>
+                <el-form-item label="中文名">
+                    <el-input v-model="form.cigar_name_CN"></el-input>
+                </el-form-item>
                 <el-form-item label="产地">
                         <el-input v-model="form.origin"></el-input>
                 </el-form-item>
-                <el-form-item label="形状">
+                <el-form-item label="品型">
                     <el-input v-model="form.shape"></el-input>
                 </el-form-item>
                 <el-form-item label="环径">
@@ -28,6 +31,7 @@
                 <el-form-item label="口味">
                     <el-input v-model="form.flavour"></el-input>
                 </el-form-item>
+
             </el-col>
             <el-col :span="10">
                 <el-form-item label="国内单支售价">
@@ -91,7 +95,8 @@
                   price_box_overswas: '',
                   box_size: '',
                   id:'',
-                  photo_list:[]
+                  photo_list:[],
+                  cigar_name_CN:''
               },
               dialogImageUrl: '',
               dialogVisible: false,
