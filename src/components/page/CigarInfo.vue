@@ -7,19 +7,16 @@
             </el-breadcrumb>
         </div>
         <div class="container">
-
             <el-tabs v-model="activeName" @tab-click="handleClick">
                 <el-tab-pane label="古巴" name="first"></el-tab-pane>
                 <el-tab-pane label="非古" name="second"></el-tab-pane>
             </el-tabs>
             <div style="margin: 20px;"></div>
-
             <div class="handle-box">
                 <el-button type="primary" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>
                 <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
                 <el-button type="success" icon="search" @click="addnews">新增</el-button>
-
             </div>
             <el-table :data="data"  tooltip-effect="dark"
                       border  class="table" ref="multipleTable" @selection-change="handleSelectionChange">
@@ -53,7 +50,6 @@
                 </el-table-column>
             </el-table>
         </div>
-
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%" >
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
@@ -78,9 +74,7 @@
                     </editor>
                     <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
                     <span>{{count}}/2000</span>
-
                 </el-form-item>
-
                 <el-form-item label="品牌logo">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
@@ -90,16 +84,13 @@
                             </div>
                         </div>
                     </template>
-
                 </el-form-item>
-
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button @click="cancleBtn">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </span>
         </el-dialog>
-
         <!-- 删除提示框 -->
         <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
@@ -112,16 +103,10 @@
 </template>
 
 <script>
-    import 'quill/dist/quill.core.css';
-    import 'quill/dist/quill.snow.css';
-    import 'quill/dist/quill.bubble.css';
-    import { quillEditor } from 'vue-quill-editor';
-
     export default {
         name: 'CigarInfo',
         data() {
             return {
-                url: './vuetable.json',
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
@@ -149,7 +134,8 @@
                 base64Array:[],
                 activeName: 'first',
                 tab_index:'1',
-                count:''
+                count:'',
+                content:''
             }
         },
         created() {
@@ -162,14 +148,7 @@
                 })
             }
         },
-        components: {
-            quillEditor
-        },
         methods: {
-            cancleBtn(){
-                this.editVisible = false;
-                window.editor.remove('abc');
-            },
             //内容改变实时更新
             onContentChange (val) {
                 this.content = val;
@@ -177,24 +156,6 @@
                 if (this.count > 2000){
                     this.$message.warning('内容字符超过2000');
                 }
-            },
-            getData() {
-                this.$axios.get('/api/cigar/cigar_brand/'+this.tab_index+'/', {
-                    page: this.cur_page
-                }).then((res) => {
-                    var arr1 = res.data.brand_list;
-                    var arr2 = res.data.hot_brand_list;
-                    for (var i =0;i<arr1.length;i++){
-                        arr1[i].is_hot = "否";
-                        for (var k =0;k<arr2.length;k++){
-                            if (arr1[i].id == arr2[k].id){
-                                arr1[i].is_hot = "是";
-                            }
-                        }
-                    }
-                    console.log(res);
-                    this.tableData = arr1;
-                })
             },
             //内容上传图片
             fileImage(e) {
@@ -213,11 +174,6 @@
                 };
                 reader.readAsDataURL(file);
             },
-            handleClick(tab, event) {
-                console.log(tab, event);
-                this.tab_index = event.target.getAttribute('id') == 'tab-second' ? 2:1;
-                this.getData();
-            },
             //编辑按钮,弹出框
             handleEdit(index, row) {
                 this.idx = index;
@@ -234,7 +190,6 @@
                 this.content = item.intro;
                 this.imgSrc = item.photo;
                 this.editVisible = true;
-
                 window.editor.create('#abc', {
                     filterMode : true,
                     langType : 'en',
@@ -251,20 +206,16 @@
                     author: '',
                     date: new Date(),
                     details: '',
-
-
                 }
                 this.content = '';
                 this.imgSrc = '';
                 this.editVisible = true;
-
                 window.editor.create('#abc', {
                     filterMode : true,
                     langType : 'en',
                 });
                 window.editor.html('');
             },
-
             // 新增和保存编辑，请求
             saveEdit(){
                 var t = this;
@@ -285,19 +236,19 @@
 
                 }
             },
+            //新增和储存公共方法
             saveAndEditCommon(res,key) {
                 var t = this;
                 var dic = {
-                    'cigar_brand_id':t.form.id,          //广告id(修改/删除传,新增不传)
+                    'cigar_brand_id':t.form.id,
                     'cigar_brand':t.form.cigar_brand,
-                    'photo':res,                         //广告展示图片
+                    'photo':res,
                     'type_cigar_brand':t.form.type =='古巴' ? '1' : '2',
                     'is_hot':t.checked?'1':'0',
-                    'intro':t.content,               //广告内容
+                    'intro':t.content,
                     'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':key                          //七牛key
+                    'qiniu_key':key                      //七牛key
                 };
-                console.log(dic);
                 t.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
@@ -306,7 +257,7 @@
                 });
                 t.cancleBtn();
             },
-                //确定删除,请求
+            //确定删除,请求
             deleteRow(){
                 this.delVisible = false;
                 var t = this;
@@ -328,8 +279,8 @@
                     t.getData();
                 });
                 t.cancleBtn();
-                this.delVisible = false;
             },
+            //跳转详情页面
             handleDetails(index,row){
                 var t = this;
                 this.$router.push({
@@ -349,11 +300,41 @@
             delAll() {
                 this.$message.info('功能开发中');
             },
+            //取消按钮方法
+            cancleBtn(){
+                this.editVisible = false;
+                window.editor.remove('abc');
+            },
+            //请求
+            getData() {
+                this.$axios.get('/api/cigar/cigar_brand/'+this.tab_index+'/', {
+                    page: this.cur_page
+                }).then((res) => {
+                    var arr1 = res.data.brand_list;
+                    var arr2 = res.data.hot_brand_list;
+                    for (var i =0;i<arr1.length;i++){
+                        arr1[i].is_hot = "否";
+                        for (var k =0;k<arr2.length;k++){
+                            if (arr1[i].id == arr2[k].id){
+                                arr1[i].is_hot = "是";
+                            }
+                        }
+                    }
+                    this.tableData = arr1;
+                })
+            },
+            //tab切换
+            handleClick(tab, event) {
+                console.log(tab, event);
+                this.tab_index = event.target.getAttribute('id') == 'tab-second' ? 2:1;
+                this.getData();
+            },
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
             search() {
                 this.is_search = true;
+                this.$message.info('功能开发中');
             },
             setImage(e){
                 const file = e.target.files[0];
@@ -369,15 +350,6 @@
                 };
                 reader.readAsDataURL(file);
             },
-            imageuploaded(res) {
-                console.log(res)
-            },
-            handleError(){
-                this.$notify.error({
-                    title: '上传失败',
-                    message: '图片上传接口上传失败，可更改为自己的服务器接口'
-                });
-            },
             getLocalTime(nS) {
                 return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
             },
@@ -386,7 +358,6 @@
                 return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
             },
             photo_formatter(value){
-                console.log(value);
                 value = value.type;
                 return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
             },

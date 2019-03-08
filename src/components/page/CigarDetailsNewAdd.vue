@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="B_Loading">
+    <div>
         <div style="margin: 20px;"></div>
         <el-form style="margin-left: 0px" :label-position="labelPosition"  label-width="100px" :model="form">
             <el-row :gutter="60">
@@ -61,11 +61,8 @@
         <div align="center">
             <el-button size="medium" type="primary" @click="saveInfo">新增</el-button>
         </div>
-
     </div>
-
 </template>
-
 <script>
     export default {
         name: "CigarDetailsNewAdd",
@@ -94,8 +91,6 @@
                 dialogImageUrl: '',
                 dialogVisible: false,
                 nameBtn:'',
-
-                B_Loading:false
             }
         },
         created(){
@@ -123,7 +118,5 @@
         }
     }
 </script>
-
 <style scoped>
-
 </style>

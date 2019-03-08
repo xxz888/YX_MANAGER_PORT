@@ -2,43 +2,33 @@
     <div class="table">
         <div class="crumbs">
             <el-breadcrumb separator="/">
-                <el-breadcrumb-item><i class="el-icon-lx-cascades"></i> 资讯列表</el-breadcrumb-item>
+                <el-breadcrumb-item><i class="el-icon-lx-cascades"></i> 广告列表</el-breadcrumb-item>
             </el-breadcrumb>
         </div>
         <div class="container">
-            <el-tabs v-model="activeName" @tab-click="handleClick">
-                <el-tab-pane label="推荐" name="first"></el-tab-pane>
-                <el-tab-pane label="雪茄" name="second"></el-tab-pane>
-                <el-tab-pane label="红酒" name="third"></el-tab-pane>
-                <el-tab-pane label="高尔夫" name="forth"></el-tab-pane>
-            </el-tabs>
+            <div style="margin: 20px;"></div>
             <div class="handle-box">
                 <el-button type="primary" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>
                 <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
                 <el-button type="primary" icon="search" @click="search">搜索</el-button>
                 <el-button type="success" icon="search" @click="addnews">新增</el-button>
             </div>
-            <el-table :data="data"  tooltip-effect="dark"
-                      border  class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+            <el-table  :data="data" border tooltip-effect="dark" class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
-                <el-table-column prop="type" label="类型" width="80" align="center" :formatter = 'type_formatter'>
+                <el-table-column prop="title" width="150" show-overflow-tooltip label="标题"  align="center">
                 </el-table-column>
-                <el-table-column prop="title" label="标题" width="150" align="center">
+                <el-table-column prop="essay"  show-overflow-tooltip label="文章内容"  align="center">
                 </el-table-column>
-                <el-table-column prop="author" label="作者" width="80" align="center">
+                <el-table-column prop="publish_time" label="时间" width="100" align="center":formatter = 'data_formatter'>
                 </el-table-column>
-                <el-table-column prop="date" label="时间" width="100" align="center":formatter = 'data_formatter'>
-                </el-table-column>
-                <el-table-column prop="details" show-overflow-tooltip  align="center" label="详情"  >
-                </el-table-column>
-                <el-table-column prop="photo" label="展示图" align="center" width="150">
+                <el-table-column prop="picture" label="展示图" width="150" align="center">
                     <template  slot-scope="scope">
-                        <img :src="scope.row.photo"  width="120" height="70" class="pre-img"/>
+                        <img :src="scope.row.picture"  width="120" height="70" class="pre-img"/>
                     </template>
                 </el-table-column>
-                <el-table-column label="操作" width="150" align="center">
+                <el-table-column label="操作" width="180" align="center" >
                     <template slot-scope="scope">
                         <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                         <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -46,49 +36,39 @@
                 </el-table-column>
             </el-table>
         </div>
+
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%">
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
-                <el-form-item label="类型">
-                    <el-select v-model="form.type" placeholder="form.type">
-                        <el-option key="0" label="推荐" value="0"></el-option>
-                        <el-option key="1" label="雪茄" value="1"></el-option>
-                        <el-option key="2" label="红酒" value="2"></el-option>
-                        <el-option key="3" label="高尔夫" value="3"></el-option>
-                    </el-select>
-                </el-form-item>
                 <el-form-item label="标题">
                     <el-input v-model="form.title"></el-input>
                 </el-form-item>
-                <el-form-item label="作者">
-                    <el-input v-model="form.author"></el-input>
-                </el-form-item>
-                <el-form-item label="详情">
+                <el-form-item label="文章内容">
                     <editor id="abc" height="500px" width=100%
                             :content="content"
                             pluginsPath="/static/kindeditor/plugins/"
                             :loadStyleMode="false"
                             @on-content-change="onContentChange">
                     </editor>
-                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
+                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="选择图片" />
                     <span>{{count}}/5000</span>
                 </el-form-item>
+
                 <el-form-item label="展示图">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
-                            <img :src="imgSrc" v-model="form.photo" class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
+                            <img :src="imgSrc" class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
                             <div class="crop-demo-btn">选择图片
                                 <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
                             </div>
                         </div>
                     </template>
                 </el-form-item>
-
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="cancleBtn">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
-            </span>
+                    <el-button @click="cancleBtn">取 消</el-button>
+                    <el-button type="primary" @click="saveEdit">确 定</el-button>
+                </span>
         </el-dialog>
         <!-- 删除提示框 -->
         <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
@@ -103,10 +83,9 @@
 
 <script>
     export default {
-        name: 'HomeInfo',
+        name: 'CigarAccessories',
         data() {
             return {
-                url: './vuetable.json',
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
@@ -117,29 +96,27 @@
                 editVisible: false,
                 delVisible: false,
                 form: {
-                    id: '',
-                    photo: '',
-                    title: '',
+                    culture_id: '',
+                    picture: '',
+                    essay: '',
                     type:'',
-                    author:'',
-                    date:'',
-                    details:''
+                    title:'',
+                    qiniu_key:''
                 },
                 idx: -1,
                 fileList: [],
                 imgSrc: '',
                 cropImg: '',
                 dialogVisible: false,
-                item:'',
+                content:'',
                 base64Array:[],
+                key:'',
+                capture:'',
                 tag:'0',
                 count:'0',
-                activeName: 'second',
-                tab_index:'1'
             }
         },
         created() {
-            this.tab_index = '1';
             this.getData();
         },
         computed: {
@@ -175,56 +152,14 @@
                 };
                 reader.readAsDataURL(file);
             },
-            //编辑按钮,弹出框
-            handleEdit(index, row) {
-                this.idx = index;
-                const item = this.tableData[index];
-                this.form = {
-                    id: item.id,
-                    photo: item.photo,
-                    title: item.title,
-                    type: item.type == 0 ? '推荐' : item.type == 1 ? '雪茄' : item.type == 2 ? '红酒' :'高尔夫',
-                    author: item.author,
-                    date: this.getLocalTime(item.date),
-                    details: item.details,
-                }
-                this.imgSrc = item.photo;
-                this.content =  item.details;
-                this.editVisible = true;
-                window.editor.create('#abc', {
-                    filterMode : false,
-                    langType : 'en',
-                });
-                window.editor.html(this.content);
-            },
-            //增加按钮，弹出框
-            addnews(){
-                this.form = {
-                    id: '',
-                    photo: '',
-                    title: '',
-                    type: this.tab_index == 0 ? '推荐' : this.tab_index == 1 ? '雪茄' : this.tab_index == 2 ? '红酒' : '高尔夫',
-                    author: '',
-                    date: new Date(),
-                    details: '',
-                }
-                this.content = '';
-                this.imgSrc = '';
-                this.editVisible = true;
-                window.editor.create('#abc', {
-                    filterMode : false,
-                    langType : 'en',
-                });
-                window.editor.html('');
-            },
             // 新增和保存编辑，请求
-            saveEdit() {
+            saveEdit(){
                 var t = this;
                 if (this.imgSrc.length == 0){
                     t.$message.warning('请上传图片');
                     return;
-                }else if(this.content.length > 2000){
-                    t.$message.warning('内容字符太长');
+                }else if(this.content.length > 5000){
+                    t.$message.warning('内容字符超过5000');
                     return;
                 }
                 if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
@@ -233,23 +168,20 @@
                     })
                 }else{
                     t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
-
                 }
             },
             //新增和储存公共方法
-            saveAndEditCommon(res,key) {
+            saveAndEditCommon(photo_res,key){
                 var t = this;
                 var dic = {
-                    'information_id':t.form.id,             //资讯id(修改/删除传,新增不传)
-                    'photo':res,                            //资讯展示图片
-                    'title':t.form.title,                   //资讯标题
-                    'type_information':t.form.type =='推荐' ? '0' : t.form.type =='雪茄' ? '1' : t.form.type =='红酒' ? '2' : '3',            //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
-                    'author':t.form.author,                  //作者
-                    'details':t.content,                    //资讯详情
-                    'type':t.form.id.length == 0 ? 2 :1,     //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':key
+                    'culture_id':t.form.culture_id,
+                    'picture':photo_res,
+                    'essay':t.content,
+                    'type':t.form.culture_id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
+                    'qiniu_key':key,                     //七牛key
+                    'title':t.form.title
                 };
-                t.$axios.post('/api/pub/information/6/',dic,{headers:{
+                t.$axios.post('/api/cigar/cigar_culture/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     t.$message.success(res.data.message);
@@ -262,22 +194,69 @@
                 this.delVisible = false;
                 var t = this;
                 var dic = {
-                    'information_id':t.tableData[t.idx].id,  //资讯id(修改/删除传,新增不传)
-                    'photo':'',                              //资讯展示图片
-                    'title':'',                              //资讯标题
-                    'type_information':t.form.type =='推荐' ? '0' : t.form.type =='雪茄' ? '1' : t.form.type =='红酒' ? '2' : '3',            //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
-                    'author':'',                             //作者
-                    'details':'',                            //资讯详情
-                    'type':'3',                              //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':''
+                    'culture_id':this.tableData[this.idx].id,
+                    'picture':'',
+                    'essay':'',
+                    'type':3, //操作类型(1/修改，2/新增，3/删除)
+                    'qiniu_key':'',
+                    'title':t.form.title
                 };
-                this.$axios.post('/api/pub/information/6/',dic,{headers:{
+                this.$axios.post('/api/cigar/cigar_culture/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     t.$message.success(res.data.message);
                     t.getData();
                 });
                 t.cancleBtn();
+            },
+            //增加按钮，弹出框
+            addnews(index, row){
+
+                this.idx = index;
+                this.form = {
+                    culture_id: "",
+                    type:3,
+                    essay: "",
+                    picture: "",
+                    title:''
+                }
+                this.content = '';
+                this.imgSrc = '';
+                this.title = '';
+                this.editVisible = true;
+                window.editor.create('#abc', {
+                    filterMode : true,
+                    langType : 'en',
+                });
+                window.editor.html('');
+            },
+            //编辑按钮,弹出框
+            handleEdit(index, row) {
+                this.idx = index;
+                const item = this.tableData[index];
+                this.form = {
+                    culture_id: item.id,
+                    essay: item.essay,
+                    picture: item.picture,
+                    title:item.title,
+                    type:'1'
+                }
+                this.imgSrc = item.picture;
+                this.content = item.essay;
+                this.title = item.title;
+                this.editVisible = true;
+
+                window.editor.create('#abc');
+                window.editor.html(this.content);
+            },
+            //单个删除,弹出框
+            handleDelete(index, row) {
+                this.idx = index;
+                this.delVisible = true;
+            },
+            //全部删除
+            delAll() {
+                this.$message.info('功能开发中');
             },
             //封面图片
             setImage(e){
@@ -290,41 +269,25 @@
                 reader.onload = (event) => {
                     t.dialogVisible = true;
                     t.imgSrc = event.target.result;
-                    t.$refs.cropper && t.$refs.cropper.replace(event.target.result);
+                    t.$refs.cropper && this.$refs.cropper.replace(event.target.result);
                 };
                 reader.readAsDataURL(file);
             },
-            //单个删除,弹出框
-            handleDelete(index, row) {
-                this.idx = index;
-                this.delVisible = true;
-            },
-            //全部删除
-            delAll() {
-                this.$message.info('功能开发中');
-            },
 
 
-            //tab切换
-            handleClick(tab, event) {
-                var index =  event.target.getAttribute('id');
-                this.tab_index =  index == 'tab-first' ? 0: index == 'tab-second' ? 1: index == 'tab-third' ? 2 : 3;
-                this.getData();
-            },
             //请求
             getData() {
-                this.$axios.get('/api/pub/information/'+this.tab_index+'/', {
+                var t = this;
+                this.$axios.get('/api/cigar/cigar_culture/'+1+'/',{
                     page: this.cur_page
                 }).then((res) => {
-                    this.tableData = res.data;
-                    console.log(this.tableData);
+                    t.tableData = res.data;
                 })
             },
             //取消按钮方法
             cancleBtn(){
                 this.editVisible = false;
                 window.editor.remove('abc');
-
             },
             //以下方法备用
             handleSelectionChange(val) {
@@ -335,9 +298,6 @@
                 this.$message.info('功能开发中');
 
             },
-            getLocalTime(nS) {
-                return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
-            },
             type_formatter(value){
                 value = value.type;
                 return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
@@ -347,16 +307,25 @@
                 value = value.type;
                 return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
             },
-            data_formatter(value){
-                return this.getLocalTime(value.date);
+            imageuploaded(res) {
+                console.log(res)
             },
-
+            getLocalTime(nS) {
+                return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
+            },
+            data_formatter(value){
+                return this.getLocalTime(value.publish_time);
+            },
         },
     }
 
 </script>
 
 <style scoped>
+    .countSpan{
+        text-align: right;        display: block;
+
+    }
     .handle-box {
         margin-bottom: 20px;
     }
@@ -376,7 +345,6 @@
     .table{
         width: 100%;
         font-size: 14px;
-
     }
     .red{
         color: #ff0000;
@@ -417,5 +385,8 @@
         background: #f8f8f8;
         border: 1px solid #eee;
         border-radius: 5px;
+    }
+    .editor-btn{
+        margin-top: 20px;
     }
 </style>

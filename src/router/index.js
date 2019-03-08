@@ -50,8 +50,16 @@ export default new Router({
                     component: resolve => require(['../components/page/CigarDetailsImage.vue'], resolve),
                     meta: {title: '雪茄图片修改'}
                 },
-
-
+                {
+                    path: '/CigarAccessories',
+                    component: resolve => require(['../components/page/CigarAccessories.vue'], resolve),
+                    meta: {title: '雪茄文化'}
+                },
+                {
+                    path: '/UsersFindTag',
+                    component: resolve => require(['../components/page/UsersFindTag.vue'], resolve),
+                    meta: {title: '发现标签'}
+                },
 
                 {
                     path: '/dashboard',

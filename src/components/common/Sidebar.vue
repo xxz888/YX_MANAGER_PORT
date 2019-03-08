@@ -57,6 +57,16 @@
                         icon: 'el-icon-goods',
                         index: 'CigarInfo',
                         title: '雪茄品牌'
+                    },
+                    {
+                        icon: 'el-icon-search',
+                        index: 'UsersFindTag',
+                        title: '发现标签'
+                    },
+                    {
+                        icon: 'el-icon-news',
+                        index: 'CigarAccessories',
+                        title: '雪茄文化'
                     }
                     ]
             }},

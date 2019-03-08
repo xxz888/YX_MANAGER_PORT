@@ -13,7 +13,6 @@
                 <el-tab-pane label="高尔夫" name="forth"></el-tab-pane>
             </el-tabs>
             <div style="margin: 20px;"></div>
-
             <div class="handle-box">
                 <el-button type="primary" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>
                 <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
@@ -27,14 +26,10 @@
                 <el-table-column prop="type" label="类型" width="80"align="center"  :formatter = 'type_formatter'>
                 </el-table-column>
                 <el-table-column prop="title" width="150" show-overflow-tooltip label="标题"  align="center">
-
                 </el-table-column>
                 <el-table-column prop="character"  show-overflow-tooltip label="广告文字"  align="center">
-
                 </el-table-column>
-
                 <el-table-column prop="photo" label="广告图片" width="150" align="center">
-                    <!-- 图片的显示 -->
                     <template  slot-scope="scope">
                         <img :src="scope.row.photo"  width="120" height="70" class="pre-img"/>
                     </template>
@@ -90,9 +85,6 @@
                     <el-button type="primary" @click="saveEdit">确 定</el-button>
                 </span>
         </el-dialog>
-
-
-
         <!-- 删除提示框 -->
         <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
@@ -105,11 +97,6 @@
 </template>
 
 <script>
-    import p_img from '../../assets/img/img.jpg'
-    import 'quill/dist/quill.core.css';
-    import 'quill/dist/quill.snow.css';
-    import 'quill/dist/quill.bubble.css';
-    import { quillEditor } from 'vue-quill-editor';
     export default {
         name: 'HomeAdver',
         data() {
@@ -156,19 +143,7 @@
                 })
             }
         },
-        components: {
-
-        },
         methods: {
-            handleClick(tab, event) {
-                var index =  event.target.getAttribute('id');
-                this.tab_index =  index == 'tab-first' ? 0: index == 'tab-second' ? 1: index == 'tab-third' ? 2 : 3;
-                this.getData();
-            },
-            cancleBtn(){
-                this.editVisible = false;
-                window.editor.remove('abc');
-            },
             //内容改变实时更新
             onContentChange (val) {
                 this.content = val;
@@ -194,16 +169,6 @@
                 };
                 reader.readAsDataURL(file);
             },
-            //请求
-            getData() {
-                var t = this;
-                this.$axios.get('/api/pub/advertising/'+this.tab_index+'/',{
-                    page: this.cur_page
-                }).then((res) => {
-                    t.Loading = false;
-                    t.tableData = res.data;
-                })
-            },
             // 新增和保存编辑，请求
             saveEdit(){
                 var t = this;
@@ -228,11 +193,11 @@
                 var t = this;
                 var dic = {
                     'advertising_id':t.form.id,          //广告id(修改/删除传,新增不传)
-                    'photo':photo_res,                         //广告展示图片
+                    'photo':photo_res,                   //广告展示图片
                     'character':t.content,               //广告内容
-                    'type_advertising':this.tab_index,                //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
+                    'type_advertising':t.form.type =='推荐' ? '0' : t.form.type =='雪茄' ? '1' : t.form.type =='红酒' ? '2' : '3',            //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
                     'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':key,                          //七牛key
+                    'qiniu_key':key,                     //七牛key
                     'title':t.form.title
                 };
                 t.$axios.post('/api/pub/advertising/6/',dic,{headers:{
@@ -250,11 +215,11 @@
                 t.Loading = true;
                 var dic = {
                     'advertising_id':this.tableData[this.idx].id,          //广告id(修改/删除传,新增不传)
-                    'photo':'',                //广告展示图片
-                    'character':'',               //广告内容
+                    'photo':'',                                            //广告展示图片
+                    'character':'',                                        //广告内容
                     'type_advertising':t.form.type =='推荐' ? '0' : t.form.type =='雪茄' ? '1' : t.form.type =='红酒' ? '2' : '3',            //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
-                    'type':'3',                          //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':'',                      //七牛key
+                    'type':'3',                                            //操作类型(1/修改，2/新增，3/删除)
+                    'qiniu_key':'',                                        //七牛key
                     'title':''
                 };
                 this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
@@ -265,11 +230,6 @@
                 });
                 t.cancleBtn();
             },
-
-
-
-
-
             //增加按钮，弹出框
             addnews(index, row){
 
@@ -320,21 +280,7 @@
             delAll() {
                 this.$message.info('功能开发中');
             },
-            handleSelectionChange(val) {
-                this.multipleSelection = val;
-            },
-            search() {
-                this.is_search = true;
-            },
-            type_formatter(value){
-                value = value.type;
-                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
-            },
-            photo_formatter(value){
-                console.log(value);
-                value = value.type;
-                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
-            },
+            //封面图片
             setImage(e){
                 const file = e.target.files[0];
                 if (!file.type.includes('image/')) {
@@ -349,14 +295,49 @@
                 };
                 reader.readAsDataURL(file);
             },
+
+
+            //请求
+            getData() {
+                var t = this;
+                this.$axios.get('/api/pub/advertising/'+this.tab_index+'/',{
+                    page: this.cur_page
+                }).then((res) => {
+                    t.Loading = false;
+                    t.tableData = res.data;
+                })
+            },
+            //tab切换
+            handleClick(tab, event) {
+                var index =  event.target.getAttribute('id');
+                this.tab_index =  index == 'tab-first' ? 0: index == 'tab-second' ? 1: index == 'tab-third' ? 2 : 3;
+                this.getData();
+            },
+            //取消按钮方法
+            cancleBtn(){
+                this.editVisible = false;
+                window.editor.remove('abc');
+            },
+            //以下方法备用
+            handleSelectionChange(val) {
+                this.multipleSelection = val;
+            },
+            search() {
+                this.is_search = true;
+                this.$message.info('功能开发中');
+
+            },
+            type_formatter(value){
+                value = value.type;
+                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
+            },
+            photo_formatter(value){
+                console.log(value);
+                value = value.type;
+                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
+            },
             imageuploaded(res) {
                 console.log(res)
-            },
-            handleError(){
-                this.$notify.error({
-                    title: '上传失败',
-                    message: '图片上传接口上传失败，可更改为自己的服务器接口'
-                });
             },
             getLocalTime(nS) {
                 return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
