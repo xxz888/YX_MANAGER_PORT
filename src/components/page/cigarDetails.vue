@@ -71,10 +71,13 @@
             getParams(){
                 // 取到路由带过来的参数
                 this.id = this.$route.query.id;
-                this.cigar_name = this.$route.query.cigar_name;
+                this.cigar_name = this.$route.query.cigar_name ? this.$route.query.cigar_name : '';
                 this.getData();
             },
             getData(){
+                if (!this.id){
+                    return;
+                }
                 var t = this;
                 var dic = {'cigar_brand_id':this.id};
                 this.$axios.post('/api/cigar/cigar_brand_details/',dic,{headers:{
@@ -91,7 +94,9 @@
             },
 
             handleDelete(item){
-
+                if (!this.id){
+                    return;
+                }
                 var t = this;
                 var dic = item;
                 dic['cigar_id'] = item.id;

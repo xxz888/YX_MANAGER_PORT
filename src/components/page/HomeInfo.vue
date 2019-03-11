@@ -71,7 +71,7 @@
                             @on-content-change="onContentChange">
                     </editor>
                     <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
-                    <span>{{count}}/5000</span>
+                    <span>{{count}}</span>
                 </el-form-item>
                 <el-form-item label="展示图">
                     <template  slot-scope="scope">
@@ -154,9 +154,6 @@
             onContentChange (val) {
                 this.content = val;
                 this.count = this.content.length;
-                if (this.count > 5000){
-                    this.$message.warning('内容字符超过5000');
-                }
             },
             //内容上传图片
             fileImage(e) {
@@ -191,6 +188,8 @@
                 this.imgSrc = item.photo;
                 this.content =  item.details;
                 this.editVisible = true;
+                this.count = item.details.length;
+
                 window.editor.create('#abc', {
                     filterMode : false,
                     langType : 'en',
@@ -222,9 +221,6 @@
                 var t = this;
                 if (this.imgSrc.length == 0){
                     t.$message.warning('请上传图片');
-                    return;
-                }else if(this.content.length > 2000){
-                    t.$message.warning('内容字符太长');
                     return;
                 }
                 if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){

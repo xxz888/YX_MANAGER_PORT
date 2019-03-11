@@ -189,7 +189,10 @@
                 this.checked = item.is_hot == '是' ? true : false;
                 this.content = item.intro;
                 this.imgSrc = item.photo;
+                this.count = item.intro.length;
+
                 this.editVisible = true;
+
                 window.editor.create('#abc', {
                     filterMode : true,
                     langType : 'en',

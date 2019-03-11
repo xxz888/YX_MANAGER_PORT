@@ -44,7 +44,16 @@ router.beforeEach((to, from, next) => {
 })
 
 
-new Vue({
+var vue = new Vue({
     router,
     render: h => h(App)
 }).$mount('#app')
+
+window.addEventListener('load', function () {
+    if (vue.$route.path === '/CigarDetailsChange' ||
+        vue.$route.path === '/CigarDetails' ||
+        vue.$route.path === '/CigarDetailsImage'
+    ) { // /date 表示日期选择路由
+        vue.$router.replace('/CigarInfo') // 列表页面的路由
+    }
+})

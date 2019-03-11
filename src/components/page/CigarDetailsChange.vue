@@ -121,6 +121,9 @@
                 var dic = t.form;
                 dic['type'] = '1';
                 dic['cigar_id'] = t.form.id;
+                if (!t.form.id){
+                    return;
+                }
                 t.$axios.post('/api/cigar/ad_cigar/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
