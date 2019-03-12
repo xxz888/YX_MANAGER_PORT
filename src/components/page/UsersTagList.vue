@@ -10,7 +10,7 @@
         </div>
         <br>
         <el-tag size="medium"
-                :key="item.tag"
+                :key="item.id"
                 v-for="item in dataArray"
                 closable
                 :disable-transitions="false"
@@ -87,6 +87,7 @@
             },
             getParams(){
                 // 取到路由带过来的参数
+                this.dataArray = [];
                 this.id = this.$route.query.id;
                 this.getData();
             },
