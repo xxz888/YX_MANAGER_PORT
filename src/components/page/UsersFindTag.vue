@@ -31,7 +31,7 @@
                 v-for="item in dynamicTags"
                 :disable-transitions="true"
                 @click="jumpDetail(item)">
-            {{item.type+'详情'}}
+            {{'【'+item.type+'】' + ' 详情'}}
         </el-tag>
     </div>
 

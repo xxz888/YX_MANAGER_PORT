@@ -166,7 +166,7 @@
                         }}).then((res)=>{
                         if (res.data.status == 1){
                             this.$message.success(res.data.message);
-                            this.getData();
+                            this.clearTf();
                         } else {
                             this.$message.warning(res.data.message);
                         }
@@ -185,9 +185,10 @@
                         }}).then((res)=>{
                         if (res.data.status == 1){
                             this.$message.success(res.data.message);
-                            this.getData();
                             this.inputVisible = false;
                             this.inputValue = '';
+                            this.clearTf();
+
                         } else {
                             this.$message.warning(res.data.message);
                         }
