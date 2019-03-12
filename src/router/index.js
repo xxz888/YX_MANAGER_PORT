@@ -60,7 +60,11 @@ export default new Router({
                     component: resolve => require(['../components/page/UsersFindTag.vue'], resolve),
                     meta: {title: '发现标签'}
                 },
-
+                {
+                    path: '/UsersTagList',
+                    component: resolve => require(['../components/page/UsersTagList.vue'], resolve),
+                    meta: {title: '标签列表'}
+                },
                 {
                     path: '/dashboard',
                     component: resolve => require(['../components/other/Dashboard.vue'], resolve),

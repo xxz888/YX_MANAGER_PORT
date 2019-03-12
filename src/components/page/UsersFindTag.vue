@@ -3,7 +3,7 @@
 
         <br>
         <el-tag size="medium"
-                :key="item.type"
+                :key="item.id"
                 v-for="item in dynamicTags"
                 closable
                 :disable-transitions="false"
@@ -21,7 +21,18 @@
                 @blur="handleInputConfirm"
         >
         </el-input>
+
         <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+        <br>  <br>
+        <el-tag
+                type="danger"
+                size="medium"
+                :key="item.type"
+                v-for="item in dynamicTags"
+                :disable-transitions="true"
+                @click="jumpDetail(item)">
+            {{item.type+'详情'}}
+        </el-tag>
     </div>
 
 </template>
@@ -40,6 +51,15 @@
             this.getData();
         },
         methods: {
+            jumpDetail(item){
+                var t = this;
+                this.$router.push({
+                    path:'/UsersTagList',
+                    query:{
+                        'id':item.id
+                    }
+                })
+            },
             getData(){
                 this.$axios.get("/api/users/find_tag/",).then((res)=>{
                         this.dynamicTags = res.data;
