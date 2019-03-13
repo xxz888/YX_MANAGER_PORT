@@ -4,17 +4,19 @@
 
 <template>
     <div >
-        <el-button style="margin:20px 0px" size="medium" type="success" @click="addInfo">新增</el-button>
+        <!--<el-button style="margin:20px 0px" size="medium" type="success" @click="addInfo">新增</el-button>-->
         <el-row>
             <el-col align="right" :span="4" v-for="(item, index) in tableData">
                 <el-card  :body-style="{ padding: '5px' }">
                     <img :src="item.brand_logo" class="image" />
-                    <div class="namediv" style="padding: 10px;">
+                    <div class="namediv" style="padding: 15px;">
                         <p class="spanname">{{item.brand_name}}</p>
-                        <el-button type="text" icon="el-icon-edit" @click="handleClick(index)">编辑信息</el-button>
-                        <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(index)">删除</el-button>
-                        <div style="margin: 10px 0px"></div>
-                        <el-button size="mini" type="success" @click="handleDetails(index)">详情</el-button>
+                        <el-button style="margin: 15px 0px" size="mini" type="success" @click="handleClick(index)">编辑</el-button>
+                        <el-button size="mini" type="danger"  @click="handleDelete(index)">删除</el-button>
+                        <el-button  style="margin: 10px 0px" size="mini" type="warning" @click="addInfo">新增</el-button>
+
+
+                        <el-button  size="mini" type="primary" @click="handleDetails(index)">详情</el-button>
 
                     </div>
                 </el-card>
