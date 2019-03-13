@@ -67,7 +67,13 @@
                         icon: 'el-icon-news',
                         index: 'CigarAccessories',
                         title: '雪茄文化'
-                    }
+                    },
+                    {
+                        icon: 'el-icon-location-outline',
+                        index: 'CigarShop',
+                        title: '雪茄配件'
+                    },
+
                     ]
             }},
         computed:{

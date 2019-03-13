@@ -72,7 +72,7 @@
                 <el-form-item label="广告图片">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
-                            <img :src="imgSrc" class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
+                            <img :src="imgSrc"  class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
                             <div class="crop-demo-btn">选择图片
                                 <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
                             </div>
