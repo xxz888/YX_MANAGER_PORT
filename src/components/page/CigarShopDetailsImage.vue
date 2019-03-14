@@ -1,5 +1,5 @@
 <template>
-    <div v-loading="B_Loading">
+    <div >
         <div class="hello">
             <div class="upload">
                 <div class="upload_warp">
@@ -38,13 +38,12 @@
 
 <script>
     export default {
-        name: "CigarDetailsImage",
+        name: "CigarShopDetailsImage",
         data(){
             return {
                 dic:{},
                 imgList: [],
                 size: 0,
-                B_Loading:false
             }
         },
         created(){
@@ -58,13 +57,11 @@
                 this.imgList = [];
                 this.dic = this.$route.query.key;
                 for (var i = 0 ; i <this.dic.photo_list.length;i++){
-                    if (this.dic.photo_list[i].photo_url.length != 0) {
-                        this.imgList.push(
-                            {
-                                'file':
-                                    {
-                                        'name':     this.dic.photo_list[i]['id'],
-                                        'src':this.dic.photo_list[i]['photo_url']
+                    if (this.dic.photo_list[i].photo.length != 0) {
+                        this.imgList.push({
+                                'file': {
+                                        'name':this.dic.photo_list[i]['id'],
+                                        'src':this.dic.photo_list[i]['photo']
                                     }
                             }
                         )
@@ -74,7 +71,6 @@
             },
             saveUpLoad(){
                 var t = this;
-                this.B_Loading = true;
                 var qiniuImgList = [];
 
                 for (let i = 0 ; i <this.imgList.length;i++){
@@ -82,14 +78,13 @@
                     (function () {
                         if (src.indexOf('http://photo.thegdlife.com') == -1){
                             t.$uploadQiNiuYun.uploadqiniuyun(src,function (res,key) {
-                                t.B_Loading = false;
                                 var dic = {
-                                    'cigar_id':t.dic.id,
+                                    'cigar_accessories_id':t.dic.id,
                                     'photo_url':res,
                                     'photo_id':'',
                                     'type':2,           //操作类型(2/新增，3/删除)
                                 };
-                                t.$axios.post('/api/cigar/ad_cigar_photo/',dic,{headers:{
+                                t.$axios.post('/api/cigar/ad_cigar_accessories_photo/',dic,{headers:{
                                         "Authorization":"JWT " + localStorage.getItem('token')
                                     }}).then(res=>{
                                     if (res.data.status == 1){
@@ -184,13 +179,13 @@
             fileDel(index) {
                 var t = this;
                 var dic = {
-                    'cigar_id':t.dic.id,
+                    'cigar_accessories_id':t.dic.id,
                     'photo_url':t.imgList[index].file.src,
                     'photo_id':t.imgList[index].file.name,
                     'qiniu_key':t.imgList[index].file.src.split('http://photo.thegdlife.com/')[1],
                     'type':3,           //操作类型(2/新增，3/删除)
                 };
-                t.$axios.post('/api/cigar/ad_cigar_photo/',dic,{headers:{
+                t.$axios.post('/api/cigar/ad_cigar_accessories_photo/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     t.$message.success(res.data.message);

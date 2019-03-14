@@ -36,6 +36,11 @@
             </el-table-column>
             <el-table-column prop="weight" label="权重" width="80" align="center">
             </el-table-column>
+            <el-table-column  label="修改图片" width="80" align="center">
+                <template slot-scope="scope">
+                    <el-button type="primary" round @click="changePhotolist(scope.$index, scope.row)">图片</el-button>
+                </template>
+            </el-table-column>
             <el-table-column label="操作" width="150" align="center">
                 <template slot-scope="scope">
                     <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
@@ -52,43 +57,31 @@
                 :total="100"
                 :current-page = 'currentPage'
                 @current-change="handleCurrentChange"
-
         >
         </el-pagination>
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%" >
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
-                <el-form-item label="类型">
-                    <el-select v-model="form.type" placeholder="form.type">
-                        <el-option key="1" label="古巴" value="1"></el-option>
-                        <el-option key="2" label="非古" value="2"></el-option>
-                    </el-select>
+                <el-form-item label="类型" >
+                    <el-input v-model="form.type_accessories" disabled="false"></el-input>
                 </el-form-item>
-                <el-form-item label="雪茄名">
-                    <el-input v-model="form.cigar_brand"></el-input>
+                <el-form-item label="品牌名">
+                    <el-input v-model="form.brand_name" disabled="false"></el-input>
                 </el-form-item>
-                <el-form-item label="热门">
-                    <el-checkbox v-model="checked">热门</el-checkbox>
+                <el-form-item label="配件名">
+                    <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-form-item label="详情">
-                    <editor id="abc" height="500px" width=100%
-                            :content="content"
-                            pluginsPath="/static/kindeditor/plugins/"
-                            :loadStyleMode="false"
-                            @on-content-change="onContentChange">
-                    </editor>
-                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
-                    <span>{{count}}/2000</span>
+                <el-form-item label="价格">
+                    <el-input v-model="form.price"></el-input>
                 </el-form-item>
-                <el-form-item label="品牌logo">
-                    <template  slot-scope="scope">
-                        <div class="crop-demo">
-                            <img :src="imgSrc" v-model="form.photo" class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
-                            <div class="crop-demo-btn">选择图片
-                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
-                            </div>
-                        </div>
-                    </template>
+                <el-form-item label="权重">
+                    <el-input v-model="form.weight"></el-input>
+                </el-form-item>
+                <el-form-item label="配件信息">
+                    <el-input type="textarea" v-model="form.info"></el-input>
+                </el-form-item>
+                <el-form-item label="购买须知">
+                    <el-input type="textarea" v-model="form.notice"></el-input>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -100,7 +93,7 @@
         <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
             <span slot="footer" class="dialog-footer">
-                <el-button @click="cancleBtn">取 消</el-button>
+                <el-button @click="delVisible = false">取 消</el-button>
                 <el-button type="primary" @click="deleteRow">确 定</el-button>
             </span>
         </el-dialog>
@@ -125,11 +118,14 @@
                     type:'',
                     weight:''
                 },
-                tab_index:'1',
-                currentPage:'1'
+                tab_index:'',
+                currentPage:'1',
+                editVisible:false,
+                delVisible:false,
+                activeName: '1',
+                idx:''
             };
         },
-
         created(){
             this.tab_index = '1';
             this.getParams();
@@ -149,13 +145,21 @@
                 this.brand_name = this.$route.query.brand_name;
                 this.getData();
             },
+            //请求数据
             getData(){
+                var self = this;
                 if (!this.brand_name){
                     return;
                 }
                 var parStr = "/api/cigar/cigar_accessories/"+ this.tab_index+'/'+this.currentPage+'/'+this.brand_name+'/';
               this.$axios.get(parStr).then(res=>{
-                  this.tableData = res.data;
+                  self.tableData = res.data;
+                  for(var i = 0 ; i < self.tableData.length;i++){
+                      if(self.tableData[i].photo_list.length == 0){
+                          var dic = {'photo_url':''};
+                          self.tableData[i].photo_list.push(dic)
+                      }
+                  }
               })
             },
             handleClick(tab, event) {
@@ -172,9 +176,96 @@
                                               index == 'tab-5' ? 5:6;
                 this.getData();
             },
+            //分页切换取值
             handleCurrentChange(val) {
                 this.currentPage = val;
                 this.getData();
+            },
+            //编辑按钮,弹出框
+            handleEdit(index, row) {
+                const item = this.tableData[index];
+                var val = this.tab_index;
+                this.form = {
+                    brand_name:this.brand_name,
+                    name:item.name,
+                    price:item.price,
+                    info:item.info,
+                    notice:item.notice,
+                    type:1,
+                    weight:item.weight,
+                    cigar_accessories_id:item.id,
+                    type_accessories:val==1?'推荐':val==2?'雪茄剪':val==3?'打火机':val==4?'保湿盒':val==5?'雪茄盒':'烟灰缸',
+                }
+                this.editVisible = true;
+            },
+            //新增按钮
+            addnews(){
+                var val = this.tab_index;
+                this.form = {
+                    brand_name:this.brand_name,
+                    name:'',
+                    price:'',
+                    info:'',
+                    notice:'',
+                    type:2,
+                    weight:'',
+                    cigar_accessories_id:'',
+                    type_accessories:val==1?'推荐':val==2?'雪茄剪':val==3?'打火机':val==4?'保湿盒':val==5?'雪茄盒':'烟灰缸',
+                }
+                this.editVisible = true;
+            },
+            //新增和编辑的请求
+            saveEdit(){
+                if (!this.brand_name){
+                    return;
+                }
+                var self = this;
+                var dic = this.form;
+                dic.type_accessories = this.tab_index;
+                console.log(dic);
+                this.$axios.post('/api/cigar/cigar_accessories/6/6/bn/',dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then(res=>{
+                    self.$message.success(res.data.message);
+                    self.getData();
+                });
+                this.cancleBtn();
+            },
+            //取消按钮
+            cancleBtn(){
+                this.editVisible = false;
+            },
+            //删除,弹出框
+            handleDelete(index, row) {
+                this.idx = index;
+                this.delVisible = true;
+            },
+            //删除请求
+            deleteRow(){
+                if (!this.brand_name){
+                    return;
+                }
+                this.delVisible = false;
+                var self = this;
+                var dic = this.form;
+                dic.brand_name = this.brand_name;
+                dic.cigar_accessories_id = self.tableData[this.idx]['id'];
+                dic.type = 3;
+                dic.type_accessories = this.tab_index;
+                this.$axios.post('/api/cigar/cigar_accessories/6/6/bn/',dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then(res=>{
+                    self.$message.success(res.data.message);
+                    self.getData();
+                });
+            },
+            //修改图片片
+            changePhotolist(index,row){
+                var self = this;
+                this.$router.push({
+                    path:'/CigarShopDetailsImage',
+                    query: {'key':self.tableData[index]}
+                })
             }
         }
     };
