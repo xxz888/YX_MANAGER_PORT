@@ -179,8 +179,8 @@
                     'brand_name': t.form.brand_name,
                     'brand_logo': res,
                     'is_got': t.checked?'1':'0',
-                    'brand_id':t.form.id,
-                    'type':t.form.id ? 1 : 2,
+                    'brand_id':t.form.brand_id,
+                    'type':t.form.brand_id ? 1 : 2,
                     'qiniu_key':key                      //七牛key
                 };
                 t.$axios.post('/api/cigar/cigar_accessories_brand/',dic,{headers:{

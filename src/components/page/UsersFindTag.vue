@@ -70,7 +70,7 @@
                 this.$alert( '是否删除标签'+ '【'+item.type + '】', {
                     confirmButtonText: '确定',
                     callback: action => {
-                        var dic = {'tag_id':item.id,'tag':'','type':'3'};
+                        var dic = {'tag_id':item.id,'tag':'','type':'3','weight':item.weight};
                         this.$axios.post("/api/users/find_tag/",dic,{headers:{
                                 "Authorization":"JWT " + localStorage.getItem('token')
                             }}).then((res)=>{
@@ -93,11 +93,18 @@
             },
             //编辑
             changeEdit(item) {
-                this.$prompt('请输入新的标签名', '编辑'+ '【'+item.type + '】', {
+                this.$prompt('请输入新的标签名和权重，以空格分割', '编辑'+ '【'+item.type + '】', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
+                    inputValue:item.type+' '+item.weight,
                 }).then(({ value }) => {
-                    var dic = {'tag_id':item.id,'tag':value,'type':'1'};
+                    if (value.length == 0) return;
+                    var array = value.split(' ');
+                    if (value.indexOf(' ') == -1 || array[1].length == 0){
+                        this.$message.warning('请输入权重，以空格分割');
+                        return;
+                    }
+                    var dic = {'tag_id':item.id,'tag':array[0],'type':'1','weight':array[1]};
                     this.$axios.post("/api/users/find_tag/",dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then((res)=>{
@@ -109,18 +116,19 @@
                         }
                     })
                 }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '取消输入'
-                    });
                 });
             },
             //新增
             handleInputConfirm() {
                 let inputValue = this.inputValue;
-
+                var array = inputValue.split(' ');
+                if (inputValue.length == 0) return;
+                if (inputValue.indexOf(' ') == -1 || array[1].length == 0){
+                    this.$message.warning('请输入权重，以空格分割');
+                    return;
+                }
                 if (inputValue) {
-                    var dic = {'tag_id':'','tag':inputValue,'type':'2'};
+                    var dic = {'tag_id':'','tag':array[0],'type':'2','weight':array[1]};
                     this.$axios.post("/api/users/find_tag/",dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then((res)=>{

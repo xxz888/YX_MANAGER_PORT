@@ -11,9 +11,9 @@
         </el-tabs>
         <div style="margin: 20px;"></div>
         <div class="handle-box">
-            <el-button type="primary" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>
-            <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
-            <el-button type="primary" icon="search" @click="search">搜索</el-button>
+            <el-button type="primary" icon="delete" class="handle-del mr10">批量删除</el-button>
+            <el-input  placeholder="筛选关键词" class="handle-input mr10"></el-input>
+            <el-button type="primary" icon="search">搜索</el-button>
             <el-button type="success" icon="search" @click="addnews">新增</el-button>
         </div>
         <el-table :data="data"  tooltip-effect="dark"
@@ -266,6 +266,9 @@
                     path:'/CigarShopDetailsImage',
                     query: {'key':self.tableData[index]}
                 })
+            },
+            handleSelectionChange(){
+
             }
         }
     };
