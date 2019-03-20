@@ -10,7 +10,7 @@
         <el-collapse accordion>
             <el-collapse-item v-for="tab in tableData">
                 <template slot="title" >
-                    <img   :src="tab.photo ? tab.photo : tab.user_photo" style="width: 35px;height:35px;border-radius:50%" >
+                    <img   :src="getPhoto(tab)" style="width: 35px;height:35px;border-radius:50%" >
                     <p style="margin-left: 10px">{{tab.user_name}}</p>
                     <p style="margin-left: 10px;color: red;">【{{getTypeChinese(tab.type)}}】</p>
                     <p style="margin-left: 20px;color:darkblue;"> {{toChineseWords(tab.describe?tab.describe:tab.title?tab.title:tab.content)}}</p>
@@ -20,6 +20,7 @@
 
                 </template>
                 <div style="margin: 20px 20px"></div>
+                <div>{{tab.question?toChineseWords(tab.question):''}}</div>
                 <div>
                     <img   :src="tab.photo1 ? tab.photo1 : tab.pic1" class="image">
                     <img   :src="tab.photo2 ? tab.photo2 : tab.pic2" class="image">
@@ -29,10 +30,14 @@
                 <div style="color:blue">标签:{{tab.tag}}  </div>
                 <div>时间:{{getLocalTime(tab.publish_time)}}</div>
                 <div>地点:{{tab.publish_site}}</div>
-                <div>{{tab.question?toChineseWords(tab.question):''}}</div>
                 <div>{{tab.cigar_info ? tab.cigar_info.brand_name:''}}</div>
-                <img   :src="getPingLun1(tab)" style="width: 20px;height:20px;border-radius:50%">
-                <span style="margin-left: 10px">{{getPingLun2(tab)}}</span>
+                <!--<img   :src="getPingLun1(tab)" style="width: 20px;height:20px;border-radius:50%">-->
+                <div>最热评论:</div>
+                <div style="margin-left: 10px">
+                    <span style="color: gray;">{{getPingLun2(tab)}}</span>
+                    &nbsp
+                     <span>{{getPingLun3(tab)}}</span>
+                </div>
 
 
 
@@ -94,7 +99,6 @@
 </template>
 
 <script>
-    import userPhoto from '../../assets/img_moren.png'
     export default {
         name: "UsersFindContent",
         data() {
@@ -110,7 +114,6 @@
                 tab:{},
                 tab_index:'1',
                 currentPage:1,
-                errorUserPhoto:userPhoto,
                 xxzloading:false
             };
         },
@@ -171,7 +174,7 @@
                 return post_type;
             },
             toChineseWords(data){
-                if(data == '' || typeof data == 'undefined') return '请输入十六进制unicode';
+                if(data == '' || typeof data == 'undefined') return '';
                     data = data.split("\\u");
                      var str ='';
                      for(var i=0;i<data.length;i++){
@@ -245,6 +248,27 @@
                 }
                 if (tab.comment_list && tab.comment_list.length > 0){
                     return  tab.comment_list[0].user_name;
+                }
+                return '';
+            },
+            getPingLun3(tab){
+                if (tab.max_hot_comment){
+                    return this.toChineseWords(tab.max_hot_comment.comment);
+                }
+                if (tab.answer && tab.answer.length > 0){
+                    return this.toChineseWords(tab.answer[0].answer);
+                }
+                if (tab.comment_list && tab.comment_list.length > 0){
+                    return  this.toChineseWords(tab.comment_list[0].comment);
+                }
+                return '';
+            },
+            getPhoto(tab){
+                if (tab.photo){
+                    return tab.photo;
+                }
+                if (tab.user_photo){
+                    return tab.user_photo;
                 }
                 return '';
             },
