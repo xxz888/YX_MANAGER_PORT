@@ -92,7 +92,11 @@ export default new Router({
                     meta: { title: '系统首页' }
                 },
 
-
+                {
+                    path: '/CigarShopTags',
+                    component: resolve => require(['../components/page/CigarShopTags.vue'], resolve),
+                    meta: { title: '配件标签' }
+                },
                 {
                     path: '/icon',
                     component: resolve => require(['../components/other/Icon.vue'], resolve),

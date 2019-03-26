@@ -70,6 +70,10 @@
                         index: 'CigarShop',
                         title: '配件'
                     },
+                    {
+                        index: 'CigarShopTags',
+                        title: '配件标签'
+                    },
 
 /*
                     {
@@ -151,7 +155,7 @@
                             }
                         ]
                     }
-                   */
+*/
                     ]
             }},
         computed:{
