@@ -74,7 +74,7 @@
             },
             // 侧边栏折叠
             collapseChage(){
-                this.collapse = false;
+                this.collapse = !this.collapse;
                 bus.$emit('collapse', this.collapse);
             },
             // 全屏事件

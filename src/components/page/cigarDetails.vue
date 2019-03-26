@@ -84,15 +84,12 @@
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     t.tableData = res.data.data;
-                    var array = [];
                     for(var i = 0 ; i < t.tableData.length;i++){
                         if(t.tableData[i].photo_list.length == 0){
                             var dic = {'photo_url':''};
                             t.tableData[i].photo_list.push(dic)
                         }
-                        array.push(t.tableData[i]['cigar_name'].replace(/''/g, ""));
                     }
-                    console.log(array);
                 });
             },
 

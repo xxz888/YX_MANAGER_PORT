@@ -138,9 +138,6 @@
                 content:''
             }
         },
-        components(){
-
-        },
         created() {
             this.getData();
         },

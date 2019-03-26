@@ -7,9 +7,6 @@
                     <el-form-item label="雪茄名">
                         <el-input v-model="form.cigar_name"></el-input>
                     </el-form-item>
-                    <el-form-item label="中文名">
-                        <el-input v-model="form.cigar_name_CN"></el-input>
-                    </el-form-item>
                     <el-form-item label="产地">
                         <el-input v-model="form.origin"></el-input>
                     </el-form-item>
@@ -90,8 +87,6 @@
                     price_single_overseas: '',
                     price_box_overswas: '',
                     box_size: '',
-                    cigar_name_CN:''
-
                 },
                 dialogImageUrl: '',
                 dialogVisible: false,

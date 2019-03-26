@@ -47,7 +47,7 @@
         methods: {
             //发送验证码
             sendPhoneCode() {
-                this.$axios.get('/api/pub/smscode/'+this.ruleForm.username+'/1/').then(res=>{
+                this.$axios.get('/api/pub/smscode/'+this.ruleForm.username+'/').then(res=>{
                     this.$message({
                         message: '验证码已发送',
                         type: 'success'
