@@ -77,6 +77,11 @@ export default new Router({
                     meta: {title: '发现标签'}
                 },
                 {
+                    path: '/UsersFindContent',
+                    component: resolve => require(['../components/page/UsersFindContent.vue'], resolve),
+                    meta: { title: '发现内容' }
+                },
+                {
                     path: '/UsersTagList',
                     component: resolve => require(['../components/page/UsersTagList.vue'], resolve),
                     meta: {title: '标签列表'}
@@ -85,6 +90,12 @@ export default new Router({
                     path: '/dashboard',
                     component: resolve => require(['../components/other/Dashboard.vue'], resolve),
                     meta: { title: '系统首页' }
+                },
+
+                {
+                    path: '/CigarShopTags',
+                    component: resolve => require(['../components/page/CigarShopTags.vue'], resolve),
+                    meta: { title: '配件标签' }
                 },
                 {
                     path: '/icon',
