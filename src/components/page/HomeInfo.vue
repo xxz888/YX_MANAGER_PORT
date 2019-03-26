@@ -135,7 +135,8 @@
                 tag:'0',
                 count:'0',
                 activeName: 'second',
-                tab_index:'1'
+                tab_index:'1',
+                content:''
             }
         },
         created() {
@@ -167,7 +168,7 @@
                     t.dialogVisible = true;
                     t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
                         var img  = '<img src="'+ res  + '" alt="" />'
-                        window.editor.insertHtml(img);
+                        t.content = t.content + img;
                     });
                 };
                 reader.readAsDataURL(file);
@@ -189,12 +190,6 @@
                 this.content =  item.details;
                 this.editVisible = true;
                 this.count = item.details.length;
-
-                window.editor.create('#abc', {
-                    filterMode : false,
-                    langType : 'en',
-                });
-                window.editor.html(this.content);
             },
             //增加按钮，弹出框
             addnews(){
@@ -210,11 +205,6 @@
                 this.content = '';
                 this.imgSrc = '';
                 this.editVisible = true;
-                window.editor.create('#abc', {
-                    filterMode : false,
-                    langType : 'en',
-                });
-                window.editor.html('');
             },
             // 新增和保存编辑，请求
             saveEdit() {
@@ -319,7 +309,6 @@
             //取消按钮方法
             cancleBtn(){
                 this.editVisible = false;
-                window.editor.remove('abc');
 
             },
             //以下方法备用

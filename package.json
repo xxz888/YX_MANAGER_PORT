@@ -18,7 +18,7 @@
     "qiniu-js": "^2.5.4",
     "vue": "^2.5.21",
     "vue-cropperjs": "^3.0.0",
-    "vue-kindeditor": "^0.4.0",
+    "vue-kindeditor": "^0.4.5",
     "vue-quill-editor": "^3.0.6",
     "vue-router": "^3.0.1",
     "vue-schart": "^1.0.0",

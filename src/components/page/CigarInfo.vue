@@ -169,7 +169,7 @@
                     t.dialogVisible = true;
                     t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
                         var img  = '<img src="'+ res  + '" alt="" />'
-                        window.editor.insertHtml(img);
+                        t.content = t.content + img;
                     });
                 };
                 reader.readAsDataURL(file);
@@ -193,11 +193,6 @@
 
                 this.editVisible = true;
 
-                window.editor.create('#abc', {
-                    filterMode : true,
-                    langType : 'en',
-                });
-                window.editor.html(this.content);
             },
             //增加按钮，弹出框
             addnews(){
@@ -213,11 +208,7 @@
                 this.content = '';
                 this.imgSrc = '';
                 this.editVisible = true;
-                window.editor.create('#abc', {
-                    filterMode : true,
-                    langType : 'en',
-                });
-                window.editor.html('');
+
             },
             // 新增和保存编辑，请求
             saveEdit(){
@@ -306,7 +297,6 @@
             //取消按钮方法
             cancleBtn(){
                 this.editVisible = false;
-                window.editor.remove('abc');
             },
             //请求
             getData() {

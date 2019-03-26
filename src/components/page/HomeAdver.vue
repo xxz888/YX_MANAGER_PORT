@@ -161,7 +161,7 @@
                     t.dialogVisible = true;
                     t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
                         var img  = '<img src="'+ res  + '" alt="" />'
-                        window.editor.insertHtml(img);
+                        t.content = t.content + img;
                     });
                 };
                 reader.readAsDataURL(file);
@@ -240,11 +240,6 @@
                 this.title = '';
                 this.editVisible = true;
                 this.count = '0';
-                window.editor.create('#abc', {
-                    filterMode : true,
-                    langType : 'en',
-                });
-                window.editor.html('');
             },
             //编辑按钮,弹出框
             handleEdit(index, row) {
@@ -262,9 +257,6 @@
                 this.title = item.title;
                 this.editVisible = true;
                 this.count = item.character.length;
-
-                window.editor.create('#abc');
-                window.editor.html(this.content);
             },
             //单个删除,弹出框
             handleDelete(index, row) {
@@ -311,7 +303,6 @@
             //取消按钮方法
             cancleBtn(){
                 this.editVisible = false;
-                window.editor.remove('abc');
             },
             //以下方法备用
             handleSelectionChange(val) {
