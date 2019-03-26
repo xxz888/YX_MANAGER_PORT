@@ -61,7 +61,8 @@
                 })
             },
             getData(){
-                this.$axios.get("/api/users/find_tag/",).then((res)=>{
+                this.$axios.get("/api/users/find_tag/",{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
                         this.dynamicTags = res.data;
                         console.log(this.dynamicTags);
                 })

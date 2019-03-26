@@ -162,9 +162,6 @@
                   }
               })
             },
-            handleClick(tab, event) {
-                console.log(tab, event);
-            },
             //tab切换
             handleClick(tab, event) {
                 this.currentPage = '1';
