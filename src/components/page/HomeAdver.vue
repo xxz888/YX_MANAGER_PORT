@@ -135,6 +135,7 @@
         created() {
             this.tab_index = '1';
             this.getData();
+
         },
         computed: {
             data() {
@@ -161,7 +162,7 @@
                     t.dialogVisible = true;
                     t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
                         var img  = '<img src="'+ res  + '" alt="" />'
-                        t.content = t.content + img;
+                        KindEditor.insertHtml('#abc',img);
                     });
                 };
                 reader.readAsDataURL(file);
@@ -184,6 +185,7 @@
             },
             //新增和储存公共方法
             saveAndEditCommon(photo_res,key){
+
                 var t = this;
                 var dic = {
                     'advertising_id':t.form.id,          //广告id(修改/删除传,新增不传)
@@ -227,6 +229,8 @@
             //增加按钮，弹出框
             addnews(index, row){
 
+
+
                 this.idx = index;
                 this.form = {
                     id: "",
@@ -240,6 +244,8 @@
                 this.title = '';
                 this.editVisible = true;
                 this.count = '0';
+
+
             },
             //编辑按钮,弹出框
             handleEdit(index, row) {

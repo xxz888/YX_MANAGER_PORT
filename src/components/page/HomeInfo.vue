@@ -168,7 +168,7 @@
                     t.dialogVisible = true;
                     t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
                         var img  = '<img src="'+ res  + '" alt="" />'
-                        t.content = t.content + img;
+                        KindEditor.insertHtml('#abc',img);
                     });
                 };
                 reader.readAsDataURL(file);
