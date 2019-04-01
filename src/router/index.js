@@ -52,6 +52,12 @@ export default new Router({
                     meta: {title: '雪茄详情修改'}
                 },
                 {
+                    path: '/CigarBrandSite',
+                    component: resolve => require(['../components/page/CigarBrandSite.vue'], resolve),
+                    meta: {title: '产地名称'}
+                },
+
+                {
                     path: '/CigarDetailsNewAdd',
                     component: resolve => require(['../components/page/CigarDetailsNewAdd.vue'], resolve),
                     meta: {title: '雪茄详情新增'}

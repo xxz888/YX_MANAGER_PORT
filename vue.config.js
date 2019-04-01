@@ -5,7 +5,7 @@ module.exports = {
         proxy: {
             '/api':{
                 target:'http://thegdlife.com:8001',
-               // target:'http://192.168.0.12:8001',
+                //target:'http://192.168.0.12:8001',
                 changeOrigin:true,
                 pathRewrite:{
                     '/api':''

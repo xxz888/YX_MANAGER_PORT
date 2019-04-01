@@ -58,6 +58,12 @@
                 <el-form-item label="收藏人数">
                     <el-input v-model="form.collect_number"></el-input>
                 </el-form-item>
+                <el-form-item label="香港店名">
+                    <el-input v-model="form.store_hongkong"></el-input>
+                </el-form-item>
+                <el-form-item label="海外店名">
+                    <el-input v-model="form.store_overseas"></el-input>
+                </el-form-item>
             </el-col>
         </el-row>
     </el-form>
@@ -96,7 +102,11 @@
                   box_size: '',
                   id:'',
                   photo_list:[],
-                  cigar_name_CN:''
+                  cigar_name_CN:'',
+                  store_hongkong:'',
+                  store_overseas:'',
+                  collect_number:''
+
               },
               dialogImageUrl: '',
               dialogVisible: false,
@@ -130,7 +140,7 @@
                     if (res.data.status == 1){
                         t.$router.go(-1);
                         t.$message.success(res.data.message);
-                    }else {
+                      }else {
                         t.$message.warning(res.data.message);
                     }
                 });

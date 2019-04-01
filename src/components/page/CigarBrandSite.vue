@@ -1,22 +1,17 @@
 <template>
     <div class="container">
-        <el-tabs v-model="activeName" @tab-click="handleClick" >
-            <el-tab-pane v-for="item in brandList" :label="item.brand_name" :name="item.brand_name"></el-tab-pane>
-        </el-tabs>
-
+        <div class="item-title">
+            <el-button  @click="addTag()" type="success">新增</el-button>
+        </div>
         <div class="drag-box">
             <div class="drag-box-item">
-                <div class="item-title">
-                    <span>{{activeName}}</span>
-                    <el-button style="float:right;" @click="addTag()" type="success">新增</el-button>
-                </div>
                 <div style="margin: 20px auto"></div>
                 <draggable v-model="todo"
                            :options="dragOptions"
-                @end="dragEnd">
+                           @end="dragEnd">
                     <transition-group tag="div" id="todo" class="item-ul">
                         <div v-for="item in todo" class="drag-list" :key="item.id" >
-                            {{item.type}}
+                            {{item.site}}
                             <div style="float: right;">
                                 <el-button size="mini" @click="editTag(item)" type="primary" icon="el-icon-edit" circle></el-button>
                                 <el-button  size="mini" @click="delTag(item)" type="danger" icon="el-icon-delete" circle></el-button>
@@ -27,108 +22,75 @@
             </div>
         </div>
     </div>
-
 </template>
 
 <script>
     import draggable from 'vuedraggable'
     export default {
-        name: "CigarShopTags",
+        name: "CigarBrandSite",
         data(){
-          return{
-              dragOptions:{
-                  animation: 120,
-                  scroll: true,
-                  group: 'sortlist',
-                  ghostClass: 'ghost-style'
-              },
-              todo: [],
-              brandList:[],
-              brandId:'',
-              activeName: '1'
-
-          }
+            return {
+                dragOptions: {
+                    animation: 120,
+                    scroll: true,
+                    group: 'sortlist',
+                    ghostClass: 'ghost-style'
+                },
+                todo: [],
+                brandList: [],
+            }
         },
-
         components:{
             draggable
         },
         created(){
-            this.getBrandList();
+            this.getData();
         },
         watch:{
-            '$route':'getBrandList'
+            '$route':'getData'
         },
         methods: {
-            //tab切换
-            handleClick(tab, event) {
-                var index =  event.target.getAttribute('id');
-                var brandTagName =   index.replace('tab-','');
-                for (var i = 0; i < this.brandList.length; i++){
-                    if (this.brandList[i].brand_name == brandTagName) {
-                        this.brandId = this.brandList[i].id;
-                        break;
-                    }
-                }
-                this.getData();
-            },
             dragEnd(event){
                 var self = this;
-
-                console.log(this.todo);
                 for (var i = 0 ; i < this.todo.length ; i ++){
                     this.todo[i].weight = i+1;
                     var dic = {
-                        'tag_id':this.todo[i].id,
-                        'tag':this.todo[i].type,
-                        'type':'1',
+                        'site_id':this.todo[i].id,
+                        'type':'3',
                         'weight':this.todo[i].weight,
-                        'brand_id':self.brandId
-
+                        'site':this.todo[i].site
                     };
-                    this.$axios.post("/api/cigar/cigar_accessories_type/0/",dic,{headers:{
+                    this.$axios.post("/api/cigar/cigar_brand_site/",dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then((res)=>{ })
                 }
 
             },
-            getBrandList(){
-                var self = this;
-                this.$axios.get('/api/cigar/cigar_accessories_brand/',{headers:{
-                        "Authorization":"JWT " + localStorage.getItem('token')
-                    }}).then(res=>{
-                    self.brandList = res.data;
-                    self.brandId = self.brandList[0]['id'];
-                    self.activeName = self.brandList[0]['brand_name'];
-                    self.getData();
-                });
-            },
             getData(){
                 var self = this;
                 self.todo = [];
-                 this.$axios.get('/api/cigar/cigar_accessories_type/'+self.brandId+'/',{headers:{
-                         "Authorization":"JWT " + localStorage.getItem('token')
-                     }}).then(res=>{
+                this.$axios.get('/api/cigar/cigar_brand_site/',{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then(res=>{
                     self.todo = res.data;
                 });
             },
             editTag(item){
                 var self = this;
 
-                this.$prompt('请输入新的标签名', '编辑'+ '【'+item.type + '】', {
+                this.$prompt('请输入新的产地名', '编辑'+ '【'+item.site + '】', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
-                    inputValue:item.type,
+                    inputValue:item.site,
                 }).then(({ value }) => {
                     if (value.length == 0) return;
                     var dic = {
-                        'tag_id':item.id,
-                        'tag':value,
-                        'type':'1',
+                        'site_id':item.id,
+                        'site':value,
+                        'type':'3',
                         'weight':item.weight,
-                        'brand_id':self.brandId
                     };
-                    this.$axios.post("/api/cigar/cigar_accessories_type/0/",dic,{headers:{
+                    this.$axios.post("/api/cigar/cigar_brand_site/",dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then((res)=>{
                         if (res.data.status == 1){
@@ -144,18 +106,17 @@
             delTag(item){
                 var self = this;
 
-                this.$alert( '是否删除标签'+ '【'+item.type + '】', {
+                this.$alert( '是否删除产地'+ '【'+item.site + '】', {
                     confirmButtonText: '确定',
                     callback: action => {
                         var dic = {
-                            'tag_id':item.id,
-                            'tag':'',
-                            'type':'3',
+                            'site_id':item.id,
+                            'type':'2',
                             'weight':item.weight,
-                            'brand_id':self.brandId
+                            'site':''
 
                         };
-                        this.$axios.post("/api/cigar/cigar_accessories_type/0/",dic,{headers:{
+                        this.$axios.post("/api/cigar/cigar_brand_site/",dic,{headers:{
                                 "Authorization":"JWT " + localStorage.getItem('token')
                             }}).then((res)=>{
                             if (res.data.status == 1){
@@ -170,21 +131,20 @@
             },
             addTag(){
                 var self = this;
-                this.$prompt('请输入新的标签名', {
+                this.$prompt('请输入新的产地名', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     inputValue:'',
                 }).then(({ value }) => {
                     if (value.length == 0) return;
                     var dic = {
-                        'tag_id':'',
-                        'tag':value,
-                        'type':'2',
+                        'site':value,
+                        'type':'1',
                         'weight':'1',
-                        'brand_id':self.brandId
+                        'site_id':''
 
                     };
-                    this.$axios.post("/api/cigar/cigar_accessories_type/0/",dic,{headers:{
+                    this.$axios.post("/api/cigar/cigar_brand_site/",dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then((res)=>{
                         if (res.data.status == 1){
@@ -258,4 +218,3 @@
         border-style: dashed
     }
 </style>
-

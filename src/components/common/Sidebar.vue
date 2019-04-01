@@ -74,7 +74,10 @@
                         index: 'CigarShopTags',
                         title: '配件标签'
                     },
-
+                    {
+                        index: 'CigarBrandSite',
+                        title: '产地名称'
+                    },
 /*
                     {
                         icon: 'el-icon-lx-cascades',
