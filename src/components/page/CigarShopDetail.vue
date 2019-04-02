@@ -2,12 +2,7 @@
 <template>
     <div class="container">
         <el-tabs v-model="activeName" @tab-click="handleClick">
-            <el-tab-pane label="推荐" name="1"></el-tab-pane>
-            <el-tab-pane label="雪茄剪" name="2"></el-tab-pane>
-            <el-tab-pane label="打火机" name="3"></el-tab-pane>
-            <el-tab-pane label="保湿盒" name="4"></el-tab-pane>
-            <el-tab-pane label="雪茄盒" name="5"></el-tab-pane>
-            <el-tab-pane label="烟灰缸" name="6"></el-tab-pane>
+            <el-tab-pane v-for='item in todo' :label="item.type" :name="item.type"></el-tab-pane>
         </el-tabs>
         <div style="margin: 20px;"></div>
         <div class="handle-box">
@@ -119,16 +114,27 @@
                     weight:''
                 },
                 tab_index:'',
-                currentPage:'1',
+                currentPage:1,
                 editVisible:false,
                 delVisible:false,
                 activeName: '1',
-                idx:''
+                idx:'',
+                todo:[],
+                brandId:''
             };
         },
         created(){
-            this.tab_index = '1';
-            this.getParams();
+            this.brand_name = this.$route.query.brand_name;
+            this.brand_id =this.$route.query.brand_id;
+            var self = this;
+            this.$axios.get('/api/cigar/cigar_accessories_type/'+self.brand_id+'/',{headers:{
+                    "Authorization":"JWT " + localStorage.getItem('token')
+                }}).then(res=>{
+                self.todo = res.data;
+                self.tab_index = self.todo[0]['id'];
+                self.activeName = self.todo[0]['type'];
+                self.getData();
+            });
         },
         watch:{
             '$route':'getParams'
@@ -142,8 +148,7 @@
         },
         methods: {
             getParams(){
-                this.brand_name = this.$route.query.brand_name;
-                this.getData();
+
             },
             //请求数据
             getData(){
@@ -164,13 +169,15 @@
             },
             //tab切换
             handleClick(tab, event) {
-                this.currentPage = '1';
+                this.currentPage = 1;
                 var index =  event.target.getAttribute('id');
-                this.tab_index =  index == 'tab-1' ? 1:
-                                    index == 'tab-2' ? 2:
-                                          index == 'tab-3' ? 3:
-                                              index == 'tab-4' ? 4:
-                                              index == 'tab-5' ? 5:6;
+                var brandTagName =   index.replace('tab-','');
+                for (var i = 0; i < this.todo.length; i++){
+                    if (this.todo[i].type == brandTagName) {
+                        this.tab_index = this.todo[i].id;
+                        break;
+                    }
+                }
                 this.getData();
             },
             //分页切换取值

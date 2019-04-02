@@ -7,9 +7,8 @@
             </el-breadcrumb>
         </div>
         <div class="container">
-            <el-tabs v-model="activeName" @tab-click="handleClick">
-                <el-tab-pane label="古巴" name="first"></el-tab-pane>
-                <el-tab-pane label="非古" name="second"></el-tab-pane>
+            <el-tabs v-model="activeName"  @tab-click="handleClick">
+                <el-tab-pane v-for = 'item in todo' :label="item.site" :name="item.site"></el-tab-pane>
             </el-tabs>
             <div style="margin: 20px;"></div>
             <div class="handle-box">
@@ -54,10 +53,7 @@
         <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%" >
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型">
-                    <el-select v-model="form.type" placeholder="form.type">
-                        <el-option key="1" label="古巴" value="1"></el-option>
-                        <el-option key="2" label="非古" value="2"></el-option>
-                    </el-select>
+                    <el-input :disabled="input_disabled" v-model="form.type"></el-input>
                 </el-form-item>
                 <el-form-item label="雪茄名">
                     <el-input v-model="form.cigar_brand"></el-input>
@@ -107,6 +103,7 @@
         name: 'CigarInfo',
         data() {
             return {
+                input_disabled:'false',
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
@@ -123,7 +120,8 @@
                     intro: '',
                     concern_number: '',
                     sort: '',
-                    is_concern: ''
+                    is_concern: '',
+                    activeName:''
                 },
                 idx: -1,
                 fileList: [],
@@ -132,14 +130,23 @@
                 dialogVisible: false,
                 checked:'',
                 base64Array:[],
-                activeName: 'first',
-                tab_index:'1',
+                activeName: '',
+                tab_index:'',
                 count:'',
-                content:''
+                content:'',
+                todo:[]
             }
         },
         created() {
-            this.getData();
+            var self = this;
+            this.$axios.get('/api/cigar/cigar_brand_site/',{headers:{
+                    "Authorization":"JWT " + localStorage.getItem('token')
+                }}).then(res=>{
+                self.todo = res.data;
+                self.activeName = self.todo[0]['site'];
+                self.tab_index = self.todo[0]['id'];
+                self.getData();
+            });
         },
         computed: {
             data() {
@@ -184,7 +191,7 @@
                     cigar_brand:item.cigar_brand,
                     intro:item.intro,
                     concern_number:item.concern_number,
-                    type:  this.tab_index==1 ? '古巴' : '非古',
+                    type:  this.activeName,
                 }
                 this.checked = item.is_hot == '是' ? true : false;
                 this.content = item.intro;
@@ -200,7 +207,7 @@
                     id: '',
                     photo: '',
                     title: '',
-                    type:  this.tab_index==1 ? '古巴' : '非古',
+                    type:  this.activeName,
                     author: '',
                     date: new Date(),
                     details: '',
@@ -208,7 +215,7 @@
                 this.content = '';
                 this.imgSrc = '';
                 this.editVisible = true;
-
+                this.type = this.form.type;
             },
             // 新增和保存编辑，请求
             saveEdit(){
@@ -237,7 +244,7 @@
                     'cigar_brand_id':t.form.id,
                     'cigar_brand':t.form.cigar_brand,
                     'photo':res,
-                    'type_cigar_brand':t.form.type =='古巴' ? '1' : '2',
+                    'type_cigar_brand':t.tab_index,
                     'is_hot':t.checked?'1':'0',
                     'intro':t.content,
                     'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
@@ -300,6 +307,7 @@
             },
             //请求
             getData() {
+
                 this.$axios.get('/api/cigar/cigar_brand/'+this.tab_index+'/', {
                     page: this.cur_page
                 }).then((res) => {
@@ -319,7 +327,13 @@
             //tab切换
             handleClick(tab, event) {
                 console.log(tab, event);
-                this.tab_index = event.target.getAttribute('id') == 'tab-second' ? 2:1;
+                var string = event.target.getAttribute('id').split('-')[1];
+                for (var i = 0 ; i < this.todo.length ; i ++){
+                    if (string == this.todo[i].site){
+                        this.tab_index = this.todo[i].id;
+                        this.activeName = this.todo[i].site;
+                    }
+                }
                 this.getData();
             },
             handleSelectionChange(val) {
@@ -345,14 +359,6 @@
             },
             getLocalTime(nS) {
                 return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
-            },
-            type_formatter(value){
-                value = value.type;
-                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
-            },
-            photo_formatter(value){
-                value = value.type;
-                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
             },
             data_formatter(value){
                 return this.getLocalTime(value.date);

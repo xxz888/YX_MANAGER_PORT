@@ -250,7 +250,9 @@
                 var t = this;
                 this.$router.push({
                     path:'/CigarShopDetail',
-                    query: {'brand_name':item.brand_name}
+                    query: {'brand_name':item.brand_name,
+                            'brand_id':item.id
+                    }
                 })
             }
         }

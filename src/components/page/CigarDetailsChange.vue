@@ -7,29 +7,17 @@
                 <el-form-item label="雪茄名">
                     <el-input v-model="form.cigar_name"></el-input>
                 </el-form-item>
-                <el-form-item label="中文名">
-                    <el-input v-model="form.cigar_name_CN"></el-input>
+                <el-form-item label="盒装规格">
+                    <el-input v-model="form.box_size"></el-input>
                 </el-form-item>
-                <el-form-item label="产地">
-                        <el-input v-model="form.origin"></el-input>
+                <el-form-item label="收藏人数">
+                    <el-input v-model="form.collect_number"></el-input>
                 </el-form-item>
-                <el-form-item label="品型">
-                    <el-input v-model="form.shape"></el-input>
+                <el-form-item label="香港店名">
+                    <el-input v-model="form.store_hongkong"></el-input>
                 </el-form-item>
-                <el-form-item label="环径">
-                    <el-input v-model="form.ring_gauge"></el-input>
-                </el-form-item>
-                <el-form-item label="长度">
-                    <el-input v-model="form.length"></el-input>
-                </el-form-item>
-                <el-form-item label="包装颜色">
-                    <el-input v-model="form.wrapper_color"></el-input>
-                </el-form-item>
-                <el-form-item label="浓度">
-                    <el-input v-model="form.strength"></el-input>
-                </el-form-item>
-                <el-form-item label="口味">
-                    <el-input v-model="form.flavour"></el-input>
+                <el-form-item label="海外店名">
+                    <el-input v-model="form.store_overseas"></el-input>
                 </el-form-item>
 
             </el-col>
@@ -52,27 +40,16 @@
                 <el-form-item label="海外一盒售价">
                     <el-input v-model="form.price_box_overswas"></el-input>
                 </el-form-item>
-                <el-form-item label="盒装规格">
-                    <el-input v-model="form.box_size"></el-input>
-                </el-form-item>
-                <el-form-item label="收藏人数">
-                    <el-input v-model="form.collect_number"></el-input>
-                </el-form-item>
-                <el-form-item label="香港店名">
-                    <el-input v-model="form.store_hongkong"></el-input>
-                </el-form-item>
-                <el-form-item label="海外店名">
-                    <el-input v-model="form.store_overseas"></el-input>
-                </el-form-item>
             </el-col>
         </el-row>
     </el-form>
-        <div style="margin: 20px;"></div>
+        <p style="margin: 0px 20px;font-size: 13px;color:red;">实例:中文名称 BHK52;环径 52;长度 119mm</p>
+        <input placeholder="名字和值用空格隔开,不同字段用英文分号隔开。" type="text" style="margin: 10px 20px;width: 100%;height: 40px;font-size: 15px" v-model="otherInput">
         <div align="center">
             <el-button size="medium" type="primary" @click="saveInfo">修改</el-button>
         </div>
 
-        </div>
+    </div>
 
 </template>
 
@@ -83,16 +60,10 @@
           return {
               dic:'',
               labelPosition: 'left',
+              collectdisabled:'false',
               form: {
                   cigar_name: '',
                   cigar_brand_id:'',
-                  origin: '',
-                  shape: '',
-                  ring_gauge: '',
-                  length: '',
-                  wrapper_color: '',
-                  strength: '',
-                  flavour: '',
                   price_single_china: '',
                   price_box_china: '',
                   price_single_hongkong: '',
@@ -102,16 +73,15 @@
                   box_size: '',
                   id:'',
                   photo_list:[],
-                  cigar_name_CN:'',
                   store_hongkong:'',
                   store_overseas:'',
-                  collect_number:''
-
+                  collect_number:'',
+                  otherInput:''
               },
               dialogImageUrl: '',
               dialogVisible: false,
               nameBtn:'',
-
+              otherInput:'',
               B_Loading:false
           }
         },
@@ -125,6 +95,14 @@
         methods:{
             getParams(){
                 this.form = this.$route.query.key;
+                if (this.form.argument){
+                    var dic = JSON.parse(this.form.argument);
+                    for(var key in dic){
+                        var newKey =   key;
+                        var newValue = dic[key];
+                        this.otherInput = (this.otherInput ? this.otherInput : '') + newKey + ' ' + newValue + ';';
+                    }
+                }
             },
             saveInfo(){
                 var t = this;
@@ -134,6 +112,16 @@
                 if (!t.form.id){
                     return;
                 }
+
+                var objDic = {};
+                var array = this.otherInput.split(';');
+                for (var i = 0 ; i < array.length;i++){
+                    var array1 = array[i].split(' ');
+                    var key = array1[0];
+                    var value = array1[1];
+                    objDic[key] = value;
+                }
+                dic['argument'] = objDic;
                 t.$axios.post('/api/cigar/ad_cigar/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
@@ -144,6 +132,15 @@
                         t.$message.warning(res.data.message);
                     }
                 });
+            },
+            toChineseWords(data){
+                if(data == '' || typeof data == 'undefined') return '';
+                data = data.split("\\u");
+                var str ='';
+                for(var i=0;i<data.length;i++){
+                    str+=String.fromCharCode(parseInt(data[i],16).toString(10));
+                }
+                return str;
             },
 
 
