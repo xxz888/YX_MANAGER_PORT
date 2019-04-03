@@ -36,7 +36,16 @@
                 </el-table-column>
             </el-table>
         </div>
-
+        <el-pagination
+                style="margin: 50px auto;"
+                align="center"
+                background
+                layout="prev, pager, next"
+                :total="100"
+                :current-page = 'currentPage'
+                @current-change="handleCurrentChange"
+        >
+        </el-pagination>
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%">
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
@@ -114,6 +123,8 @@
                 capture:'',
                 tag:'0',
                 count:'0',
+                currentPage:1,
+
             }
         },
         created() {
@@ -127,6 +138,11 @@
             }
         },
         methods: {
+            //分页切换取值
+            handleCurrentChange(val) {
+                this.currentPage = val;
+                this.getData();
+            },
             //内容改变实时更新
             onContentChange (val) {
                 this.content = val;
@@ -271,7 +287,7 @@
             //请求
             getData() {
                 var t = this;
-                this.$axios.get('/api/cigar/cigar_culture/'+1+'/',{
+                this.$axios.get('/api/cigar/cigar_culture'+'/1/'+t.currentPage + '/',{
                     page: this.cur_page
                 }).then((res) => {
                     t.tableData = res.data;

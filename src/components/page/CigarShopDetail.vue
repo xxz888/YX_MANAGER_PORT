@@ -175,6 +175,7 @@
                 for (var i = 0; i < this.todo.length; i++){
                     if (this.todo[i].type == brandTagName) {
                         this.tab_index = this.todo[i].id;
+                        this.activeName = this.todo[i].type;
                         break;
                     }
                 }
@@ -198,7 +199,7 @@
                     type:1,
                     weight:item.weight,
                     cigar_accessories_id:item.id,
-                    type_accessories:val==1?'推荐':val==2?'雪茄剪':val==3?'打火机':val==4?'保湿盒':val==5?'雪茄盒':'烟灰缸',
+                    type_accessories:this.activeName,
                 }
                 this.editVisible = true;
             },
@@ -214,7 +215,7 @@
                     type:2,
                     weight:'',
                     cigar_accessories_id:'',
-                    type_accessories:val==1?'推荐':val==2?'雪茄剪':val==3?'打火机':val==4?'保湿盒':val==5?'雪茄盒':'烟灰缸',
+                    type_accessories:this.activeName,
                 }
                 this.editVisible = true;
             },
