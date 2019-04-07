@@ -47,34 +47,6 @@
         >
         </el-pagination>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%">
-            <el-form ref="form" :model="form" label-width="100px" label-height = auto>
-                <el-form-item label="标题">
-                    <el-input v-model="form.title"></el-input>
-                </el-form-item>
-                <el-form-item label="文章内容">
-                    <vue-ueditor-wrap id="ud1" v-model="content" :config="myConfig"></vue-ueditor-wrap>
-
-                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="选择图片" />
-                    <span>{{count}}/5000</span>
-                </el-form-item>
-
-                <el-form-item label="展示图">
-                    <template  slot-scope="scope">
-                        <div class="crop-demo">
-                            <img :src="imgSrc" class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
-                            <div class="crop-demo-btn">选择图片
-                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
-                            </div>
-                        </div>
-                    </template>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                    <el-button @click="cancleBtn">取 消</el-button>
-                    <el-button type="primary" @click="saveEdit">确 定</el-button>
-                </span>
-        </el-dialog>
         <!-- 删除提示框 -->
         <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
@@ -87,27 +59,11 @@
 </template>
 
 <script>
-    import VueUeditorWrap from 'vue-ueditor-wrap' // ES6 Module
 
     export default {
         name: 'CigarAccessories',
-        components: {
-            VueUeditorWrap
-        },
         data() {
             return {
-                myConfig: {
-                    // 编辑器不自动被内容撑高
-                    autoHeightEnabled: false,
-                    // 初始容器高度
-                    initialFrameHeight: 240,
-                    // 初始容器宽度
-                    initialFrameWidth: '100%',
-                    // 上传文件接口（这个地址是我为了方便各位体验文件上传功能搭建的临时接口，请勿在生产环境使用！！！）
-                    serverUrl: 'http://35.201.165.105:8000/controller.php',
-                    // UEditor 资源文件的存放路径，如果你使用的是 vue-cli 生成的项目，通常不需要设置该选项，vue-ueditor-wrap 会自动处理常见的情况，如果需要特殊配置，参考下方的常见问题2
-                    UEDITOR_HOME_URL: "/UEditor/"
-                },
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
@@ -151,85 +107,14 @@
             }
         },
         methods: {
-            myConfig: {
-                // 编辑器不自动被内容撑高
-                autoHeightEnabled: false,
-                // 初始容器高度
-                initialFrameHeight: 240,
-                // 初始容器宽度
-                initialFrameWidth: '100%',
-                // 上传文件接口（这个地址是我为了方便各位体验文件上传功能搭建的临时接口，请勿在生产环境使用！！！）
-                serverUrl: 'http://35.201.165.105:8000/controller.php',
-                // UEditor 资源文件的存放路径，如果你使用的是 vue-cli 生成的项目，通常不需要设置该选项，vue-ueditor-wrap 会自动处理常见的情况，如果需要特殊配置，参考下方的常见问题2
-                UEDITOR_HOME_URL: "/UEditor/"
-            },
             //分页切换取值
             handleCurrentChange(val) {
                 this.currentPage = val;
                 this.getData();
             },
-            //内容改变实时更新
-            onContentChange (val) {
-                this.content = val;
-                this.count = this.content.length;
-                if (this.count > 5000){
-                    this.$message.warning('内容字符超过5000');
-                }
-            },
-            //内容上传图片
-            fileImage(e) {
-                const file = e.target.files[0];
-                if (!file.type.includes('image/')) {
-                    return;
-                }
-                const reader = new FileReader();
-                var t = this;
-                reader.onload = (event) => {
-                    t.dialogVisible = true;
-                    t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
-                        var img  = '<img src="'+ res  + '" alt="" />'
-                        t.content = t.content + img;
-                    });
-                };
-                reader.readAsDataURL(file);
-            },
-            // 新增和保存编辑，请求
-            saveEdit(){
-                var t = this;
-                if (this.imgSrc.length == 0){
-                    t.$message.warning('请上传图片');
-                    return;
-                }else if(this.content.length > 5000){
-                    t.$message.warning('内容字符超过5000');
-                    return;
-                }
-                if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
-                    this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                        t.saveAndEditCommon(res,key);
-                    })
-                }else{
-                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
-                }
-            },
-            //新增和储存公共方法
-            saveAndEditCommon(photo_res,key){
-                var t = this;
-                var dic = {
-                    'culture_id':t.form.culture_id,
-                    'picture':photo_res,
-                    'essay':t.content,
-                    'type':t.form.culture_id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':key,                     //七牛key
-                    'title':t.form.title
-                };
-                t.$axios.post('/api/cigar/cigar_culture/6/',dic,{headers:{
-                        "Authorization":"JWT " + localStorage.getItem('token')
-                    }}).then(res=>{
-                    t.$message.success(res.data.message);
-                    t.getData();
-                });
-                t.cancleBtn();
-            },
+
+
+
             //确定删除,请求
             deleteRow(){
                 this.delVisible = false;
@@ -261,10 +146,13 @@
                     picture: "",
                     title:''
                 }
-                this.content = '';
-                this.imgSrc = '';
-                this.title = '';
-                this.editVisible = true;
+                var t = this;
+                this.$router.push({
+                    path:'/CigarAccessories_Edit',
+                    query:{
+                        'form':t.form,
+                    }
+                })
             },
             //编辑按钮,弹出框
             handleEdit(index, row) {
@@ -277,11 +165,13 @@
                     title:item.title,
                     type:'1'
                 }
-                this.imgSrc = item.picture;
-                this.content = item.essay;
-                this.title = item.title;
-                this.editVisible = true;
-
+                var t = this;
+                this.$router.push({
+                    path:'/CigarAccessories_Edit',
+                    query:{
+                        'form':t.form,
+                    }
+                })
             },
             //单个删除,弹出框
             handleDelete(index, row) {
@@ -291,21 +181,6 @@
             //全部删除
             delAll() {
                 this.$message.info('功能开发中');
-            },
-            //封面图片
-            setImage(e){
-                const file = e.target.files[0];
-                if (!file.type.includes('image/')) {
-                    return;
-                }
-                const reader = new FileReader();
-                var t = this;
-                reader.onload = (event) => {
-                    t.dialogVisible = true;
-                    t.imgSrc = event.target.result;
-                    t.$refs.cropper && this.$refs.cropper.replace(event.target.result);
-                };
-                reader.readAsDataURL(file);
             },
 
 
@@ -332,11 +207,6 @@
 
             },
             type_formatter(value){
-                value = value.type;
-                return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
-            },
-            photo_formatter(value){
-                console.log(value);
                 value = value.type;
                 return value == 0 ? '推荐' : value == 1 ? '雪茄' : value == 2 ? '红酒' :'高尔夫';
             },

@@ -44,44 +44,6 @@
             </el-table>
         </div>
 
-        <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%">
-            <el-form ref="form" :model="form" label-width="100px" label-height = auto>
-                <el-form-item label="类型">
-                    <el-select v-model="form.type" placeholder="form.type">
-                        <el-option key="0" label="推荐" value="0"></el-option>
-                        <el-option key="1" label="雪茄" value="1"></el-option>
-                        <el-option key="2" label="红酒" value="2"></el-option>
-                        <el-option key="3" label="高尔夫" value="3"></el-option>
-                    </el-select>
-
-                </el-form-item>
-                <el-form-item label="标题">
-                    <el-input v-model="form.title"></el-input>
-                </el-form-item>
-                <el-form-item label="广告文字">
-                        <vue-ueditor-wrap id="ud1" v-model="content" :config="myConfig"></vue-ueditor-wrap>
-
-                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="选择图片" />
-                        <span>{{count}}</span>
-                </el-form-item>
-
-                <el-form-item label="广告图片">
-                    <template  slot-scope="scope">
-                        <div class="crop-demo">
-                            <img :src="imgSrc"  class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
-                            <div class="crop-demo-btn">选择图片
-                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
-                            </div>
-                        </div>
-                    </template>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                    <el-button @click="cancleBtn">取 消</el-button>
-                    <el-button type="primary" @click="saveEdit">确 定</el-button>
-                </span>
-        </el-dialog>
         <!-- 删除提示框 -->
         <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
@@ -94,27 +56,13 @@
 </template>
 
 <script>
-    import VueUeditorWrap from 'vue-ueditor-wrap' // ES6 Module
     export default {
         name: 'HomeAdver',
-        components: {
-            VueUeditorWrap
-        },
+
         data() {
             return {
                 tableData: [],
-                myConfig: {
-                    // 编辑器不自动被内容撑高
-                    autoHeightEnabled: false,
-                    // 初始容器高度
-                    initialFrameHeight: 240,
-                    // 初始容器宽度
-                    initialFrameWidth: '100%',
-                    // 上传文件接口（这个地址是我为了方便各位体验文件上传功能搭建的临时接口，请勿在生产环境使用！！！）
-                    serverUrl: 'http://35.201.165.105:8000/controller.php',
-                    // UEditor 资源文件的存放路径，如果你使用的是 vue-cli 生成的项目，通常不需要设置该选项，vue-ueditor-wrap 会自动处理常见的情况，如果需要特殊配置，参考下方的常见问题2
-                    UEDITOR_HOME_URL: "/UEditor/"
-                },
+
                 cur_page: 1,
                 multipleSelection: [],
                 select_cate: '',
@@ -130,17 +78,11 @@
                     type:'',
                     title:''
                 },
-                idx: -1,
-                fileList: [],
-                imgSrc: '',
-                cropImg: '',
                 dialogVisible: false,
-                content:'',
                 base64Array:[],
                 key:'',
                 capture:'',
                 tag:'0',
-                count:'0',
                 activeName: 'second',
                 tab_index:'1'
             }
@@ -158,65 +100,7 @@
             }
         },
         methods: {
-            //内容改变实时更新
-            onContentChange (val) {
-                this.content = val;
-                this.count = this.content.length;
-            },
-            //内容上传图片
-            fileImage(e) {
-                const file = e.target.files[0];
-                if (!file.type.includes('image/')) {
-                    return;
-                }
-                const reader = new FileReader();
-                var t = this;
-                reader.onload = (event) => {
-                    t.dialogVisible = true;
-                    t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
-                        var img  = '<img src="'+ res  + '" alt="" />'
-                        t.content = t.content + img;
-                    });
-                };
-                reader.readAsDataURL(file);
-            },
-            // 新增和保存编辑，请求
-            saveEdit(){
-                var t = this;
-                t.Loading = true;
-                if (this.imgSrc.length == 0){
-                    t.$message.warning('请上传图片');
-                    return;
-                }
-                if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
-                    this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                        t.saveAndEditCommon(res,key);
-                    })
-                }else{
-                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
-                }
-            },
-            //新增和储存公共方法
-            saveAndEditCommon(photo_res,key){
 
-                var t = this;
-                var dic = {
-                    'advertising_id':t.form.id,          //广告id(修改/删除传,新增不传)
-                    'photo':photo_res,                   //广告展示图片
-                    'character':t.content,               //广告内容
-                    'type_advertising':t.form.type =='推荐' ? '0' : t.form.type =='雪茄' ? '1' : t.form.type =='红酒' ? '2' : '3',            //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
-                    'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':key,                     //七牛key
-                    'title':t.form.title
-                };
-                t.$axios.post('/api/pub/advertising/6/',dic,{headers:{
-                        "Authorization":"JWT " + localStorage.getItem('token')
-                    }}).then(res=>{
-                    t.$message.success(res.data.message);
-                    t.getData();
-                });
-                t.cancleBtn();
-            },
             //确定删除,请求
             deleteRow(){
                 this.delVisible = false;
@@ -242,8 +126,6 @@
             //增加按钮，弹出框
             addnews(index, row){
 
-
-
                 this.idx = index;
                 this.form = {
                     id: "",
@@ -252,13 +134,13 @@
                     photo: "",
                     title:''
                 }
-                this.content = '';
-                this.imgSrc = '';
-                this.title = '';
-                this.editVisible = true;
-                this.count = '0';
-
-
+                var t = this;
+                this.$router.push({
+                    path:'/HomeAdver_Edit',
+                    query:{
+                        'form':t.form,
+                    }
+                })
             },
             //编辑按钮,弹出框
             handleEdit(index, row) {
@@ -271,11 +153,13 @@
                     photo: item.photo,
                     title:item.title
                 }
-                this.imgSrc = item.photo;
-                this.content = item.character;
-                this.title = item.title;
-                this.editVisible = true;
-                this.count = item.character.length;
+                var t = this;
+                this.$router.push({
+                    path:'/HomeAdver_Edit',
+                    query:{
+                        'form':t.form,
+                    }
+                })
             },
             //单个删除,弹出框
             handleDelete(index, row) {
@@ -286,21 +170,7 @@
             delAll() {
                 this.$message.info('功能开发中');
             },
-            //封面图片
-            setImage(e){
-                const file = e.target.files[0];
-                if (!file.type.includes('image/')) {
-                    return;
-                }
-                const reader = new FileReader();
-                var t = this;
-                reader.onload = (event) => {
-                    t.dialogVisible = true;
-                    t.imgSrc = event.target.result;
-                    t.$refs.cropper && this.$refs.cropper.replace(event.target.result);
-                };
-                reader.readAsDataURL(file);
-            },
+
 
 
             //请求
@@ -319,10 +189,7 @@
                 this.tab_index =  index == 'tab-first' ? 0: index == 'tab-second' ? 1: index == 'tab-third' ? 2 : 3;
                 this.getData();
             },
-            //取消按钮方法
-            cancleBtn(){
-                this.editVisible = false;
-            },
+
             //以下方法备用
             handleSelectionChange(val) {
                 this.multipleSelection = val;
@@ -330,7 +197,6 @@
             search() {
                 this.is_search = true;
                 this.$message.info('功能开发中');
-
             },
             type_formatter(value){
                 value = value.type;

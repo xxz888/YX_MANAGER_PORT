@@ -29,6 +29,21 @@ export default new Router({
                     component: resolve => require(['../components/page/CigarDetails.vue'], resolve),
                     meta: {title: '雪茄详情'}
                 },
+                {
+                    path: '/HomeAdver_Edit',
+                    component: resolve => require(['../components/page/HomeAdver_Edit.vue'], resolve),
+                    meta: {title: '广告编辑'}
+                },
+                {
+                    path: '/HomeInfo_Edit',
+                    component: resolve => require(['../components/page/HomeInfo_Edit.vue'], resolve),
+                    meta: {title: '资讯编辑'}
+                },
+                {
+                    path: '/CigarAccessories_Edit',
+                    component: resolve => require(['../components/page/CigarAccessories_Edit.vue'], resolve),
+                    meta: {title: '文化编辑'}
+                },
 
                 {
                     path: '/CigarShop',
