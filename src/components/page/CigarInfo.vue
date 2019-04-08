@@ -50,39 +50,6 @@
             </el-table>
         </div>
         <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%" >
-            <el-form ref="form" :model="form" label-width="100px" label-height = auto>
-                <el-form-item label="类型">
-                    <el-input :disabled="input_disabled" v-model="form.type"></el-input>
-                </el-form-item>
-                <el-form-item label="雪茄名">
-                    <el-input v-model="form.cigar_brand"></el-input>
-                </el-form-item>
-                <el-form-item label="热门">
-                    <el-checkbox v-model="checked">热门</el-checkbox>
-                </el-form-item>
-                <el-form-item label="详情">
-                    <vue-ueditor-wrap id="ud1" v-model="content" :config="myConfig"></vue-ueditor-wrap>
-
-                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
-                    <span>{{count}}/2000</span>
-                </el-form-item>
-                <el-form-item label="品牌logo">
-                    <template  slot-scope="scope">
-                        <div class="crop-demo">
-                            <img :src="imgSrc" v-model="form.photo" class="pre-img" width="100" height="70" :formatter = 'photo_formatter'>
-                            <div class="crop-demo-btn">选择图片
-                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
-                            </div>
-                        </div>
-                    </template>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="cancleBtn">取 消</el-button>
-                <el-button type="primary" @click="saveEdit">确 定</el-button>
-            </span>
-        </el-dialog>
         <!-- 删除提示框 -->
         <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
@@ -116,7 +83,6 @@
                     // UEditor 资源文件的存放路径，如果你使用的是 vue-cli 生成的项目，通常不需要设置该选项，vue-ueditor-wrap 会自动处理常见的情况，如果需要特殊配置，参考下方的常见问题2
                     UEDITOR_HOME_URL: "/UEditor/"
                 },
-                input_disabled:'false',
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
@@ -169,108 +135,56 @@
             }
         },
         methods: {
-            //内容改变实时更新
-            onContentChange (val) {
-                this.content = val;
-                this.count = this.content.length;
-                if (this.count > 2000){
-                    this.$message.warning('内容字符超过2000');
-                }
-            },
-            //内容上传图片
-            fileImage(e) {
-                const file = e.target.files[0];
-                if (!file.type.includes('image/')) {
-                    return;
-                }
-                const reader = new FileReader();
-                var t = this;
-                reader.onload = (event) => {
-                    t.dialogVisible = true;
-                    t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
-                        var img  = '<img src="'+ res  + '" alt="" />'
-                        t.content = t.content + img;
-                    });
-                };
-                reader.readAsDataURL(file);
-            },
+
             //编辑按钮,弹出框
             handleEdit(index, row) {
                 this.idx = index;
                 const item = this.tableData[index];
                 this.form = {
-                    id: item.id,
-                    photo: item.photo,
+                    cigar_brand_id: item.id,
                     cigar_brand:item.cigar_brand,
+                    photo: item.photo,
+                    type_cigar_brand:this.tab_index,
+                    is_hot: item.is_hot == '是' ? true : false,
                     intro:item.intro,
                     concern_number:item.concern_number,
-                    type:  this.activeName,
+                    type:  '1',
+                    qiniu_key:'',
+                    activeName:this.activeName
                 }
-                this.checked = item.is_hot == '是' ? true : false;
-                this.content = item.intro;
-                this.imgSrc = item.photo;
-                this.count = item.intro.length;
 
-                this.editVisible = true;
+                var t = this;
+                this.$router.push({
+                    path:'/CigarInfo_Edit',
+                    query:{
+                        'form':t.form,
+                    }
+                })
 
             },
             //增加按钮，弹出框
             addnews(){
                 this.form = {
-                    id: '',
+                    cigar_brand_id:'',
+                    cigar_brand:'',
                     photo: '',
-                    title: '',
-                    type:  this.activeName,
-                    author: '',
-                    date: new Date(),
-                    details: '',
+                    type_cigar_brand:this.tab_index,
+                    is_hot:true,
+                    intro:'',
+                    concern_number:'',
+                    qiniu_key:'',
+                    type:'2',
+                    activeName:this.activeName
                 }
-                this.content = '';
-                this.imgSrc = '';
-                this.editVisible = true;
-                this.type = this.form.type;
-            },
-            // 新增和保存编辑，请求
-            saveEdit(){
                 var t = this;
-                t.Loading = true;
-                if (this.imgSrc.length == 0){
-                    t.$message.warning('请上传图片');
-                    return;
-                }else if(this.content.length > 2000){
-                    t.$message.warning('内容字符超过2000');
-                    return;
-                }
-                if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
-                    this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                        t.saveAndEditCommon(res,key);
-                    })
-                }else{
-                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
+                this.$router.push({
+                    path:'/CigarInfo_Edit',
+                    query:{
+                        'form':t.form,
+                    }
+                })
+            },
 
-                }
-            },
-            //新增和储存公共方法
-            saveAndEditCommon(res,key) {
-                var t = this;
-                var dic = {
-                    'cigar_brand_id':t.form.id,
-                    'cigar_brand':t.form.cigar_brand,
-                    'photo':res,
-                    'type_cigar_brand':t.tab_index,
-                    'is_hot':t.checked?'1':'0',
-                    'intro':t.content,
-                    'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':key                      //七牛key
-                };
-                t.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
-                        "Authorization":"JWT " + localStorage.getItem('token')
-                    }}).then(res=>{
-                    t.$message.success(res.data.message);
-                    t.getData();
-                });
-                t.cancleBtn();
-            },
             //确定删除,请求
             deleteRow(){
                 this.delVisible = false;
@@ -316,7 +230,7 @@
             },
             //取消按钮方法
             cancleBtn(){
-                this.editVisible = false;
+                this.delVisible = false;
             },
             //请求
             getData() {
@@ -356,20 +270,7 @@
                 this.is_search = true;
                 this.$message.info('功能开发中');
             },
-            setImage(e){
-                const file = e.target.files[0];
-                if (!file.type.includes('image/')) {
-                    return;
-                }
-                const reader = new FileReader();
-                var t = this;
-                reader.onload = (event) => {
-                    t.dialogVisible = true;
-                    t.imgSrc = event.target.result;
-                    t.$refs.cropper && this.$refs.cropper.replace(event.target.result);
-                };
-                reader.readAsDataURL(file);
-            },
+
             getLocalTime(nS) {
                 return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
             },

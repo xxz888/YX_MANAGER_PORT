@@ -1,0 +1,158 @@
+<template>
+    <div>
+            <el-form ref="form" :model="form" label-width="100px" label-height = auto>
+                <el-form-item label="类型">
+                    <el-input :disabled="disabled" v-model="form.activeName"></el-input>
+                </el-form-item>
+                <el-form-item label="雪茄名">
+                    <el-input v-model="form.cigar_brand"></el-input>
+                </el-form-item>
+                <el-form-item label="热门">
+                    <el-checkbox v-model="checked">热门</el-checkbox>
+                </el-form-item>
+                <el-form-item label="详情">
+                    <vue-ueditor-wrap id="ud1" v-model="content" :config="myConfig"></vue-ueditor-wrap>
+                    <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
+                </el-form-item>
+                <el-form-item label="品牌logo">
+                    <template  slot-scope="scope">
+                        <div class="crop-demo">
+                            <img :src="imgSrc" v-model="form.photo" class="pre-img" width="100" height="70">
+                            <div class="crop-demo-btn">选择图片
+                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
+                            </div>
+                        </div>
+                    </template>
+                </el-form-item>
+            </el-form>
+            <div align="center">
+                <el-button @click="cancleBtn">取 消</el-button>
+                <el-button type="primary" @click="saveEdit">确 定</el-button>
+            </div>
+    </div>
+</template>
+
+<script>
+    import VueUeditorWrap from 'vue-ueditor-wrap' // ES6 Module
+    export default {
+        name: "CigarInfo_Edit",
+        components: {
+            VueUeditorWrap
+        },
+        data(){
+            return{
+                form:{},
+                myConfig: {
+                    // 编辑器不自动被内容撑高
+                    autoHeightEnabled: true,
+                    serverUrl: 'http://35.201.165.105:8000/controller.php',
+                    UEDITOR_HOME_URL: "/UEditor/",
+                    initialFrameWidth: '100%',
+                },
+                idx: -1,
+                fileList: [],
+                imgSrc: '',
+                cropImg: '',
+                content:'',
+                checked:true,
+                disabled:false
+            }
+        },
+        created(){
+            this.getParams();
+
+        },
+        watch:{
+            '$route':'getParams'
+        },
+        methods:{
+            getParams(){
+                this.form = this.$route.query.form;
+                this.imgSrc = this.form.photo;
+                this.content = this.form.intro;
+                this.title = this.form.title;
+                this.checked = this.form.is_hot
+                this.type = this.form.type
+            },
+            //内容上传图片
+            fileImage(e) {
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var t = this;
+                reader.onload = (event) => {
+                    t.dialogVisible = true;
+                    t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
+                        var img  = '<img src="'+ res  + '" alt="" />'
+                        t.content = t.content + img;
+                    });
+                };
+                reader.readAsDataURL(file);
+            },
+            // 新增和保存编辑，请求
+            saveEdit(){
+                var t = this;
+                t.Loading = true;
+                if (this.imgSrc.length == 0){
+                    t.$message.warning('请上传图片');
+                    return;
+                }else if(this.content.length > 2000){
+                    t.$message.warning('内容字符超过2000');
+                    return;
+                }
+                if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
+                    this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
+                        t.saveAndEditCommon(res,key);
+                    })
+                }else{
+                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
+
+                }
+            },
+            //新增和储存公共方法
+            saveAndEditCommon(res,key) {
+                var t = this;
+                var dic = {
+                    'cigar_brand_id':t.form.cigar_brand_id,
+                    'cigar_brand':t.form.cigar_brand,
+                    'photo':res,
+                    'type_cigar_brand':t.form.type_cigar_brand,
+                    'is_hot':t.checked?'1':'0',
+                    'intro':t.content,
+                    'type':t.form.type,
+                    'qiniu_key':key                      //七牛key
+                };
+                t.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then(res=>{
+                    t.$message.success(res.data.message);
+                });
+                t.cancleBtn();
+            },
+            setImage(e){
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var t = this;
+                reader.onload = (event) => {
+                    t.dialogVisible = true;
+                    t.imgSrc = event.target.result;
+                    t.$refs.cropper && this.$refs.cropper.replace(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
+            //取消按钮方法
+            cancleBtn(){
+                this.$router.go(-1);
+            },
+        }
+    }
+</script>
+
+<style scoped>
+
+</style>
