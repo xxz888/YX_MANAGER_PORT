@@ -33,6 +33,8 @@
                 </el-table-column>
                 <el-table-column prop="details" show-overflow-tooltip  align="center" label="详情"  >
                 </el-table-column>
+                <el-table-column prop="reprint_url"  show-overflow-tooltip label="转载URL"  align="center">
+                </el-table-column>
                 <el-table-column prop="photo" label="展示图" align="center" width="150">
                     <template  slot-scope="scope">
                         <img :src="scope.row.photo"  width="120" height="70" class="pre-img"/>
@@ -80,7 +82,8 @@
                     type:'',
                     author:'',
                     date:'',
-                    details:''
+                    details:'',
+
                 },
                 idx: -1,
                 fileList: [],
@@ -121,6 +124,8 @@
                     author: item.author,
                     date: this.getLocalTime(item.date),
                     details: item.details,
+                    is_reprint:item.is_reprint,
+                    reprint_url:item.reprint_url,
                 }
                 var t = this;
                 this.$router.push({
@@ -140,6 +145,8 @@
                     author: '',
                     date: new Date(),
                     details: '',
+                    is_reprint:'',
+                    reprint_url:'',
                 }
                 var t = this;
                 this.$router.push({
@@ -162,7 +169,9 @@
                     'author':'',                             //作者
                     'details':'',                            //资讯详情
                     'type':'3',                              //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':''
+                    'qiniu_key':'',
+                    'is_reprint':'',
+                    'reprint_url':'',
                 };
                 this.$axios.post('/api/pub/information/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')

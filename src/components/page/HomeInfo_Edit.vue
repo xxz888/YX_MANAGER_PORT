@@ -15,7 +15,13 @@
             <el-form-item label="作者">
                 <el-input v-model="form.author"></el-input>
             </el-form-item>
-            <el-form-item label="详情">
+            <el-form-item label="转载">
+                <el-checkbox @change="handleCheckedChange" v-model="zz_checked">是否为转载</el-checkbox>
+            </el-form-item>
+            <el-form-item v-if="visible1" label="转载URL">
+                <el-input v-model="form.reprint_url"></el-input>
+            </el-form-item>
+            <el-form-item v-if="visible2" label="详情">
                 <vue-ueditor-wrap id="ud1" v-model="content" :config="myConfig"></vue-ueditor-wrap>
                 <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
             </el-form-item>
@@ -66,6 +72,9 @@
                 imgSrc: '',
                 cropImg: '',
                 content:'',
+                zz_checked:'',
+                visible1:false,
+                visible2:true
             }
         },
         created(){
@@ -76,11 +85,25 @@
             '$route':'getParams'
         },
         methods:{
+            handleCheckedChange(val){
+                this.visible1 = val;
+                this.visible2 = !val;
+            },
             getParams(){
                 this.form = this.$route.query.form;
                 this.imgSrc = this.form .photo;
                 this.content = this.form .details;
                 this.title = this.form .title;
+
+                if (this.form.id.length == 0){
+                    this.visible1 = false;
+                    this.visible2 = true;//!this.form.is_reprint;
+                } else {
+                    this.visible1 = this.form.is_reprint;
+                    this.visible2 = !this.form.is_reprint;
+                }
+                this.zz_checked = this.form.is_reprint;
+
             },
             // 新增和保存编辑，请求
             saveEdit() {
@@ -109,7 +132,9 @@
                     'author':t.form.author,                  //作者
                     'details':t.content,                    //资讯详情
                     'type':t.form.id.length == 0 ? 2 :1,     //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':key
+                    'qiniu_key':key,
+                    'is_reprint':t.zz_checked ? '1' : '0',
+                    'reprint_url':t.form.reprint_url,
                 };
                 t.$axios.post('/api/pub/information/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')

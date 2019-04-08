@@ -30,6 +30,8 @@
                 </el-table-column>
                 <el-table-column prop="character"  show-overflow-tooltip label="广告文字"  align="center">
                 </el-table-column>
+                <el-table-column prop="reprint_url"  show-overflow-tooltip label="转载URL"  align="center">
+                </el-table-column>
                 <el-table-column prop="photo" label="广告图片" width="150" align="center">
                     <template  slot-scope="scope">
                         <img :src="scope.row.photo"  width="120" height="70" class="pre-img"/>
@@ -113,7 +115,9 @@
                     'type_advertising':t.form.type =='推荐' ? '0' : t.form.type =='雪茄' ? '1' : t.form.type =='红酒' ? '2' : '3',            //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
                     'type':'3',                                            //操作类型(1/修改，2/新增，3/删除)
                     'qiniu_key':'',                                        //七牛key
-                    'title':''
+                    'title':'',
+                    'is_reprint':'',
+                    'reprint_url':'',
                 };
                 this.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
@@ -132,7 +136,9 @@
                     type: this.tab_index == 0 ? '推荐' : this.tab_index == 1 ? '雪茄' : this.tab_index == 2 ? '红酒' : '高尔夫',
                     character: "",
                     photo: "",
-                    title:''
+                    title:'',
+                    is_reprint:'',
+                    reprint_url:'',
                 }
                 var t = this;
                 this.$router.push({
@@ -151,7 +157,9 @@
                     type: item.type == 0 ? '推荐' : item.type == 1 ? '雪茄' : item.type == 2 ? '红酒' :'高尔夫',
                     character: item.character,
                     photo: item.photo,
-                    title:item.title
+                    title:item.title,
+                    is_reprint:item.is_reprint,
+                    reprint_url:item.reprint_url,
                 }
                 var t = this;
                 this.$router.push({

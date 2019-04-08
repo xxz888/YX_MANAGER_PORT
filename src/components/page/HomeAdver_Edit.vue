@@ -12,8 +12,14 @@
             <el-form-item label="标题">
                 <el-input v-model="form.title"></el-input>
             </el-form-item>
-            <el-form-item label="广告文字">
-                <vue-ueditor-wrap id="ud1" v-model="content" :config="myConfig"></vue-ueditor-wrap>
+            <el-form-item label="转载">
+                <el-checkbox @change="handleCheckedChange" v-model="zz_checked">是否为转载</el-checkbox>
+            </el-form-item>
+            <el-form-item v-if="visible1" label="转载URL">
+                <el-input v-model="form.reprint_url"></el-input>
+            </el-form-item>
+            <el-form-item v-if="visible2" label="广告文字">
+                <vue-ueditor-wrap  id="ud1" v-model="content" :config="myConfig"></vue-ueditor-wrap>
                 <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="选择图片" />
             </el-form-item>
 
@@ -57,6 +63,9 @@
                 imgSrc: '',
                 cropImg: '',
                 content:'',
+                zz_checked:'',
+                visible1:false,
+                visible2:true
             }
         },
         created(){
@@ -67,11 +76,25 @@
             '$route':'getParams'
         },
         methods:{
+            handleCheckedChange(val){
+                this.visible1 = val;
+                this.visible2 = !val;
+            },
             getParams(){
                 this.form = this.$route.query.form;
                 this.imgSrc = this.form .photo;
                 this.content = this.form .character;
                 this.title = this.form .title;
+
+                if (this.form.id.length == 0){
+                    this.visible1 = false;
+                    this.visible2 = true;//!this.form.is_reprint;
+                } else {
+                    this.visible1 = this.form.is_reprint;
+                    this.visible2 = !this.form.is_reprint;
+                }
+                this.zz_checked = this.form.is_reprint;
+
             },
             //封面图片
             setImage(e){
@@ -132,7 +155,9 @@
                     'type_advertising':t.form.type =='推荐' ? '0' : t.form.type =='雪茄' ? '1' : t.form.type =='红酒' ? '2' : '3',            //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
                     'type':t.form.id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
                     'qiniu_key':key,                     //七牛key
-                    'title':t.form.title
+                    'title':t.form.title,
+                    'is_reprint':t.zz_checked ? '1' : '0',
+                    'reprint_url':t.form.reprint_url,
                 };
                 t.$axios.post('/api/pub/advertising/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')

@@ -21,6 +21,8 @@
                 </el-table-column>
                 <el-table-column prop="essay"  show-overflow-tooltip label="文章内容"  align="center">
                 </el-table-column>
+                <el-table-column prop="reprint_url"  show-overflow-tooltip label="转载URL"  align="center">
+                </el-table-column>
                 <el-table-column prop="publish_time" label="时间" width="100" align="center":formatter = 'data_formatter'>
                 </el-table-column>
                 <el-table-column prop="picture" label="展示图" width="150" align="center">
@@ -120,14 +122,17 @@
                 this.delVisible = false;
                 var t = this;
                 var dic = {
-                    'culture_id':this.tableData[this.idx].id,
+                    'title':t.form.title,
                     'picture':'',
                     'essay':'',
-                    'type':3, //操作类型(1/修改，2/新增，3/删除)
                     'qiniu_key':'',
-                    'title':t.form.title
+                    'culture_id':this.tableData[this.idx].id,
+                    'type':3, //操作类型(1/修改，2/新增，3/删除)
+                    'is_reprint':'',
+                    'reprint_url':'',
+                    'culture_type':'1'
                 };
-                this.$axios.post('/api/cigar/cigar_culture/6/',dic,{headers:{
+                this.$axios.post('/api/cigar/cigar_culture/6/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     t.$message.success(res.data.message);
@@ -140,11 +145,14 @@
 
                 this.idx = index;
                 this.form = {
-                    culture_id: "",
-                    type:3,
-                    essay: "",
+                    title:'',
                     picture: "",
-                    title:''
+                    essay: "",
+                    qiniu_key:'',
+                    culture_id: "",
+                    type:'2',
+                    is_reprint:'',
+                    reprint_url:''
                 }
                 var t = this;
                 this.$router.push({
@@ -163,7 +171,11 @@
                     essay: item.essay,
                     picture: item.picture,
                     title:item.title,
-                    type:'1'
+                    type:'1',
+                    is_reprint:item.is_reprint,
+                    reprint_url:item.reprint_url,
+                    qiniu_key:'',
+
                 }
                 var t = this;
                 this.$router.push({

@@ -4,7 +4,13 @@
                 <el-form-item label="标题">
                     <el-input v-model="form.title"></el-input>
                 </el-form-item>
-                <el-form-item label="文章内容">
+                <el-form-item label="转载">
+                    <el-checkbox @change="handleCheckedChange" v-model="zz_checked">是否为转载</el-checkbox>
+                </el-form-item>
+                <el-form-item v-if="visible1" label="转载URL">
+                    <el-input v-model="form.reprint_url"></el-input>
+                </el-form-item>
+                <el-form-item v-if="visible2" label="文章内容" >
                     <vue-ueditor-wrap id="ud1" v-model="content" :config="myConfig"></vue-ueditor-wrap>
                     <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="选择图片" />
                 </el-form-item>
@@ -51,21 +57,39 @@
                 imgSrc: '',
                 cropImg: '',
                 content:'',
+                zz_checked:'',
+                visible1:false,
+                visible2:true
+
             }
         },
         created(){
             this.getParams();
-
         },
         watch:{
             '$route':'getParams'
         },
         methods:{
+            handleCheckedChange(val){
+                this.visible1 = val;
+                this.visible2 = !val;
+            },
             getParams(){
                 this.form = this.$route.query.form;
                 this.imgSrc = this.form.picture;
                 this.content = this.form.essay;
                 this.title = this.form.title;
+                this.zz_checked = this.form.is_reprint;
+
+                if (this.form.type == 2){
+                    this.visible1 = false;
+                    this.visible2 = true;//!this.form.is_reprint;
+                } else {
+                    this.visible1 = this.form.is_reprint;
+                    this.visible2 = !this.form.is_reprint;
+                }
+                this.zz_checked = this.form.is_reprint;
+
             },
             //封面图片
             setImage(e){
@@ -103,14 +127,17 @@
             saveAndEditCommon(photo_res,key){
                 var t = this;
                 var dic = {
-                    'culture_id':t.form.culture_id,
+                    'title':t.form.title,
                     'picture':photo_res,
                     'essay':t.content,
-                    'type':t.form.culture_id.length == 0 ? 2 :1, //操作类型(1/修改，2/新增，3/删除)
                     'qiniu_key':key,                     //七牛key
-                    'title':t.form.title
+                    'culture_id':t.form.culture_id,
+                    'type':t.form.type,
+                    'is_reprint':t.zz_checked ? '1' : '0',
+                    'reprint_url':t.form.reprint_url,
+                    'culture_type':'1'
                 };
-                t.$axios.post('/api/cigar/cigar_culture/6/',dic,{headers:{
+                t.$axios.post('/api/cigar/cigar_culture/6/6/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     t.$message.success(res.data.message);
