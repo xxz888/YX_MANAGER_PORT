@@ -24,6 +24,8 @@
         </el-row>
 
 
+
+
         <!-- 编辑弹出框 -->
         <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%">
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
@@ -254,7 +256,10 @@
                             'brand_id':item.id
                     }
                 })
-            }
+            },
+            editImgVisible(){
+
+            },
         }
     }
 </script>
