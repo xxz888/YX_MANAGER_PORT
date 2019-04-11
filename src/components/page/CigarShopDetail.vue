@@ -58,10 +58,10 @@
         <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%" >
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
                 <el-form-item label="类型" >
-                    <el-input v-model="form.type_accessories" disabled="false"></el-input>
+                    <el-input v-model="form.type_accessories" :disabled="false"></el-input>
                 </el-form-item>
                 <el-form-item label="品牌名">
-                    <el-input v-model="form.brand_name" disabled="false"></el-input>
+                    <el-input v-model="form.brand_name" :disabled="false"></el-input>
                 </el-form-item>
                 <el-form-item label="配件名">
                     <el-input v-model="form.name"></el-input>
@@ -124,17 +124,7 @@
             };
         },
         created(){
-            this.brand_name = this.$route.query.brand_name;
-            this.brand_id =this.$route.query.brand_id;
-            var self = this;
-            this.$axios.get('/api/cigar/cigar_accessories_type/'+self.brand_id+'/',{headers:{
-                    "Authorization":"JWT " + localStorage.getItem('token')
-                }}).then(res=>{
-                self.todo = res.data;
-                self.tab_index = self.todo[0]['id'];
-                self.activeName = self.todo[0]['type'];
-                self.getData();
-            });
+            this.getParams();
         },
         watch:{
             '$route':'getParams'
@@ -148,7 +138,17 @@
         },
         methods: {
             getParams(){
-
+                this.brand_name = this.$route.query.brand_name;
+                this.brand_id =this.$route.query.brand_id;
+                var self = this;
+                this.$axios.get('/api/cigar/cigar_accessories_type/'+self.brand_id+'/',{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then(res=>{
+                    self.todo = res.data;
+                    self.tab_index = self.todo[0]['id'];
+                    self.activeName = self.todo[0]['type'];
+                    self.getData();
+                });
             },
             //请求数据
             getData(){
