@@ -7,7 +7,7 @@
         <!--<el-button style="margin:20px 0px" size="medium" type="success" @click="addInfo">新增</el-button>-->
         <el-row>
             <el-col align="right" :span="4" v-for="(item, index) in tableData">
-                <el-card  :body-style="{ padding: '5px' }">
+                <el-card  :body-style="{ padding: '5px',height:'250px'}">
                     <img :src="item.brand_logo" class="image" />
                     <div class="namediv" style="padding: 15px;">
                         <p class="spanname">{{item.brand_name}}</p>
@@ -80,7 +80,7 @@
     .spanname{
         text-align: left;
         vertical-align: middle;
-
+        white-space:nowrap
     }
     .button {
         padding: 0;
