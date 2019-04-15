@@ -80,7 +80,7 @@
                 }
                 var t = this;
                 var dic = {'cigar_brand_id':this.id};
-                this.$axios.post('/api/cigar/cigar_brand_details/',dic,{headers:{
+                this.$axios.post('/api/cigar/admin_cigar_brand_details/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     t.tableData = res.data.data;

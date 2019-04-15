@@ -105,9 +105,6 @@
                 <el-form-item label="配件名">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
-                <el-form-item label="价格">
-                    <el-input v-model="form.price"></el-input>
-                </el-form-item>
                 <el-form-item label="权重">
                     <el-input v-model="form.weight"></el-input>
                 </el-form-item>
@@ -116,6 +113,11 @@
                 </el-form-item>
                 <el-form-item label="购买须知">
                     <el-input type="textarea" v-model="form.notice"></el-input>
+                </el-form-item>
+                <el-form-item label="地区价格">
+                    <p style="font-size: 13px;color:red;">实例:国内 100元;美国 200美元</p>
+                    <input placeholder="名字和值用空格隔开,不同字段用英文分号隔开。" type="text" style="width: 100%;height: 40px;font-size: 15px" v-model="otherInput">
+
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -163,7 +165,8 @@
                 dic:{},
                 imgList: [],
                 size: 0,
-                editImgVisible:false
+                editImgVisible:false,
+                otherInput:''
             };
         },
         created(){
@@ -245,10 +248,17 @@
                     type_accessories:this.activeName,
                 }
                 this.editVisible = true;
+                this.otherInput =
+                    item.store_a + ' ' + item.price_a + ';'  +
+                    item.store_b + ' ' + item.price_b + ';'  +
+                    item.store_c + ' ' + item.price_c + ';';
+
+
             },
             //新增按钮
             addnews(){
                 var val = this.tab_index;
+
                 this.form = {
                     brand_name:this.brand_name,
                     name:'',
@@ -260,6 +270,8 @@
                     cigar_accessories_id:'',
                     type_accessories:this.activeName,
                 }
+
+
                 this.editVisible = true;
             },
             //新增和编辑的请求
@@ -267,11 +279,41 @@
                 if (!this.brand_name){
                     return;
                 }
+
+                var array = this.otherInput.split(';');
+                if (array.length == 1){
+                    var array1 = array[0].split(' ');
+                    this.form.store_a = array1[0];
+                    this.form.price_a = array1[1];
+                    this.form.store_b = '';
+                    this.form.price_b = '';
+                    this.form.store_c = '';
+                    this.form.price_c = '';
+                }
+                if (array.length == 2){
+                    var array1 = array[0].split(' ');
+                    this.form.store_a = array1[0];
+                    this.form.price_a = array1[1];
+                    var array2 = array[1].split(' ');
+                    this.form.store_b = array2[0];
+                    this.form.price_b = array2[1];
+                    this.form.store_c = '';
+                    this.form.price_c = '';
+                }
+                if (array.length >= 3){
+                    var array1 = array[0].split(' ');
+                    this.form.store_a = array1[0];
+                    this.form.price_a = array1[1];
+                    var array2 = array[1].split(' ');
+                    this.form.store_b = array2[0];
+                    this.form.price_b = array2[1];
+                    var array3 = array[2].split(' ');
+                    this.form.store_c = array3[0];
+                    this.form.price_c = array3[1];
+                }
+                this.form.type_accessories = this.tab_index;
                 var self = this;
-                var dic = this.form;
-                dic.type_accessories = this.tab_index;
-                console.log(dic);
-                this.$axios.post('/api/cigar/cigar_accessories/6/6/bn/',dic,{headers:{
+                this.$axios.post('/api/cigar/cigar_accessories/6/6/bn/',this.form,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     self.$message.success(res.data.message);
@@ -300,6 +342,12 @@
                 dic.cigar_accessories_id = self.tableData[this.idx]['id'];
                 dic.type = 3;
                 dic.type_accessories = this.tab_index;
+                dic.price_a = '';
+                dic.store_a = '';
+                dic.price_b = '';
+                dic.store_b = '';
+                dic.price_c = '';
+                dic.store_c = '';
                 this.$axios.post('/api/cigar/cigar_accessories/6/6/bn/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{

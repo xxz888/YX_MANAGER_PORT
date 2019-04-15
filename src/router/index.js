@@ -40,6 +40,12 @@ export default new Router({
                     meta: {title: '资讯编辑'}
                 },
                 {
+                    path: '/CigarShop_Edit',
+                    component: resolve => require(['../components/page/CigarShop_Edit.vue'], resolve),
+                    meta: {title: '配件编辑'}
+                },
+
+                {
                     path: '/CigarAccessories_Edit',
                     component: resolve => require(['../components/page/CigarAccessories_Edit.vue'], resolve),
                     meta: {title: '文化编辑'}

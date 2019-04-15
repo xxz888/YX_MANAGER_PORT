@@ -23,37 +23,6 @@
             </el-col>
         </el-row>
 
-
-
-
-        <!-- 编辑弹出框 -->
-        <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%">
-            <el-form ref="form" :model="form" label-width="100px" label-height = auto>
-                <el-form-item label="品牌名">
-                    <el-input v-model="form.brand_name"></el-input>
-                </el-form-item>
-                <el-form-item label="热门">
-                    <el-checkbox v-model="checked">热门</el-checkbox>
-                </el-form-item>
-                <el-form-item label="品牌logo">
-                    <template  slot-scope="scope">
-                        <div class="crop-demo">
-                            <img :src="imgSrc" class="pre-img" width="100" height="70" >
-                            <div class="crop-demo-btn">选择图片
-                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
-                            </div>
-                        </div>
-                    </template>
-                </el-form-item>
-            </el-form>
-
-            <span slot="footer" class="dialog-footer">
-                    <el-button @click="cancleBtn">取 消</el-button>
-                    <el-button type="primary" @click="saveEdit">确 定</el-button>
-                </span>
-        </el-dialog>
-
-
         <!-- 删除提示框 -->
         <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
             <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
@@ -142,57 +111,8 @@
                     t.tableData = res.data;
                 });
             },
-            //封面图片
-            setImage(e){
-                const file = e.target.files[0];
-                if (!file.type.includes('image/')) {
-                    return;
-                }
-                const reader = new FileReader();
-                var t = this;
-                reader.onload = (event) => {
-                    t.dialogVisible = true;
-                    t.imgSrc = event.target.result;
-                    t.$refs.cropper && this.$refs.cropper.replace(event.target.result);
-                };
-                reader.readAsDataURL(file);
-            },
-            saveEdit(){
 
-                var t = this;
-                t.Loading = true;
-                if (this.imgSrc.length == 0){
-                    t.$message.warning('请上传图片');
-                    return;
-                }
-                if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
-                    this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                        t.saveAndEditCommon(res,key);
-                    })
-                }else{
-                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
-                }
 
-            },
-            //新增和储存公共方法
-            saveAndEditCommon(res,key) {
-                var t = this;
-                var dic = {
-                    'brand_name': t.form.brand_name,
-                    'brand_logo': res,
-                    'is_got': t.checked?'1':'0',
-                    'brand_id':t.form.brand_id,
-                    'type':t.form.brand_id ? 1 : 2,
-                    'qiniu_key':key                      //七牛key
-                };
-                t.$axios.post('/api/cigar/cigar_accessories_brand/',dic,{headers:{
-                        "Authorization":"JWT " + localStorage.getItem('token')
-                    }}).then(res=>{
-                    t.$message.success(res.data.message);
-                    t.getData();
-                });
-                t.cancleBtn();
-            },
             cancleBtn(){
               this.editVisible = false;
             },
@@ -205,6 +125,7 @@
                     'is_got': t.checked?'1':'0',
                     'brand_id':this.tableData[this.idx].id,
                     'type':3,
+                    'intro':'',
                     'qiniu_key':''                      //七牛key
                 };
                 t.$axios.post('/api/cigar/cigar_accessories_brand/',dic,{headers:{
@@ -222,6 +143,8 @@
 
             },
             handleClick(index){
+
+
                 this.idx = index;
                 const item = this.tableData[index];
                 this.form = {
@@ -229,22 +152,38 @@
                     brand_logo: item.brand_logo,
                     is_got: this.checked?'1':'0',
                     brand_id:item.id,
-                    type:''
+                    type:'1',
+                    intro:item.intro,
+
                 }
-                this.checked = item.is_hot == '是' ? true : false;
-                this.imgSrc = item.brand_logo;
-                this.editVisible = true;
+
+                var t = this;
+                this.$router.push({
+                    path:'/CigarShop_Edit',
+                    query:{
+                        'form':t.form,
+                    }
+                })
+
             },
             addInfo(){
+
                 this.form = {
                     brand_name: '',
                     brand_logo: '',
-                    is_got: '',
+                    is_got: true,
                     brand_id:'',
-                    type:''
+                    type:'2',
+                    intro:'',
+
                 }
-                this.imgSrc = '';
-                this.editVisible = true;
+                var t = this;
+                this.$router.push({
+                    path:'/CigarShop_Edit',
+                    query:{
+                        'form':t.form,
+                    }
+                })
             },
             handleDetails(index){
                 const item = this.tableData[index];

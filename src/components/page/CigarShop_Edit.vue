@@ -1,44 +1,41 @@
 <template>
-    <div>
+        <div>
             <el-form ref="form" :model="form" label-width="100px" label-height = auto>
-                <el-form-item label="类型">
-                    <el-input :disabled="disabled" v-model="form.activeName"></el-input>
-                </el-form-item>
-                <el-form-item label="雪茄名">
-                    <el-input v-model="form.cigar_brand"></el-input>
+                <el-form-item label="配件名">
+                    <el-input v-model="form.brand_name"></el-input>
                 </el-form-item>
                 <el-form-item label="热门">
                     <el-checkbox v-model="checked">热门</el-checkbox>
                 </el-form-item>
-                <el-form-item label="显示">
-                    <el-checkbox v-model="showChecked">显示</el-checkbox>
-                </el-form-item>
-                <el-form-item label="详情">
+
+                <el-form-item label="商品简介">
                     <vue-ueditor-wrap id="ud1" v-model="content" :config="myConfig"></vue-ueditor-wrap>
                     <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
                 </el-form-item>
-                <el-form-item label="品牌logo">
+                <el-form-item label="配件logo">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
-                            <img :src="imgSrc" v-model="form.photo" class="pre-img" width="100" height="70">
+                            <img :src="imgSrc" class="pre-img" width="100" height="70" >
                             <div class="crop-demo-btn">选择图片
                                 <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
                             </div>
                         </div>
                     </template>
                 </el-form-item>
+
+
             </el-form>
             <div align="center">
                 <el-button @click="cancleBtn">取 消</el-button>
                 <el-button type="primary" @click="saveEdit">确 定</el-button>
             </div>
-    </div>
+        </div>
 </template>
 
 <script>
     import VueUeditorWrap from 'vue-ueditor-wrap' // ES6 Module
     export default {
-        name: "CigarInfo_Edit",
+        name: "CigarShop_Edit",
         components: {
             VueUeditorWrap
         },
@@ -59,8 +56,6 @@
                 content:'',
                 checked:true,
                 disabled:false,
-                showChecked:true
-
             }
         },
         created(){
@@ -70,16 +65,13 @@
         watch:{
             '$route':'getParams'
         },
-        methods:{
-            getParams(){
+        methods: {
+            getParams() {
                 this.form = this.$route.query.form;
-                this.imgSrc = this.form.photo;
+                this.imgSrc = this.form.brand_logo;
                 this.content = this.form.intro;
-                this.title = this.form.title;
-                this.checked = this.form.is_hot;
+                this.checked = this.form.is_got;
                 this.type = this.form.type;
-                this.showChecked = this.form.is_show;
-
             },
             //内容上传图片
             fileImage(e) {
@@ -91,30 +83,30 @@
                 var t = this;
                 reader.onload = (event) => {
                     t.dialogVisible = true;
-                    t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function(res,key){
-                        var img  = '<img src="'+ res  + '" alt="" />'
+                    t.$uploadQiNiuYun.uploadqiniuyun(event.target.result, function (res, key) {
+                        var img = '<img src="' + res + '" alt="" />'
                         t.content = t.content + img;
                     });
                 };
                 reader.readAsDataURL(file);
             },
             // 新增和保存编辑，请求
-            saveEdit(){
+            saveEdit() {
                 var t = this;
                 t.Loading = true;
-                if (this.imgSrc.length == 0){
+                if (this.imgSrc.length == 0) {
                     t.$message.warning('请上传图片');
                     return;
-                }else if(this.content.length > 2000){
+                } else if (this.content.length > 2000) {
                     t.$message.warning('内容字符超过2000');
                     return;
                 }
-                if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
-                    this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
-                        t.saveAndEditCommon(res,key);
+                if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1) {
+                    this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc, function (res, key) {
+                        t.saveAndEditCommon(res, key);
                     })
-                }else{
-                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
+                } else {
+                    t.saveAndEditCommon(this.imgSrc, t.imgSrc.split('http://photo.thegdlife.com/')[1]);
 
                 }
             },
@@ -122,24 +114,23 @@
             saveAndEditCommon(res,key) {
                 var t = this;
                 var dic = {
-                    'cigar_brand_id':t.form.cigar_brand_id,
-                    'cigar_brand':t.form.cigar_brand,
-                    'photo':res,
-                    'type_cigar_brand':t.form.type_cigar_brand,
-                    'is_hot':t.checked?'1':'0',
-                    'is_show': t.showChecked?'1':'0',
+                    'brand_name': t.form.brand_name,
+                    'brand_logo': res,
+                    'is_got': t.checked?'1':'0',
                     'intro':t.content,
+                    'brand_id':t.form.brand_id,
                     'type':t.form.type,
                     'qiniu_key':key                      //七牛key
                 };
-                t.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
+                t.$axios.post('/api/cigar/cigar_accessories_brand/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     t.$message.success(res.data.message);
+                    t.getData();
                 });
                 t.cancleBtn();
             },
-            setImage(e){
+            setImage(e) {
                 const file = e.target.files[0];
                 if (!file.type.includes('image/')) {
                     return;
@@ -154,7 +145,7 @@
                 reader.readAsDataURL(file);
             },
             //取消按钮方法
-            cancleBtn(){
+            cancleBtn() {
                 this.$router.go(-1);
             },
         }

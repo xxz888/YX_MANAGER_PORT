@@ -19,6 +19,9 @@
                 <el-form-item label="海外店名">
                     <el-input v-model="form.store_overseas"></el-input>
                 </el-form-item>
+                <el-form-item label="显示">
+                    <el-checkbox v-model="showChecked">显示</el-checkbox>
+                </el-form-item>
 
             </el-col>
             <el-col :span="10">
@@ -76,13 +79,15 @@
                   store_hongkong:'',
                   store_overseas:'',
                   collect_number:'',
-                  otherInput:''
+                  otherInput:'',
+                  is_show:''
               },
               dialogImageUrl: '',
               dialogVisible: false,
               nameBtn:'',
               otherInput:'',
-              B_Loading:false
+              B_Loading:false,
+              showChecked:''
           }
         },
         created(){
@@ -95,6 +100,7 @@
         methods:{
             getParams(){
                 this.form = this.$route.query.key;
+                this.showChecked = this.form.is_show == 1 ? true : false;
                 if (this.form.argument){
                     var dic = JSON.parse(this.form.argument);
                     for(var key in dic){
@@ -109,6 +115,7 @@
                 var dic = t.form;
                 dic['type'] = '1';
                 dic['cigar_id'] = t.form.id;
+                dic.is_show = this.showChecked ? '1' : '0';
                 if (!t.form.id){
                     return;
                 }

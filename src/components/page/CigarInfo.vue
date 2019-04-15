@@ -28,14 +28,16 @@
                         <img :src="scope.row.photo"  width="80" height="30" class="pre-img"/>
                     </template>
                 </el-table-column>
-                <el-table-column prop="cigar_brand" label="雪茄品牌" width="150" align="center">
+                <el-table-column prop="cigar_brand" label="雪茄品牌" width="120" align="center">
                 </el-table-column>
                 <el-table-column prop="concern_number" label="关注人数" width="100" align="center" >
                 </el-table-column>
                 <el-table-column prop="intro" show-overflow-tooltip  align="center" label="详情"  >
                 </el-table-column>
-                    <el-table-column prop="is_hot" label="热门" width="80" align="center">
-                    </el-table-column>
+                <el-table-column prop="is_hot" label="热门" width="80" align="center" >
+                </el-table-column>
+                <el-table-column prop="is_show" label="显示" width="80" align="center" :formatter="isShowFormatter">
+                </el-table-column>
                 <el-table-column  label="详情" width="80" align="center">
                     <template slot-scope="scope">
                         <el-button type="primary" round @click="handleDetails(scope.$index, scope.row)">详情</el-button>
@@ -135,7 +137,9 @@
             }
         },
         methods: {
-
+            isShowFormatter: function (row, column) {
+                return row.is_show? '是' : '否';
+            },
             //编辑按钮,弹出框
             handleEdit(index, row) {
                 this.idx = index;
@@ -146,6 +150,7 @@
                     photo: item.photo,
                     type_cigar_brand:this.tab_index,
                     is_hot: item.is_hot == '是' ? true : false,
+                    is_show:item.is_show,
                     intro:item.intro,
                     concern_number:item.concern_number,
                     type:  '1',
@@ -170,6 +175,7 @@
                     photo: '',
                     type_cigar_brand:this.tab_index,
                     is_hot:true,
+                    is_show:true,
                     intro:'',
                     concern_number:'',
                     qiniu_key:'',
@@ -196,6 +202,7 @@
                     'photo':'',                         //广告展示图片
                     'type_cigar_brand':this.tab_index,
                     'is_hot':'',
+                    'is_show':'',
                     'intro':'',               //广告内容
                     'type':'3', //操作类型(1/修改，2/新增，3/删除)
                     'qiniu_key':t.tableData[t.idx].photo.split('http://photo.thegdlife.com/')[1]                          //七牛key
@@ -235,7 +242,7 @@
             //请求
             getData() {
 
-                this.$axios.get('/api/cigar/cigar_brand/'+this.tab_index+'/', {
+                this.$axios.get('/api/cigar/admin_cigar_brand/'+this.tab_index+'/', {
                     page: this.cur_page
                 }).then((res) => {
                     var arr1 = res.data.brand_list;
