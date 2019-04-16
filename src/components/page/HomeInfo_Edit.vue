@@ -2,12 +2,7 @@
     <div>
         <el-form ref="form" :model="form" label-width="100px" label-height = auto>
             <el-form-item label="类型">
-                <el-select v-model="form.type" placeholder="form.type">
-                    <el-option key="0" label="推荐" value="0"></el-option>
-                    <el-option key="1" label="雪茄" value="1"></el-option>
-                    <el-option key="2" label="红酒" value="2"></el-option>
-                    <el-option key="3" label="高尔夫" value="3"></el-option>
-                </el-select>
+                <el-input type="text" v-model="form.type_information"></el-input>
             </el-form-item>
             <el-form-item label="标题">
                 <el-input v-model="form.title"></el-input>
@@ -128,7 +123,7 @@
                     'information_id':t.form.id,             //资讯id(修改/删除传,新增不传)
                     'photo':res,                            //资讯展示图片
                     'title':t.form.title,                   //资讯标题
-                    'type_information':t.form.type =='推荐' ? '0' : t.form.type =='雪茄' ? '1' : t.form.type =='红酒' ? '2' : '3',            //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
+                    'type_information':t.form.type_information =='推荐' ? '0' : t.form.type_information =='雪茄' ? '1' : t.form.type_information =='红酒' ? '2' : '3',            //(0,推荐)(1,雪茄)(2,红酒)(3,高尔夫)
                     'author':t.form.author,                  //作者
                     'details':t.content,                    //资讯详情
                     'type':t.form.id.length == 0 ? 2 :1,     //操作类型(1/修改，2/新增，3/删除)

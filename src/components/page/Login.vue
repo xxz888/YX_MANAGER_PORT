@@ -80,7 +80,6 @@
         position: relative;
         width:100%;
         height:100%;
-        background-image: url(../../assets/img/login-bg1.png);
         background-size: 100%;
     }
     .ms-title{
