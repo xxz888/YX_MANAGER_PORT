@@ -23,13 +23,13 @@
                     <img :src="scope.row.photo_list[0].photo"  width="120" height="80" class="pre-img"/>
                 </template>
             </el-table-column>
-            <el-table-column prop="price" label="价格" width="100" align="center">
-            </el-table-column>
             <el-table-column prop="info" show-overflow-tooltip label="配件信息" align="center" >
             </el-table-column>
             <el-table-column prop="notice" show-overflow-tooltip  align="center" label="购买须知"  >
             </el-table-column>
             <el-table-column prop="weight" label="权重" width="80" align="center">
+            </el-table-column>
+            <el-table-column prop="is_show" label="显示" width="80" align="center" :formatter="isShowFormatter">
             </el-table-column>
             <el-table-column  label="修改图片" width="80" align="center">
                 <template slot-scope="scope">
@@ -102,6 +102,9 @@
                 <el-form-item label="品牌名">
                     <el-input v-model="form.brand_name" :disabled="false"></el-input>
                 </el-form-item>
+                <el-form-item label="显示">
+                    <el-checkbox v-model="showChecked">显示</el-checkbox>
+                </el-form-item>
                 <el-form-item label="配件名">
                     <el-input v-model="form.name"></el-input>
                 </el-form-item>
@@ -152,7 +155,8 @@
                     info:'',
                     notice:'',
                     type:'',
-                    weight:''
+                    weight:'',
+                    is_hot:''
                 },
                 tab_index:'',
                 currentPage:1,
@@ -166,8 +170,10 @@
                 imgList: [],
                 size: 0,
                 editImgVisible:false,
-                otherInput:''
-            };
+                otherInput:'',
+                showChecked:''
+
+        };
         },
         created(){
             this.getParams();
@@ -183,6 +189,9 @@
             }
         },
         methods: {
+            isShowFormatter: function (row, column) {
+                return row.is_show? '是' : '否';
+            },
             getParams(){
                 this.brand_name = this.$route.query.brand_name;
                 this.brand_id =this.$route.query.brand_id;
@@ -202,7 +211,7 @@
                 if (!this.brand_name){
                     return;
                 }
-                var parStr = "/api/cigar/cigar_accessories/"+ this.tab_index+'/'+this.currentPage+'/'+this.brand_name+'/';
+                var parStr = "/api/cigar/admin_cigar_accessories/"+ this.tab_index+'/'+this.currentPage+'/'+this.brand_name+'/';
               this.$axios.get(parStr).then(res=>{
                   self.tableData = res.data;
                   for(var i = 0 ; i < self.tableData.length;i++){
@@ -246,8 +255,10 @@
                     weight:item.weight,
                     cigar_accessories_id:item.id,
                     type_accessories:this.activeName,
+                    is_show:item.is_show,
                 }
                 this.editVisible = true;
+                this.showChecked = this.form.is_show;
                 this.otherInput =
                     item.store_a + ' ' + item.price_a + ';'  +
                     item.store_b + ' ' + item.price_b + ';'  +
@@ -269,6 +280,8 @@
                     weight:'',
                     cigar_accessories_id:'',
                     type_accessories:this.activeName,
+                    is_show:true,
+
                 }
 
 
@@ -311,6 +324,8 @@
                     this.form.store_c = array3[0];
                     this.form.price_c = array3[1];
                 }
+                 this.form.is_show = this.showChecked ? '1' : '0';
+
                 this.form.type_accessories = this.tab_index;
                 var self = this;
                 this.$axios.post('/api/cigar/cigar_accessories/6/6/bn/',this.form,{headers:{

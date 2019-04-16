@@ -105,7 +105,7 @@
             },
             getData(){
                 var t = this;
-                this.$axios.get('/api/cigar/cigar_accessories_brand/',{headers:{
+                this.$axios.get('/api/cigar/admin_cigar_accessories_brand/',{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     t.tableData = res.data;
@@ -126,9 +126,10 @@
                     'brand_id':this.tableData[this.idx].id,
                     'type':3,
                     'intro':'',
-                    'qiniu_key':''                      //七牛key
+                    'qiniu_key':'',                      //七牛key
+                    'is_show':''
                 };
-                t.$axios.post('/api/cigar/cigar_accessories_brand/',dic,{headers:{
+                t.$axios.post('/api/cigar/admin_cigar_accessories_brand/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     t.$message.success(res.data.message);
@@ -154,7 +155,7 @@
                     brand_id:item.id,
                     type:'1',
                     intro:item.intro,
-
+                    is_show:item.is_show
                 }
 
                 var t = this;
@@ -175,7 +176,7 @@
                     brand_id:'',
                     type:'2',
                     intro:'',
-
+                    is_show:true
                 }
                 var t = this;
                 this.$router.push({

@@ -7,7 +7,9 @@
                 <el-form-item label="热门">
                     <el-checkbox v-model="checked">热门</el-checkbox>
                 </el-form-item>
-
+                <el-form-item label="显示">
+                    <el-checkbox v-model="showChecked">显示</el-checkbox>
+                </el-form-item>
                 <el-form-item label="商品简介">
                     <vue-ueditor-wrap id="ud1" v-model="content" :config="myConfig"></vue-ueditor-wrap>
                     <input @change="fileImage" type="file" accept="image/jpeg,image/x-png,image/gif" id="" value="" />
@@ -56,6 +58,8 @@
                 content:'',
                 checked:true,
                 disabled:false,
+                showChecked:true
+
             }
         },
         created(){
@@ -72,6 +76,8 @@
                 this.content = this.form.intro;
                 this.checked = this.form.is_got;
                 this.type = this.form.type;
+                this.showChecked = this.form.is_show;
+
             },
             //内容上传图片
             fileImage(e) {
@@ -120,13 +126,13 @@
                     'intro':t.content,
                     'brand_id':t.form.brand_id,
                     'type':t.form.type,
-                    'qiniu_key':key                      //七牛key
+                    'qiniu_key':key,                      //七牛key
+                    'is_show': t.showChecked?'1':'0',
                 };
                 t.$axios.post('/api/cigar/cigar_accessories_brand/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     t.$message.success(res.data.message);
-                    t.getData();
                 });
                 t.cancleBtn();
             },
