@@ -10,7 +10,10 @@
         <el-collapse accordion>
             <el-collapse-item v-for="tab in tableData">
                 <template slot="title" >
-                    <img   :src="getPhoto(tab)" style="width: 35px;height:35px;border-radius:50%" >
+                    <img   :src="getPhoto(tab)"
+                           style="width: 35px;height:35px;border-radius:50%"
+                           :onerror="defaultImg"
+                    >
                     <p style="margin-left: 10px">{{tab.user_name}}</p>
                     <p style="margin-left: 10px;color: red;">【{{getTypeChinese(tab.type)}}】</p>
                     <p style="margin-left: 20px;color:darkblue;"> {{toChineseWords(tab.describe?tab.describe:tab.title?tab.title:tab.content)}}</p>
@@ -22,9 +25,18 @@
                 <div style="margin: 20px 20px"></div>
                 <div>{{tab.question?toChineseWords(tab.question):''}}</div>
                 <div>
-                    <img   :src="tab.photo1 ? tab.photo1 : tab.pic1" class="image">
-                    <img   :src="tab.photo2 ? tab.photo2 : tab.pic2" class="image">
-                    <img    :src="tab.photo3 ? tab.photo3 : tab.pic3 " class="image">
+                    <img   :src="tab.photo1 ? tab.photo1 : tab.pic1"
+                           class="image"
+                           :onerror="defaultImg"
+                    >
+                    <img   :src="tab.photo2 ? tab.photo2 : tab.pic2"
+                           class="image"
+                           :onerror="defaultImg"
+                    >
+                    <img    :src="tab.photo3 ? tab.photo3 : tab.pic3 "
+                            class="image"
+                            :onerror="defaultImg"
+                    >
                 </div>
                 <div>评论数:{{tab.comment_number}} 点赞数:{{tab.praise_number?tab.praise_number:tab.answer_number}} </div>
                 <div style="color:blue">标签:{{tab.tag}}  </div>
@@ -53,7 +65,7 @@
                 align="center"
                 background
                 layout="prev, pager, next"
-                :total="100"
+                :total="1000"
                 :current-page = 'currentPage'
                 @current-change="handleCurrentChange"
         >
@@ -103,6 +115,7 @@
         name: "UsersFindContent",
         data() {
             return {
+                defaultImg:'this.src="' + require('../../assets/img_moren.png') + '"',
                 activeName: '1',
                 checked: true,
                 tableData:[],
@@ -114,11 +127,15 @@
                 tab:{},
                 tab_index:'1',
                 currentPage:1,
-                xxzloading:false
+                xxzloading:false,
+                user_id:''
             };
         },
         created(){
             this.getFindTag();
+        },
+        watch:{
+            '$route':'getParams'
         },
         methods: {
             handleClick(tab, event) {
@@ -141,12 +158,27 @@
                 })
             },
             getData(){
+                var self = this;
+                this.user_id = this.$route.query.user_id;
                 this.xxzloading = true;
                 var url = "/api/users/admin_ptq/"+this.tab_index+'/'+this.currentPage+'/';
                 this.$axios.get(url,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
-                    this.tableData = res.data;
-                    this.xxzloading = false;
+                    self.tableData = [];
+                    //在这里判断是因为，用户界面直接传id过来，复用了这个界面
+                    if (self.user_id && self.user_id.toString().length > 0){
+                        for(var item of res.data){
+                            if (item.user_id == self.user_id){
+                                self.tableData.push(item);
+                            }
+                        }
+
+                    } else{
+                        self.tableData = res.data;
+                    }
+
+                    self.xxzloading = false;
+
                 })
             },
             editAction(tab){

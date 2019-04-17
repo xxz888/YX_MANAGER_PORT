@@ -67,6 +67,11 @@ export default new Router({
                     component: resolve => require(['../components/page/CigarShopDetail.vue'], resolve),
                     meta: {title: '配件信息'}
                 },
+                {
+                    path: '/UserList',
+                    component: resolve => require(['../components/page/UserList.vue'], resolve),
+                    meta: {title: '用户列表'}
+                },
 
                 {
                     path: '/CigarInfo',

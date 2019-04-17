@@ -43,6 +43,11 @@
                         title: '系统首页'
                     },
                     {
+                        index: 'UserList',
+                        title: '用户列表'
+                    },
+
+                    {
                         index: 'HomeAdver',
                         title: '广告列表'
                     },
