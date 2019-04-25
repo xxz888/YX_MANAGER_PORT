@@ -46,8 +46,8 @@
             </el-col>
         </el-row>
     </el-form>
-        <p style="margin: 0px 20px;font-size: 13px;color:red;">实例:中文名称 BHK52;环径 52;长度 119mm</p>
-        <input placeholder="名字和值用空格隔开,不同字段用英文分号隔开。" type="text" style="margin: 10px 20px;width: 100%;height: 40px;font-size: 15px" v-model="otherInput">
+        <p style="margin: 0px 20px;font-size: 13px;color:red;">实例:中文名称,BHK52;环径,52;长度,119mm</p>
+        <input placeholder="名字和值用英文逗号隔开,不同字段用英文分号隔开。" type="text" style="margin: 10px 20px;width: 100%;height: 40px;font-size: 15px" v-model="otherInput">
         <div align="center">
             <el-button size="medium" type="primary" @click="saveInfo">修改</el-button>
         </div>
@@ -102,12 +102,15 @@
                 this.form = this.$route.query.key;
                 this.showChecked = this.form.is_show == 1 ? true : false;
                 if (this.form.argument){
+                    this.otherInput = this.form.argument;
+                    /*
                     var dic = JSON.parse(this.form.argument);
                     for(var key in dic){
                         var newKey =   key;
                         var newValue = dic[key];
                         this.otherInput = (this.otherInput ? this.otherInput : '') + newKey + ' ' + newValue + ';';
                     }
+                    */
                 }
             },
             saveInfo(){
@@ -119,7 +122,7 @@
                 if (!t.form.id){
                     return;
                 }
-
+/*
                 var objDic = {};
                 var array = this.otherInput.split(';');
                 for (var i = 0 ; i < array.length;i++){
@@ -128,7 +131,8 @@
                     var value = array1[1];
                     objDic[key] = value;
                 }
-                dic['argument'] = objDic;
+               */
+                dic['argument'] = this.otherInput;
                 t.$axios.post('/api/cigar/ad_cigar/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
