@@ -136,6 +136,13 @@ export default new Router({
                     meta: { title: '配件标签' }
                 },
                 {
+                    path: '/MoreTagList',
+                    component: resolve => require(['../components/page/MoreTagList.vue'], resolve),
+                    meta: { title: '更多标签' }
+                },
+
+
+                {
                     path: '/icon',
                     component: resolve => require(['../components/other/Icon.vue'], resolve),
                     meta: { title: '自定义图标' }

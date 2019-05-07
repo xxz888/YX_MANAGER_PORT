@@ -83,6 +83,10 @@
                         index: 'CigarBrandSite',
                         title: '产地名称'
                     },
+                    {
+                        index: 'MoreTagList',
+                        title: '更多标签'
+                    },
 /*
                     {
                         icon: 'el-icon-lx-cascades',
