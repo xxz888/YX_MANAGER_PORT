@@ -105,6 +105,8 @@
             var self = this;
             this.$axios.get("/api/users/find_tag/",{headers:{
                     "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
+                var dic = {'id':0,'type':'用户添加','weight':1};
+                res.data.unshift(dic);
                 self.todo = res.data;
                 self.activeName = self.todo[0].type;
                 self.type = self.todo[0].id;
