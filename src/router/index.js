@@ -72,7 +72,21 @@ export default new Router({
                     component: resolve => require(['../components/page/UserList.vue'], resolve),
                     meta: {title: '用户列表'}
                 },
-
+                {
+                    path: '/UserAdminShaiTu',
+                    component: resolve => require(['../components/page/UserAdminShaiTu.vue'], resolve),
+                    meta: {title: '晒图'}
+                },
+                {
+                    path: '/UserAdminWenDa',
+                    component: resolve => require(['../components/page/UserAdminWenDa.vue'], resolve),
+                    meta: {title: '问答'}
+                },
+                {
+                    path: '/UserAdminList',
+                    component: resolve => require(['../components/page/UserAdminList.vue'], resolve),
+                    meta: {title: '列表'}
+                },
                 {
                     path: '/CigarInfo',
                     component: resolve => require(['../components/page/CigarInfo.vue'], resolve),

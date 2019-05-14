@@ -115,7 +115,6 @@
                     })
                 }else{
                     t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
-
                 }
             },
             //新增和储存公共方法

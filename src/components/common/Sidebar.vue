@@ -42,6 +42,29 @@
                         index: 'dashboard',
                         title: '系统首页'
                     },
+
+
+                    {
+                        index: '',
+                        title: '管理员相关',
+                        subs: [
+                            {
+                                index: 'UserAdminList',
+                                title: '列表'
+                            },
+                            {
+                                index: 'UserAdminShaiTu',
+                                title: '晒图'
+                            },
+                            {
+                                index: 'UserAdminWenDa',
+                                title: '问答'
+                            }
+                        ]
+                    },
+
+
+
                     {
                         index: 'UserList',
                         title: '用户列表'

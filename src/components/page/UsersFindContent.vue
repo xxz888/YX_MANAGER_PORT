@@ -2,7 +2,6 @@
     <div class="container" v-loading="xxzloading">
         <el-tabs v-model="activeName" @tab-click="handleClick">
             <el-tab-pane label="晒图" name="1"></el-tab-pane>
-            <el-tab-pane label="足迹" name="2"></el-tab-pane>
             <el-tab-pane label="问答" name="3"></el-tab-pane>
         </el-tabs>
 
@@ -141,7 +140,7 @@
             handleClick(tab, event) {
                 this.currentPage = 1;
                 var index =  event.target.getAttribute('id');
-                this.tab_index =  index == 'tab-1' ? 1: index == 'tab-2' ? 2: 3;
+                this.tab_index =  index == 'tab-1' ? 1: 3;
                 this.getData();
             },
             //分页切换取值

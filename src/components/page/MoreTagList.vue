@@ -21,7 +21,7 @@
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
-                <el-table-column prop="tag" label="ID"  width="200" align="center">
+                <el-table-column prop="tag" label="TAG"  width="200" align="center">
                 </el-table-column>
                 <el-table-column label="操作" width="150" align="center">
                     <template slot-scope="scope">
