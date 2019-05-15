@@ -195,10 +195,17 @@
 
                 var self = this;
                 this.formInline.photo = photo;
-                this.formInline.gender = this.formInline.gender=='男'?'1':'0';
-                this.$axios.post('/api/users/admin_user/',this.formInline,{headers:{
+                this.formInline.gender =
+                    this.formInline.gender == '男' ? '1' :
+                    this.formInline.gender == '女' ? '0' : this.formInline.gender;
+
+                            this.$axios.post('/api/users/admin_user/',this.formInline,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
+
+                    if (this.formInline.mobile == localStorage.getItem('token')) {
+                        localStorage.setItem('token',res.data.token);
+                    }
                     self.$message.success(res.data.message);
                     self.editVisible= false;
                     self.getData();

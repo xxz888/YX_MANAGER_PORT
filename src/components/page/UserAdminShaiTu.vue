@@ -81,9 +81,6 @@
         <el-dialog title="编辑" :close-on-click-modal="false" :visible.sync="editVisible" width="80%">
             <el-form label-width="100px" label-height = auto>
 
-                <el-form-item label="推荐">
-                    <el-checkbox v-model="checked">是否同步到推荐</el-checkbox>
-                </el-form-item>
 
                 <el-form-item label="推荐">
                     <el-select v-model="selectInput" placeholder="请选择">
@@ -241,7 +238,7 @@
                 tagSelectInputOptions2:[],
                 type:'',
                 addForm:{
-                    url:'http://192.168.0.12:8001/users/post/0/0/0/',
+                    url:'http://thegdlife.com:8001/users/post/0/0/0/',
                     request_type:'post',
                     user_id:'',
                     publish_site : "",
@@ -287,7 +284,7 @@
                 this.getUserData();
                 this.getFind_tag();
                 this.addForm = {
-                        url:'http://192.168.0.12:8001/users/post/0/0/0/',
+                        url:'http://thegdlife.com:8001/users/post/0/0/0/',
                         request_type:'post',
                         user_id:'',
                         publish_site : "",
@@ -390,8 +387,9 @@
                 var self = this;
                 this.user_id = this.$route.query.user_id;
                 this.xxzloading = true;
-                var url = "/api/users/admin_ptq/"+this.tab_index+'/'+this.currentPage+'/';
-                this.$axios.get(url,{headers:{
+                var url = "/api/users/get_all_post/";
+                var dic = {"is_super":'1','type':'-1'};
+                this.$axios.post(url,dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
                     self.tableData = [];
                     //在这里判断是因为，用户界面直接传id过来，复用了这个界面
