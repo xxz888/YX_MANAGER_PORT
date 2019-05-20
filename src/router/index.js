@@ -58,6 +58,17 @@ export default new Router({
 
 
                 {
+                    path: '/HomeTools',
+                    component: resolve => require(['../components/page/HomeTools.vue'], resolve),
+                    meta: {title: '工具指南'}
+                },
+                {
+                    path: '/HomeToolsDetail',
+                    component: resolve => require(['../components/page/HomeToolsDetail.vue'], resolve),
+                    meta: {title: '指南详情'}
+                },
+
+                {
                     path: '/CigarShop',
                     component: resolve => require(['../components/page/CigarShop.vue'], resolve),
                     meta: {title: '雪茄配件'}

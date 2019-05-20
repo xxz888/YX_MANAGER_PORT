@@ -42,11 +42,27 @@
                         index: 'dashboard',
                         title: '系统首页'
                     },
-
-
                     {
-                        index: '',
-                        title: '管理员相关',
+                        index: 'UserList',
+                        title: '用户列表'
+                    },
+                    {
+                        index: '2',
+                        title: '雪茄相关',
+                        subs: [
+                            {
+                                index: 'CigarInfo',
+                                title: '雪茄品牌'
+                            },
+                            {
+                                index: 'CigarBrandSite',
+                                title: '产地名称'
+                            },
+                        ]
+                    },
+                    {
+                        index: '3',
+                        title: '管理相关',
                         subs: [
                             {
                                 index: 'UserAdminList',
@@ -62,54 +78,65 @@
                             }
                         ]
                     },
-
-
-
                     {
-                        index: 'UserList',
-                        title: '用户列表'
+                        index: '4',
+                        title: '新闻相关',
+                        subs: [
+                            {
+                                index: 'HomeAdver',
+                                title: '广告列表'
+                            },
+                            {
+                                index: 'HomeInfo',
+                                title: '资讯列表'
+                            },
+                            {
+                                index: 'CigarAccessories',
+                                title: '文化'
+                            },
+                        ]
+                    },
+                    {
+                        index: '5',
+                        title: '发现相关',
+                        subs: [
+                            {
+                                index: 'UsersFindTag',
+                                title: '发现标签'
+                            },
+                            {
+                                index: 'UsersFindContent',
+                                title: '发现内容'
+                            },
+                            {
+                                index: 'MoreTagList',
+                                title: '更多标签'
+                            },
+                        ]
+                    },
+                    {
+                        index: 'HomeTools',
+                        title: '工具指南'
                     },
 
                     {
-                        index: 'HomeAdver',
-                        title: '广告列表'
+                        index: '6',
+                        title: '配件',
+                        subs: [
+                            {
+                                index: 'CigarShop',
+                                title: '配件'
+                            },
+                            {
+                                index: 'CigarShopTags',
+                                title: '配件标签'
+                            },
+                        ]
                     },
-                    {
-                        index: 'HomeInfo',
-                        title: '资讯列表'
-                    },
-                    {
-                        index: 'CigarInfo',
-                        title: '雪茄品牌'
-                    },
-                    {
-                        index: 'UsersFindTag',
-                        title: '发现标签'
-                    },
-                    {
-                        index: 'UsersFindContent',
-                        title: '发现内容'
-                    },
-                    {
-                        index: 'CigarAccessories',
-                        title: '文化'
-                    },
-                    {
-                        index: 'CigarShop',
-                        title: '配件'
-                    },
-                    {
-                        index: 'CigarShopTags',
-                        title: '配件标签'
-                    },
-                    {
-                        index: 'CigarBrandSite',
-                        title: '产地名称'
-                    },
-                    {
-                        index: 'MoreTagList',
-                        title: '更多标签'
-                    },
+
+
+
+
 /*
                     {
                         icon: 'el-icon-lx-cascades',
@@ -220,7 +247,7 @@
         width: 0;
     }
     .sidebar-el-menu:not(.el-menu--collapse){
-        width: 110px;
+        width: 150px;
     }
     .sidebar > ul {
         height:100%;
