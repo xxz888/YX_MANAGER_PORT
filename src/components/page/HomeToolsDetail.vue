@@ -7,6 +7,10 @@
             </el-breadcrumb>
         </div>
         <div class="container">
+            <div class="handle-box">
+                <el-button type="primary" icon="search" @click="tagManager">标签管理</el-button>
+            </div>
+
             <el-tabs v-model="activeName"  @tab-click="handleClick">
                 <el-tab-pane v-for = 'item in todo' :label="item.name" :name="item.name"></el-tab-pane>
             </el-tabs>
@@ -85,6 +89,33 @@
                     <el-button type="primary" @click="saveDetail">确 定</el-button>
                 </span>
         </el-dialog>
+
+
+
+        <!-- 标签管理弹出框 -->
+        <el-dialog title="标签管理" :close-on-click-modal="false" :visible.sync="tagVisible" width="90%">
+            <el-tag size="medium"
+                    :key="item.id"
+                    v-for="item in todo"
+                    closable
+                    :disable-transitions="false"
+                    @close="handleClose(item)"
+                    @click="changeEdit(item)">
+                {{item.name}}
+            </el-tag>
+            <el-input
+                    class="input-new-tag"
+                    v-if="inputVisible"
+                    v-model="inputValue"
+                    ref="saveTagInput"
+                    size="small"
+                    @keyup.enter.native="handleInputConfirm"
+                    @blur="handleInputConfirm"
+            >
+            </el-input>
+
+            <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
+        </el-dialog>
     </div>
 </template>
 
@@ -132,7 +163,10 @@
                 detailVisible:false,
                 detailId:'',
                 detailDetailId:'',
-                isDetailEditOrAdd:false //false为新增 true为编辑
+                isDetailEditOrAdd:false, //false为新增 true为编辑
+                tagVisible:false,
+                inputValue:'',
+                inputVisible:false
             }
         },
         created() {
@@ -395,7 +429,99 @@
             data_formatter(value){
                 return this.getLocalTime(value.date);
             },
+            tagManager(){
+                this.tagVisible = true;
+            },
 
+            showInput() {
+                this.inputVisible = true;
+                this.$nextTick(_ => {
+                    this.$refs.saveTagInput.$refs.input.focus();
+                });
+            },
+            //删除
+            handleClose(item) {
+                this.$alert( '是否删除标签'+ '【'+item.name + '】', {
+                    confirmButtonText: '确定',
+                    callback: action => {
+                        var dic = {
+                            'action':2,
+                            'option_id':item.id,
+                        };
+                        var self = this;
+                        this.$axios.post("/api/pub/option/6/6/",dic,{headers:{
+                                "Authorization":"JWT " + localStorage.getItem('token')
+                            }}).then((res)=>{
+                            if (res.data.status == 1){
+                                self.$message.success(res.data.message);
+                                self.getData();
+                            } else {
+                                self.$message.warning(res.data.message);
+                            }
+                            self.inputVisible = false;
+                        })
+                    }
+                });
+            },
+            //编辑
+            changeEdit(item) {
+                this.$prompt('请输入新的标签名', '编辑'+ '【'+item.name + '】', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputValue:item.name,
+                    closeOnClickModal:false
+                }).then(({ value }) => {
+                    if (value.length == 0) return;
+                    var dic = {
+                        'action':3,
+                        'option_id':item.id,
+                        'name':value,
+                        'photo':'',
+                        'is_next':1,
+                    };
+                    var self = this;
+                    this.$axios.post("/api/pub/option/6/6/",dic,{headers:{
+                            "Authorization":"JWT " + localStorage.getItem('token')
+                        }}).then((res)=>{
+                        if (res.data.status == 1){
+                            self.$message.success(res.data.message);
+                            self.getData();
+                        } else {
+                            self.$message.warning(res.data.message);
+                        }
+                        self.inputVisible = false;
+                    })
+                }).catch(() => {
+                });
+            },
+            //新增
+            handleInputConfirm() {
+                let inputValue = this.inputValue;
+                if (inputValue.length == 0) return;
+                if (inputValue) {
+                    var dic = {
+                        'action':1,
+                        'father_id':this.startId,
+                        'name':inputValue,
+                        'photo':'',
+                        'is_next':1,
+                    };
+                    var self = this;
+                    this.$axios.post("/api/pub/option/6/6/",dic,{headers:{
+                            "Authorization":"JWT " + localStorage.getItem('token')
+                        }}).then((res)=>{
+                        if (res.data.status == 1){
+                            self.$message.success(res.data.message);
+                            self.getData();
+                        } else {
+                            self.$message.warning(res.data.message);
+                        }
+                        self.inputVisible = false;
+                        self.inputValue = '';
+                    })
+
+                }
+            }
         },
     }
 
@@ -469,5 +595,21 @@
         width: 150px;
         height: 400px;
         background: #f8f8f8;
+    }
+    .el-tag + .el-tag {
+        margin-left: 10px
+    }
+    .button-new-tag {
+        margin-left: 10px;
+        height: 32px;
+        line-height: 30px;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    .input-new-tag {
+        width: 90px;
+
+        margin-left: 10px;
+        vertical-align: bottom;
     }
 </style>
