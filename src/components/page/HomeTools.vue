@@ -47,6 +47,7 @@
                 <el-form-item style="width: 50%;" label="NAME">
                     <el-input placeholder="请输入名称" v-model="form.name"></el-input>
                 </el-form-item>
+
                 <el-form-item style="width: 50%;" label="显示图">
                     <template  slot-scope="scope">
                         <div class="crop-demo">

@@ -52,12 +52,26 @@
                 <el-form-item style="width: 50%;" label="NAME">
                     <el-input placeholder="请输入名称" v-model="form.name"></el-input>
                 </el-form-item>
-                <el-form-item style="width: 50%;" label="头像">
+                <el-form-item style="width: 80%;" label="简介">
+                    <el-input type="textarea" placeholder="请输入简介" v-model="form.intro"></el-input>
+                </el-form-item>
+                <el-form-item style="width: 50%;" label="显示图片">
+                <template  slot-scope="scope">
+                    <div class="crop-demo">
+                        <img :src="form.photo"  class="pre-img"  >
+                        <div class="crop-demo-btn">选择图片
+                            <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
+                        </div>
+                    </div>
+                </template>
+            </el-form-item>
+
+                <el-form-item style="width: 50%;" label="详情图片">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
-                            <img :src="form.photo"  class="pre-img"  >
-                            <div class="crop-demo-btn">选择图片
-                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
+                            <img :src="form.photo_detail"  class="pre-img-Detail">
+                            <div class="crop-demo-btn">详情图片
+                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage1"/>
                             </div>
                         </div>
                     </template>
@@ -182,6 +196,8 @@
                     id: '',
                     name: '',
                     photo: '',
+                    intro:'',
+                    photo_detail:''
                 },
                 idx: -1,
                 alertIdx:-1,
@@ -401,9 +417,26 @@
             },
             saveEdit(){
                 var self = this;
-                if (this.form.photo.indexOf('http://photo.thegdlife.com') == -1){
+
+                var boll1 =  this.form.photo.indexOf('http://photo.thegdlife.com') == -1;
+                var boll2 =  this.form.photo_detail.indexOf('http://photo.thegdlife.com') == -1;
+
+                if (boll1 && !boll2){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.form.photo,function (res,key) {
                         self.form.photo = res;
+                        self.saveEditAndAdd();
+                    })
+                }else if(boll1 && boll2){
+                    this.$uploadQiNiuYun.uploadqiniuyun(this.form.photo,function (res,key) {
+                        self.form.photo = res;
+                        self.$uploadQiNiuYun.uploadqiniuyun(this.form.photo_detail,function (res1,key) {
+                            self.form.photo_detail = res1;
+                            self.saveEditAndAdd();
+                        })
+                    })
+                }else if(!boll1 && boll2){
+                    this.$uploadQiNiuYun.uploadqiniuyun(this.form.photo_detail,function (res,key) {
+                        self.form.photo_detail = res;
                         self.saveEditAndAdd();
                     })
                 }else{
@@ -420,8 +453,8 @@
                         'name':this.form.name,
                         'photo':this.form.photo,
                         'is_next':1,
-                        'photo_detail':'',
-                        'intro':''
+                        'photo_detail':this.form.photo_detail,
+                        'intro':this.form.intro
                     };
                 }else{
                     dic = {
@@ -430,8 +463,8 @@
                         'photo':this.form.photo,
                         'is_next':1,
                         'option_id':this.form.option_id,
-                        'photo_detail':'',
-                        'intro':''
+                        'photo_detail':this.form.photo_detail,
+                        'intro':this.form.intro
                     };
                 }
 
@@ -474,7 +507,7 @@
                     self.detailVisible = true;
                 });
             },
-            //封面图片
+            //封面图片和详情图片
             setImage(e){
                 const file = e.target.files[0];
                 if (!file.type.includes('image/')) {
@@ -484,6 +517,20 @@
                 var t = this;
                 reader.onload = (event) => {
                     t.form.photo = event.target.result;
+                    t.$refs.cropper && t.$refs.cropper.replace(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
+            //详情图片
+            setImage1(e){
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var t = this;
+                reader.onload = (event) => {
+                    t.form.photo_detail = event.target.result;
                     t.$refs.cropper && t.$refs.cropper.replace(event.target.result);
                 };
                 reader.readAsDataURL(file);
@@ -513,7 +560,6 @@
                 var t = this;
                 reader.onload = (event) => {
                     t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function (res,key) {
-                        var splitArray = t.alertTableData[index].detail.split(',');
                         t.alertTableData[index].detail_list.splice(indexTag,1,res);
                     }),
                     t.$refs.cropper && t.$refs.cropper.replace(event.target.result)
