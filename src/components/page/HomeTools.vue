@@ -47,7 +47,7 @@
                 <el-form-item style="width: 50%;" label="NAME">
                     <el-input placeholder="请输入名称" v-model="form.name"></el-input>
                 </el-form-item>
-                <el-form-item style="width: 50%;" label="头像">
+                <el-form-item style="width: 50%;" label="显示图">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
                             <img :src="form.photo"  class="pre-img" width="100" height="70" >
@@ -166,6 +166,8 @@
                         'name':this.form.name,
                         'photo':this.form.photo,
                         'is_next':1,
+                        'photo_detail':'',
+                        'intro':''
                     };
                 }else{
                     dic = {
@@ -173,7 +175,9 @@
                         'name':this.form.name,
                         'photo':this.form.photo,
                         'is_next':1,
-                        'option_id':this.form.option_id
+                        'option_id':this.form.option_id,
+                        'photo_detail':'',
+                        'intro':''
                     };
                 }
 
@@ -323,7 +327,7 @@
     }
 
     .pre-img{
-        width: 100px;
+        width: 200px;
         height: 100px;
         background: #f8f8f8;
         border: 1px solid #eee;

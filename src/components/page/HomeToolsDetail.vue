@@ -36,9 +36,9 @@
                         <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
-                <el-table-column label="详情图片" width="250" align="center">
+                <el-table-column label="详情信息" width="250" align="center">
                     <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleDetail(scope.$index, scope.row)">{{scope.row.photo.length>0?'编辑详情图片':'新增详情图片'}}</el-button>
+                        <el-button type="text" icon="el-icon-edit"class="green"  @click="handleDetail(scope.$index, scope.row)">详情编辑</el-button>
 
                     </template>
                 </el-table-column>
@@ -71,27 +71,67 @@
 
 
         <!-- 详情编辑弹出框 -->
-        <el-dialog title="详情图片" :close-on-click-modal="false" :visible.sync="detailVisible" width="70%">
-            <el-form label-width="100px" label-height = auto>
-                <el-form-item style="width: 50%;" label="详情图片">
-                    <template  slot-scope="scope">
-                        <div class="crop-demo">
-                            <img :src="detailPhoto"  class="pre-img-Detail"  >
-                            <div class="crop-demo-btn">选择图片
-                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImageDetail"/>
+        <el-dialog title="详情信息" :close-on-click-modal="false" :visible.sync="detailVisible" width="95%">
+
+            <el-button type="primary" @click="addObj1">添加标题</el-button>
+            <el-button type="success" @click="addObj2">添加段落</el-button>
+            <el-button type="danger"    @click="addObj3">添加图片</el-button>
+            <el-button type="warning" @click="addObj4">添加轮播图</el-button>
+            <el-table :data="alertTableData"  style="width: 100%;margin-top: 20px" tooltip-effect="dark"
+                      border  class="table" ref="multipleTable">
+                <el-table-column
+                        prop="id"
+                        label="id"
+                        width="80"
+                        align="center">
+                </el-table-column>
+
+                <el-table-column
+                        prop="obj"
+                        label="类型"
+                        width="100"
+                        align="center"
+                        :formatter="objFormatter">
+                </el-table-column>
+                <el-table-column
+                        prop="detail"
+                        label="Detail"
+                        align="center">
+                    <template slot-scope="scope">
+                        <el-input v-if="scope.row.obj == 1" v-model="scope.row.detail" ></el-input>
+                        <el-input v-if="scope.row.obj == 2" v-model="scope.row.detail"  type="textarea"   ></el-input>
+                        <div      v-if="scope.row.obj == 3" class="crop-demo">
+                            <img :src="scope.row.detail"    v-model="scope.row.detail" class="pre-img-Detail"  >
+                            <div class="crop-demo-btn">添加编辑
+                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImageDetail($event,scope.$index)"/>
                             </div>
                         </div>
+                        <div      v-else>
+                            <el-row :gutter="0">
+                                <el-col v-for="(item,indexTag) in scope.row.detail_list" :span="8">
+                                    <div class="crop-demo">
+                                        <img :src="item"  class="pre-img-Detail">
+                                        <div class="crop-demo-btn">添加编辑
+                                            <input class="crop-input" type="file" name="image" accept="image/*" @change="setImageDetailLunBo($event,scope.$index,indexTag)"/>
+                                        </div>
+                                    </div>
+                                </el-col>
+                            </el-row>
+                        </div>
                     </template>
-                </el-form-item>
-            </el-form>
+                </el-table-column>
+
+                <el-table-column label="操作" width="150" align="center">
+                    <template slot-scope="scope">
+                        <el-button type="text" icon="el-icon-edit" @click="alertHandleSave(scope.$index, scope.row)">保存</el-button>
+                        <el-button type="text" icon="el-icon-delete" class="red" @click="alertTableDelete(scope.$index, scope.row)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
             <span slot="footer" class="dialog-footer">
-                    <el-button @click="detailVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="saveDetail">确 定</el-button>
-                </span>
+                    <el-button @click="detailVisible = false">关 闭</el-button>
+            </span>
         </el-dialog>
-
-
-
         <!-- 标签管理弹出框 -->
         <el-dialog title="标签管理" :close-on-click-modal="false" :visible.sync="tagVisible" width="90%">
             <el-tag size="medium"
@@ -144,6 +184,7 @@
                     photo: '',
                 },
                 idx: -1,
+                alertIdx:-1,
                 fileList: [],
                 imgSrc: '',
                 cropImg: '',
@@ -166,7 +207,8 @@
                 isDetailEditOrAdd:false, //false为新增 true为编辑
                 tagVisible:false,
                 inputValue:'',
-                inputVisible:false
+                inputVisible:false,
+                alertTableData:[],
             }
         },
         created() {
@@ -180,9 +222,148 @@
                 return this.tableData.filter((d) => {
                     return d;
                 })
-            }
+            },
         },
         methods: {
+            addObj1(){
+                var dic = {
+                    'detail': "",
+                    'id': '99999',
+                    'obj':'1',
+                    'option_id': this.detailId,
+                    'weight': this.alertTableData.length+1
+                }
+                this.alertTableData.push(dic);
+            },
+            addObj2(){
+                var dic = {
+                    'detail': "",
+                    'id': '99999',
+                    'obj':'2',
+                    'option_id': this.detailId,
+                    'weight': this.alertTableData.length+1
+                }
+                this.alertTableData.push(dic);
+            },
+            addObj3(){
+                var dic = {
+                    'detail': "",
+                    'id': '99999',
+                    'obj':'3',
+                    'option_id': this.detailId,
+                    'weight': this.alertTableData.length+1
+                }
+                this.alertTableData.push(dic);
+            },
+            addObj4(){
+                var dic = {
+                    'detail': "",
+                    'id': '99999',
+                    'obj':'4',
+                    'option_id': this.detailId,
+                    'weight': this.alertTableData.length+1,
+                    'detail_list':['','','']
+
+                }
+                this.alertTableData.push(dic);
+            },
+
+            alertHandleSave(index, row){
+                this.alertIdx = index;
+                const data = this.alertTableData[index];
+                var dic = {};
+                if (data.id == 99999){
+                    dic = {
+                        'action':1,
+                        'option_id':data.option_id,
+                        'obj':data.obj,
+                        'detail':data.detail,
+                        'weight':data.weight
+                    };
+                    if (data.obj == 4){
+                        var detail = data.detail_list.join(',');
+                        dic.detail = detail;
+                    }
+                }else{
+
+                    dic = {
+                        'action':3,
+                        'option_detail_id':data.id,
+                        'option_id':this.detailId,
+                        'obj':data.obj,
+                        'detail':data.detail,
+                        'weight':data.weight
+                    };
+                    if (data.obj == 4){
+                        var detail = data.detail_list.join(',');
+                        dic.detail = detail;
+                    }
+                }
+                console.log(dic);
+                this.allAerltEditAndNewAddCommonAction(dic);
+            },
+            allAerltEditAndNewAddCommonAction(dic){
+                var self = this;
+                this.$axios.post("/api/pub/option_detail/",dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then((res)=>{
+                    if (res.data.status == 1){
+                        self.$message.success(res.data.message);
+                        self.alertTableCommonRequest();
+                    } else {
+                        self.$message.warning(res.data.message);
+                    }
+                })
+            },
+
+
+            alertTableDelete(index, row){
+                this.alertIdx = index;
+                const item = this.alertTableData[index];
+                var self = this;
+                this.$confirm('是否删除此行', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    if (item.id==99999){
+                        self.alertTableData.splice(index);
+                    } else {
+                        self.alertDelCommontAction(item);
+                    }
+                }).catch(() => {});
+            },
+            alertDelCommontAction(item){
+                var dic = {
+                    'action':2,
+                    'option_detail_id':item.id
+                };
+                var self = this;
+                this.$axios.post("/api/pub/option_detail/",dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then((res)=>{
+                    if (res.data.status == 1){
+                        self.$message.success(res.data.message);
+                        self.alertTableCommonRequest();
+                    } else {
+                        self.$message.warning(res.data.message);
+                    }
+                })
+            },
+            delCommontAction(item){
+                var self = this;
+                var dic = {'action':2,'option_id':item.id,};
+                this.$axios.post("/api/pub/option/6/6/",dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then((res)=>{
+                    if (res.data.status == 1){
+                        self.$message.success(res.data.message);
+                        self.getData();
+                    } else {
+                        self.$message.warning(res.data.message);
+                    }
+                })
+            },
             getParmters(){
                 this.startId = localStorage.getItem('xxzTools');
                 if (this.startId){
@@ -239,6 +420,8 @@
                         'name':this.form.name,
                         'photo':this.form.photo,
                         'is_next':1,
+                        'photo_detail':'',
+                        'intro':''
                     };
                 }else{
                     dic = {
@@ -246,7 +429,9 @@
                         'name':this.form.name,
                         'photo':this.form.photo,
                         'is_next':1,
-                        'option_id':this.form.option_id
+                        'option_id':this.form.option_id,
+                        'photo_detail':'',
+                        'intro':''
                     };
                 }
 
@@ -273,90 +458,21 @@
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
-                    var dic = {
-                        'action':2,
-                        'option_id':item.id,
-                    };
-                    self.$axios.post("/api/pub/option/6/6/",dic,{headers:{
-                            "Authorization":"JWT " + localStorage.getItem('token')
-                        }}).then((res)=>{
-                        if (res.data.status == 1){
-                            self.$message.success(res.data.message);
-                            self.getData();
-                        } else {
-                            self.$message.warning(res.data.message);
-                        }
-                    })
+                    self.delCommontAction(item);
                 }).catch(() => {});
             },
+            //详情alerttabledata点击按钮
             handleDetail(index, row){
                 this.detailId =  this.tableData[index]['id'];
+                this.alertTableCommonRequest();
+            },
+            alertTableCommonRequest(){
                 var self = this;
                 this.$axios.get("/api/pub/option/0/"+this.detailId+'/',{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
-                            if (res.data.length>0){//编辑
-                                self.isDetailEditOrAdd = true;
-                                self.detailPhoto = res.data[0].photo;
-                                self.detailDetailId = res.data[0].id;
-                            }else {//新增
-                                self.isDetailEditOrAdd = false;
-                                self.detailPhoto = '';
-                                self.detailDetailId = '';
-                            }
-                            self.detailVisible = true;
+                    self.alertTableData = res.data;
+                    self.detailVisible = true;
                 });
-            },
-            saveDetail(){
-                var self = this;
-                if (this.detailPhoto.indexOf('http://photo.thegdlife.com') == -1){
-                    this.$uploadQiNiuYun.uploadqiniuyun(this.detailPhoto,function (res,key) {
-                        self.detailPhoto = res;
-                        self.saveEditAndAddDetail();
-                    })
-                }else{
-                    self.saveEditAndAddDetail();
-                }
-            },
-            saveEditAndAddDetail(){
-                var dic = {};
-
-                if (this.detailId){
-                    if (this.isDetailEditOrAdd){//编辑
-                        dic = {
-                            'action': '3',
-                            'option_detail_id':this.detailDetailId,
-                            'option_id':this.detailId,
-                            'photo':this.detailPhoto,
-                            'weight':'1'
-                        };
-                    } else{
-                        dic = {
-                            'action': '1',
-                            'option_id':this.detailId,
-                            'photo':this.detailPhoto,
-                            'weight':'1'
-
-                        };
-                    }
-                }else{
-                    this.$message.warning('非服务器弹出提示:未获取到[option_id]');
-                    return;
-                }
-
-                var self = this;
-                this.$axios.post("/api/pub/option_detail/",dic,{headers:{
-                        "Authorization":"JWT " + localStorage.getItem('token')
-                    }}).then((res)=>{
-                    if (res.data.status == 1){
-                        self.$message.success(res.data.message);
-                        self.getData();
-                    } else {
-                        self.$message.warning(res.data.message);
-                    }
-                    self.detailVisible = false;
-                    self.detailPhoto = '';
-                    self.detailDetailId = '';
-                })
             },
             //封面图片
             setImage(e){
@@ -372,8 +488,8 @@
                 };
                 reader.readAsDataURL(file);
             },
-            //封面图片
-            setImageDetail(e){
+            //一张图片
+            setImageDetail(e,index){
                 const file = e.target.files[0];
                 if (!file.type.includes('image/')) {
                     return;
@@ -381,8 +497,26 @@
                 const reader = new FileReader();
                 var t = this;
                 reader.onload = (event) => {
-                    t.detailPhoto = event.target.result;
-                    t.$refs.cropper && t.$refs.cropper.replace(event.target.result);
+                    t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function (res,key) {
+                            t.alertTableData[index].detail = res;}),
+                    t.$refs.cropper && t.$refs.cropper.replace(event.target.result)
+                };
+                reader.readAsDataURL(file);
+            },
+            //轮播图片
+            setImageDetailLunBo(e,index,indexTag){
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var t = this;
+                reader.onload = (event) => {
+                    t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function (res,key) {
+                        var splitArray = t.alertTableData[index].detail.split(',');
+                        t.alertTableData[index].detail_list.splice(indexTag,1,res);
+                    }),
+                    t.$refs.cropper && t.$refs.cropper.replace(event.target.result)
                 };
                 reader.readAsDataURL(file);
             },
@@ -422,7 +556,6 @@
                 this.is_search = true;
                 this.$message.info('功能开发中');
             },
-
             getLocalTime(nS) {
                 return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
             },
@@ -432,7 +565,6 @@
             tagManager(){
                 this.tagVisible = true;
             },
-
             showInput() {
                 this.inputVisible = true;
                 this.$nextTick(_ => {
@@ -478,19 +610,10 @@
                         'name':value,
                         'photo':'',
                         'is_next':1,
+                        'photo_detail':'',
+                        'intro':''
                     };
-                    var self = this;
-                    this.$axios.post("/api/pub/option/6/6/",dic,{headers:{
-                            "Authorization":"JWT " + localStorage.getItem('token')
-                        }}).then((res)=>{
-                        if (res.data.status == 1){
-                            self.$message.success(res.data.message);
-                            self.getData();
-                        } else {
-                            self.$message.warning(res.data.message);
-                        }
-                        self.inputVisible = false;
-                    })
+                    this.allEditAndNewAddCommonAction(dic,1);
                 }).catch(() => {
                 });
             },
@@ -505,22 +628,30 @@
                         'name':inputValue,
                         'photo':'',
                         'is_next':1,
+                        'photo_detail':'',
+                        'intro':''
                     };
-                    var self = this;
-                    this.$axios.post("/api/pub/option/6/6/",dic,{headers:{
-                            "Authorization":"JWT " + localStorage.getItem('token')
-                        }}).then((res)=>{
-                        if (res.data.status == 1){
-                            self.$message.success(res.data.message);
-                            self.getData();
-                        } else {
-                            self.$message.warning(res.data.message);
-                        }
-                        self.inputVisible = false;
-                        self.inputValue = '';
-                    })
+                    this.allEditAndNewAddCommonAction(dic);
 
                 }
+            },
+            allEditAndNewAddCommonAction(dic){
+                var self = this;
+                this.$axios.post("/api/pub/option/6/6/",dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then((res)=>{
+                    if (res.data.status == 1){
+                        self.$message.success(res.data.message);
+                        self.getData();
+                    } else {
+                        self.$message.warning(res.data.message);
+                    }
+                    self.inputVisible = false;
+                    self.inputValue = '';
+                })
+            },
+            objFormatter(data){
+                return data.obj == 1 ? '标题' : data.obj == 2 ? '段落' : data.obj == 3 ? '图片' : data.obj == 4 ? '轮播图' : '其他';
             }
         },
     }
@@ -575,6 +706,19 @@
         border-radius: 4px;
         box-sizing: border-box;
     }
+    .crop-demo-btn-lunbo{
+        position: relative;
+        width: 40px;
+        height: 40px;
+        padding: 0 8px;
+        margin-left: 10px;
+        background-color: #409eff;
+        color: #fff;
+        font-size: 10px;
+        border-radius: 4px;
+        line-height: 40px;
+        box-sizing: border-box;
+    }
     .crop-input{
         position: absolute;
         width: 100px;
@@ -592,10 +736,12 @@
         border-radius: 50px;
     }
     .pre-img-Detail{
-        width: 150px;
-        height: 400px;
+        width: 100px;
+        height: 60px;
         background: #f8f8f8;
+        border-radius: 5px;
     }
+
     .el-tag + .el-tag {
         margin-left: 10px
     }
