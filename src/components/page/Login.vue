@@ -47,7 +47,7 @@
         methods: {
             //发送验证码
             sendPhoneCode() {
-                this.$axios.get('/api/pub/smscode/'+this.ruleForm.username+'/1/').then(res=>{
+                this.$axios.get('http://192.168.0.12:8001/api/pub/smscode/'+this.ruleForm.username+'/1/').then(res=>{
                     this.$message({
                         message: '验证码已发送',
                         type: 'success'
@@ -57,7 +57,7 @@
             },
             //提交
             submitForm(formName) {
-                this.$axios.post('/api/users/register/',
+                this.$axios.post('http://192.168.0.12:8001/api/users/register/',
                     {'mobile':this.ruleForm.username,'sms_code':this.ruleForm.password})
                     .then(res=>{
                         if (res.data.id){

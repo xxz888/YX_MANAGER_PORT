@@ -18,8 +18,12 @@
             <div class="handle-box">
                 <el-button type="success" icon="search" @click="addnews">新增</el-button>
             </div>
-            <el-table :data="data"  tooltip-effect="dark"
-                      border  class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+            <el-table :data="data"
+                      tooltip-effect="dark"
+                      border
+                      class="table"
+                      ref="multipleTable"
+                      @selection-change="handleSelectionChange">
                 <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
                 <el-table-column prop="name" label="NAME"  width="150" align="center">
@@ -91,8 +95,14 @@
             <el-button type="success" @click="addObj2">添加段落</el-button>
             <el-button type="danger"    @click="addObj3">添加图片</el-button>
             <el-button type="warning" @click="addObj4">添加轮播图</el-button>
-            <el-table :data="alertTableData"  style="width: 100%;margin-top: 20px" tooltip-effect="dark"
-                      border  class="table" ref="multipleTable">
+            <el-table
+                            row-key="id"
+                            :data="alertTableData"
+                            style="width: 100%;margin-top: 20px"
+                            tooltip-effect="dark"
+                            border
+                            class="table"
+                            ref="multipleTable">
                 <el-table-column
                         prop="id"
                         label="id"
@@ -175,6 +185,7 @@
 
 <script>
     import VueUeditorWrap from 'vue-ueditor-wrap' // ES6 Module
+    import Sortable from 'sortablejs'
 
     export default {
         name: 'HomeToolsDetail',
@@ -240,8 +251,55 @@
                 })
             },
         },
+        mounted() {
+        },
         methods: {
+            //行拖拽
+            rowDrop() {
+                const tbody = document.querySelector('.el-dialog .el-dialog__body .el-table__body-wrapper tbody')
+                const self = this;
+                Sortable.create(tbody, {
+                    onEnd({ newIndex, oldIndex }) {
+                        var weight1 = self.alertTableData[oldIndex].weight;
+                        var weight2 = self.alertTableData[newIndex].weight;
+
+                        var data1 =  self.alertTableData[oldIndex];
+                        var dic1 = {
+                            'action':3,
+                            'option_detail_id':data1.id,
+                            'option_id':self.detailId,
+                            'obj':data1.obj,
+                            'detail':data1.detail,
+                            'weight':weight2
+                        };
+                        if (data1.obj == 4){
+                            var detail = data1.detail_list.join(',');
+                            dic1.detail = detail;
+                        }
+
+                        var data2 =  self.alertTableData[newIndex];
+                        var dic2 = {
+                            'action':3,
+                            'option_detail_id':data2.id,
+                            'option_id':self.detailId,
+                            'obj':data2.obj,
+                            'detail':data2.detail,
+                            'weight':weight1
+                        };
+                        if (data2.obj == 4){
+                            var detail = data2.detail_list.join(',');
+                            dic2.detail = detail;
+                        }
+
+
+                        self.allAerltEditAndNewAddCommonAction(dic1);
+                        self.allAerltEditAndNewAddCommonAction(dic2);
+
+                    }
+                })
+            },
             addObj1(){
+
                 var dic = {
                     'detail': "",
                     'id': '99999',
@@ -505,6 +563,10 @@
                         "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
                     self.alertTableData = res.data;
                     self.detailVisible = true;
+                    setTimeout(()=>{
+                        self.rowDrop();
+                    },2000)
+
                 });
             },
             //封面图片和详情图片
