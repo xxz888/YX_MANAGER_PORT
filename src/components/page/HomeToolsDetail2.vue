@@ -1,99 +1,23 @@
-
 <template>
+
+
     <div class="table">
-        <div class="container">
-            <div class="handle-box">
-                <el-button type="primary" icon="search" @click="tagManager">标签管理</el-button>
-            </div>
-
-            <el-tabs v-model="activeName"  @tab-click="handleClick">
-                <el-tab-pane v-for = 'item in todo' :label="item.name" :name="item.name"></el-tab-pane>
-            </el-tabs>
-            <div style="margin: 20px;"></div>
-            <div class="handle-box">
-                <el-button type="success" icon="search" @click="addnews">新增</el-button>
-            </div>
-            <el-table :data="data"
-                      tooltip-effect="dark"
-                      border
-                      class="table"
-                      ref="multipleTable"
-                      @selection-change="handleSelectionChange">
-                <el-table-column prop="id" label="ID"  width="50" align="center">
-                </el-table-column>
-                <el-table-column prop="name" label="NAME"  width="150" align="center">
-                </el-table-column>
-                <el-table-column prop="photo" label="展示图" align="center" width="200">
-                    <!-- 图片的显示 -->
-                    <template  slot-scope="scope">
-                        <img :src="scope.row.photo"  class="pre-img"/>
-                    </template>
-                </el-table-column>
-                <el-table-column label="操作" width="250" align="center">
-                    <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                        <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
-                    </template>
-                </el-table-column>
-                <el-table-column label="详情信息" width="250" align="center">
-                    <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-edit"class="green"  @click="handleDetail(scope.$index, scope.row)">详情编辑</el-button>
-
-                    </template>
-                </el-table-column>
-            </el-table>
-        </div>
-        <!-- 编辑弹出框 -->
-        <el-dialog :title="dialogTitle" :close-on-click-modal="false" :visible.sync="editVisible" width="70%">
-            <el-form label-width="100px" label-height = auto :model="form">
-                <el-form-item style="width: 50%;" label="NAME">
-                    <el-input placeholder="请输入名称" v-model="form.name"></el-input>
-                </el-form-item>
-                <el-form-item style="width: 80%;" label="简介">
-                    <el-input type="textarea" placeholder="请输入简介" v-model="form.intro"></el-input>
-                </el-form-item>
-                <el-form-item style="width: 50%;" label="显示图片">
-                <template  slot-scope="scope">
-                    <div class="crop-demo">
-                        <img :src="form.photo"  class="pre-img"  >
-                        <div class="crop-demo-btn">选择图片
-                            <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
-                        </div>
-                    </div>
-                </template>
-            </el-form-item>
-
-                <el-form-item style="width: 50%;" label="详情图片">
-                    <template  slot-scope="scope">
-                        <div class="crop-demo">
-                            <img :src="form.photo_detail"  class="pre-img-Detail">
-                            <div class="crop-demo-btn">详情图片
-                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage1"/>
-                            </div>
-                        </div>
-                    </template>
-                </el-form-item>
-            </el-form>
-            <span slot="footer" class="dialog-footer">
-                    <el-button @click="editVisible = false">取 消</el-button>
-                    <el-button type="primary" @click="saveEdit">确 定</el-button>
-                </span>
-        </el-dialog>
-        <!-- 详情编辑弹出框 -->
-        <el-dialog title="详情信息" :close-on-click-modal="false" :visible.sync="detailVisible" width="95%">
-
+        <el-tabs v-model="activeName"  @tab-click="handleClick">
+            <el-tab-pane v-for = 'item in todo' :label="item.name" :name="item.name"></el-tab-pane>
+        </el-tabs>
+        <div style="margin: 20px;"></div>
             <el-button type="primary" @click="addObj1">添加标题</el-button>
             <el-button type="success" @click="addObj2">添加段落</el-button>
             <el-button type="danger"    @click="addObj3">添加图片</el-button>
             <el-button type="warning" @click="addObj4">添加轮播图</el-button>
             <el-table
-                            row-key="id"
-                            :data="alertTableData"
-                            style="width: 100%;margin-top: 20px"
-                            tooltip-effect="dark"
-                            border
-                            class="table"
-                            ref="multipleTable">
+                    row-key="id"
+                    :data="alertTableData"
+                    style="width: 100%;margin-top: 20px"
+                    tooltip-effect="dark"
+                    border
+                    class="table"
+                    ref="multipleTable">
                 <el-table-column
                         prop="id"
                         label="id"
@@ -143,10 +67,6 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <span slot="footer" class="dialog-footer">
-                    <el-button @click="detailVisible = false">关 闭</el-button>
-            </span>
-        </el-dialog>
         <!-- 标签管理弹出框 -->
         <el-dialog title="标签管理" :close-on-click-modal="false" :visible.sync="tagVisible" width="90%">
             <el-tag size="medium"
@@ -179,7 +99,7 @@
     import Sortable from 'sortablejs'
 
     export default {
-        name: 'HomeToolsDetail',
+        name: 'HomeToolsDetail2',
         components: {
             VueUeditorWrap
         },
@@ -243,49 +163,27 @@
             },
         },
         mounted() {
+             this.rowDrop();
         },
         methods: {
             //行拖拽
             rowDrop() {
-                const tbody = document.querySelector('.el-dialog .el-dialog__body .el-table__body-wrapper tbody')
+                const tbody = document.querySelector('.el-table__body-wrapper tbody');
                 const self = this;
                 Sortable.create(tbody, {
                     onEnd({ newIndex, oldIndex }) {
-                        var weight1 = self.alertTableData[oldIndex].weight;
-                        var weight2 = self.alertTableData[newIndex].weight;
-
-                        var data1 =  self.alertTableData[oldIndex];
-                        var dic1 = {
-                            'action':3,
-                            'option_detail_id':data1.id,
-                            'option_id':self.detailId,
-                            'obj':data1.obj,
-                            'detail':data1.detail,
-                            'weight':weight2
-                        };
-                        if (data1.obj == 4){
-                            var detail = data1.detail_list.join(',');
-                            dic1.detail = detail;
-                        }
-
-                        var data2 =  self.alertTableData[newIndex];
-                        var dic2 = {
-                            'action':3,
-                            'option_detail_id':data2.id,
-                            'option_id':self.detailId,
-                            'obj':data2.obj,
-                            'detail':data2.detail,
-                            'weight':weight1
-                        };
-                        if (data2.obj == 4){
-                            var detail = data2.detail_list.join(',');
-                            dic2.detail = detail;
-                        }
-
-
-                        self.allAerltEditAndNewAddCommonAction(dic1);
-                        self.allAerltEditAndNewAddCommonAction(dic2);
-
+                        var weight1 = self.alertTableData[oldIndex].id;
+                        var weight2 = self.alertTableData[newIndex].id;
+                        var url = "/api/pub/option_detail/?first_id="+weight2+'&second_id='+weight1;
+                        self.$axios.get(url,{headers:{
+                                "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
+                            if (res.data.status == 1){
+                                self.$message.success(res.data.message);
+                                self.alertTableCommonRequest();
+                            } else {
+                                self.$message.warning(res.data.message);
+                            }
+                        });
                     }
                 })
             },
@@ -430,7 +328,7 @@
                 })
             },
             getParmters(){
-                this.startId = localStorage.getItem('xxzTools');
+                this.startId = localStorage.getItem('HomeToolsDetail2');
                 if (this.startId){
                     this.getData();
                 }
@@ -545,26 +443,14 @@
             },
             //详情alerttabledata点击按钮
             handleDetail(index, row){
-                const item = this.tableData[index];
-                localStorage.setItem('HomeToolsDetail2',item.id);
-                this.$router.push({
-                    path:'/HomeToolsDetail2',
-                })
-                /*
                 this.detailId =  this.tableData[index]['id'];
                 this.alertTableCommonRequest();
-                */
             },
             alertTableCommonRequest(){
                 var self = this;
                 this.$axios.get("/api/pub/option/0/"+this.detailId+'/',{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
                     self.alertTableData = res.data;
-                    self.detailVisible = true;
-                    setTimeout(()=>{
-                        self.rowDrop();
-                    },2000)
-
                 });
             },
             //封面图片和详情图片
@@ -605,7 +491,7 @@
                 var t = this;
                 reader.onload = (event) => {
                     t.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function (res,key) {
-                            t.alertTableData[index].detail = res;}),
+                        t.alertTableData[index].detail = res;}),
                     t.$refs.cropper && t.$refs.cropper.replace(event.target.result)
                 };
                 reader.readAsDataURL(file);
@@ -634,15 +520,8 @@
                         "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
                     self.todo = res.data;
                     self.activeName = res.data[0]['name'];
-                    self.fatherId = res.data[0]['id'];
-                    self.getDataDetail();
-                });
-            },
-            getDataDetail(){
-                var self = this;
-                this.$axios.get("/api/pub/option/1/"+this.fatherId+'/',{headers:{
-                        "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
-                    self.tableData = res.data;
+                    self.detailId = res.data[0]['id'];
+                    self.alertTableCommonRequest();
                 });
             },
             //tab切换
@@ -650,10 +529,10 @@
                 var string = event.target.getAttribute('id').split('-')[1];
                 for (var i = 0 ; i < this.todo.length ; i ++){
                     if (string == this.todo[i].name){
-                        this.fatherId = this.todo[i].id;
+                        this.detailId = this.todo[i].id;
                     }
                 }
-                this.getDataDetail();
+                this.alertTableCommonRequest();
             },
             handleSelectionChange(val) {
                 this.multipleSelection = val;
@@ -703,34 +582,25 @@
             },
             //编辑
             changeEdit(item) {
-
-                this.form = item;
-                this.form.action = 3;
-                this.form.option_id = item.id;
-                this.dialogTitle = '编辑';
-                this.fatherId = null;
-                this.editVisible=true;
-
-
-                // this.$prompt('请输入新的标签名', '编辑'+ '【'+item.name + '】', {
-                //     confirmButtonText: '确定',
-                //     cancelButtonText: '取消',
-                //     inputValue:item.name,
-                //     closeOnClickModal:false
-                // }).then(({ value }) => {
-                //     if (value.length == 0) return;
-                //     var dic = {
-                //         'action':3,
-                //         'option_id':item.id,
-                //         'name':value,
-                //         'photo':'',
-                //         'is_next':1,
-                //         'photo_detail':'',
-                //         'intro':''
-                //     };
-                //     this.allEditAndNewAddCommonAction(dic,1);
-                // }).catch(() => {
-                // });
+                this.$prompt('请输入新的标签名', '编辑'+ '【'+item.name + '】', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    inputValue:item.name,
+                    closeOnClickModal:false
+                }).then(({ value }) => {
+                    if (value.length == 0) return;
+                    var dic = {
+                        'action':3,
+                        'option_id':item.id,
+                        'name':value,
+                        'photo':'',
+                        'is_next':1,
+                        'photo_detail':'',
+                        'intro':''
+                    };
+                    this.allEditAndNewAddCommonAction(dic,1);
+                }).catch(() => {
+                });
             },
             //新增
             handleInputConfirm() {

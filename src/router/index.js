@@ -14,6 +14,13 @@ export default new Router({
             component: resolve => require(['../components/common/Home.vue'], resolve),
             meta: { title: '自述文件' },
             children:[
+
+
+                {
+                    path: '/HomeToolsDetail2',
+                    component: resolve => require(['../components/page/HomeToolsDetail2.vue'], resolve),
+                    meta: {title: '指南详情2'}
+                },
                 {
                     path: '/HomeAdver',
                     component: resolve => require(['../components/page/HomeAdver.vue'], resolve),
