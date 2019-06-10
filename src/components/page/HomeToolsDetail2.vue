@@ -2,15 +2,20 @@
 
 
     <div class="table">
+        <div class="handle-box">
+            <el-button type="primary" icon="search" @click="tagManager">标签管理</el-button>
+        </div>
         <el-tabs v-model="activeName"  @tab-click="handleClick">
             <el-tab-pane v-for = 'item in todo' :label="item.name" :name="item.name"></el-tab-pane>
         </el-tabs>
         <div style="margin: 20px;"></div>
-            <el-button type="primary" @click="addObj1">添加标题</el-button>
+            <el-button type="primary" @click="addObj1">添加大标题</el-button>
             <el-button type="success" @click="addObj2">添加段落</el-button>
             <el-button type="danger"    @click="addObj3">添加图片</el-button>
             <el-button type="warning" @click="addObj4">添加轮播图</el-button>
-            <el-table
+            <el-button type="primary" @click="addObj5">添加小标题</el-button>
+
+        <el-table
                     row-key="id"
                     :data="alertTableData"
                     style="width: 100%;margin-top: 20px"
@@ -38,6 +43,8 @@
                         align="center">
                     <template slot-scope="scope">
                         <el-input v-if="scope.row.obj == 1" v-model="scope.row.detail" ></el-input>
+                        <el-input v-if="scope.row.obj == 5" v-model="scope.row.detail" ></el-input>
+
                         <el-input v-if="scope.row.obj == 2" v-model="scope.row.detail"  type="textarea"   ></el-input>
                         <div      v-if="scope.row.obj == 3" class="crop-demo">
                             <img :src="scope.row.detail"    v-model="scope.row.detail" class="pre-img-Detail"  >
@@ -46,11 +53,11 @@
                             </div>
                         </div>
                         <div      v-else>
-                            <el-row :gutter="0">
-                                <el-col v-for="(item,indexTag) in scope.row.detail_list" :span="8">
+                            <el-row :gutter="5">
+                                <el-col style="margin-bottom: 5px" v-for="(item,indexTag) in scope.row.detail_list" :span="8">
                                     <div class="crop-demo">
                                         <img :src="item"  class="pre-img-Detail">
-                                        <div class="crop-demo-btn">添加编辑
+                                        <div class="crop-demo-btn">编辑
                                             <input class="crop-input" type="file" name="image" accept="image/*" @change="setImageDetailLunBo($event,scope.$index,indexTag)"/>
                                         </div>
                                     </div>
@@ -68,6 +75,42 @@
                 </el-table-column>
             </el-table>
         <!-- 标签管理弹出框 -->
+        <!-- 编辑弹出框 -->
+        <el-dialog :title="dialogTitle" :close-on-click-modal="false" :visible.sync="editVisible" width="70%">
+            <el-form label-width="100px" label-height = auto :model="form">
+                <el-form-item style="width: 50%;" label="NAME">
+                    <el-input placeholder="请输入名称" v-model="form.name"></el-input>
+                </el-form-item>
+                <el-form-item style="width: 80%;" label="简介">
+                    <el-input type="textarea" placeholder="请输入简介" v-model="form.intro"></el-input>
+                </el-form-item>
+                <el-form-item style="width: 50%;" label="显示图片">
+                    <template  slot-scope="scope">
+                        <div class="crop-demo">
+                            <img :src="form.photo"  class="pre-img"  >
+                            <div class="crop-demo-btn">选择图片
+                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
+                            </div>
+                        </div>
+                    </template>
+                </el-form-item>
+
+                <el-form-item style="width: 50%;" label="详情图片">
+                    <template  slot-scope="scope">
+                        <div class="crop-demo">
+                            <img :src="form.photo_detail"  class="pre-img-Detail">
+                            <div class="crop-demo-btn">详情图片
+                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage1"/>
+                            </div>
+                        </div>
+                    </template>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                    <el-button @click="editVisible = false">取 消</el-button>
+                    <el-button type="primary" @click="saveEdit">确 定</el-button>
+                </span>
+        </el-dialog>
         <el-dialog title="标签管理" :close-on-click-modal="false" :visible.sync="tagVisible" width="90%">
             <el-tag size="medium"
                     :key="item.id"
@@ -147,6 +190,7 @@
                 inputValue:'',
                 inputVisible:false,
                 alertTableData:[],
+                currentWeight:''
             }
         },
         created() {
@@ -187,45 +231,75 @@
                     }
                 })
             },
-            addObj1(){
+            jisuanMaxWeight(){
+                if (this.alertTableData.length == 0){
+                    this.currentWeight = 1;
+                } else{
+                    var newalertTableData = [];
+                    for (var i = 0 ; i < this.alertTableData.length ;i++){
+                        newalertTableData.push(this.alertTableData[i].weight);
+                    }
+                    var max = Math.max.apply(null, newalertTableData);
+                    this.currentWeight = max + 1;
+                }
 
+            },
+            addObj1(){
+                this.jisuanMaxWeight();
                 var dic = {
                     'detail': "",
                     'id': '99999',
                     'obj':'1',
                     'option_id': this.detailId,
-                    'weight': this.alertTableData.length+1
+                    'weight': this.currentWeight
+                }
+                this.alertTableData.push(dic);
+            },
+            addObj5(){
+                this.jisuanMaxWeight();
+                var dic = {
+                    'detail': "",
+                    'id': '99999',
+                    'obj':'5',
+                    'option_id': this.detailId,
+                    'weight': this.currentWeight
                 }
                 this.alertTableData.push(dic);
             },
             addObj2(){
+                this.jisuanMaxWeight();
+
                 var dic = {
                     'detail': "",
                     'id': '99999',
                     'obj':'2',
                     'option_id': this.detailId,
-                    'weight': this.alertTableData.length+1
+                    'weight': this.currentWeight
                 }
                 this.alertTableData.push(dic);
             },
             addObj3(){
+                this.jisuanMaxWeight();
+
                 var dic = {
                     'detail': "",
                     'id': '99999',
                     'obj':'3',
                     'option_id': this.detailId,
-                    'weight': this.alertTableData.length+1
+                    'weight': this.currentWeight
                 }
                 this.alertTableData.push(dic);
             },
             addObj4(){
+                this.jisuanMaxWeight();
+
                 var dic = {
                     'detail': "",
                     'id': '99999',
                     'obj':'4',
                     'option_id': this.detailId,
-                    'weight': this.alertTableData.length+1,
-                    'detail_list':['','','']
+                    'weight': this.currentWeight,
+                    'detail_list':['','','','','','']
 
                 }
                 this.alertTableData.push(dic);
@@ -257,6 +331,7 @@
                         'detail':data.detail,
                         'weight':data.weight
                     };
+
                     if (data.obj == 4){
                         var detail = data.detail_list.join(',');
                         dic.detail = detail;
@@ -267,16 +342,53 @@
             },
             allAerltEditAndNewAddCommonAction(dic){
                 var self = this;
-                this.$axios.post("/api/pub/option_detail/",dic,{headers:{
-                        "Authorization":"JWT " + localStorage.getItem('token')
-                    }}).then((res)=>{
-                    if (res.data.status == 1){
-                        self.$message.success(res.data.message);
-                        self.alertTableCommonRequest();
-                    } else {
-                        self.$message.warning(res.data.message);
-                    }
-                })
+                if (dic.obj == 3){
+                    var img = new Image();
+                    img.src = dic.detail;
+                    img.onload = function(){
+                        dic.ratio = img.height/img.width;
+                        self.$axios.post("/api/pub/option_detail/",dic,{headers:{
+                                "Authorization":"JWT " + localStorage.getItem('token')
+                            }}).then((res)=>{
+                            if (res.data.status == 1){
+                                self.$message.success(res.data.message);
+                                self.alertTableCommonRequest();
+                            } else {
+                                self.$message.warning(res.data.message);
+                            }
+                        })
+                    };
+                }else if (dic.obj == 4){
+                    var img = new Image();
+                    img.src = dic.detail.split(',')[0];
+                    img.onload = function(){
+                        dic.ratio = img.height/img.width;
+                        self.$axios.post("/api/pub/option_detail/",dic,{headers:{
+                                "Authorization":"JWT " + localStorage.getItem('token')
+                            }}).then((res)=>{
+                            if (res.data.status == 1){
+                                self.$message.success(res.data.message);
+                                self.alertTableCommonRequest();
+                            } else {
+                                self.$message.warning(res.data.message);
+                            }
+                        })
+                    };
+                }else{
+                    dic.ratio = 1;
+                    self.$axios.post("/api/pub/option_detail/",dic,{headers:{
+                            "Authorization":"JWT " + localStorage.getItem('token')
+                        }}).then((res)=>{
+                        if (res.data.status == 1){
+                            self.$message.success(res.data.message);
+                            self.alertTableCommonRequest();
+                        } else {
+                            self.$message.warning(res.data.message);
+                        }
+                    })
+                }
+
+
             },
 
 
@@ -582,25 +694,34 @@
             },
             //编辑
             changeEdit(item) {
-                this.$prompt('请输入新的标签名', '编辑'+ '【'+item.name + '】', {
-                    confirmButtonText: '确定',
-                    cancelButtonText: '取消',
-                    inputValue:item.name,
-                    closeOnClickModal:false
-                }).then(({ value }) => {
-                    if (value.length == 0) return;
-                    var dic = {
-                        'action':3,
-                        'option_id':item.id,
-                        'name':value,
-                        'photo':'',
-                        'is_next':1,
-                        'photo_detail':'',
-                        'intro':''
-                    };
-                    this.allEditAndNewAddCommonAction(dic,1);
-                }).catch(() => {
-                });
+
+                this.form = item;
+                this.form.action = 3;
+                this.form.option_id = item.id;
+                this.dialogTitle = '编辑';
+                this.fatherId = null;
+                this.editVisible=true;
+
+
+                // this.$prompt('请输入新的标签名', '编辑'+ '【'+item.name + '】', {
+                //     confirmButtonText: '确定',
+                //     cancelButtonText: '取消',
+                //     inputValue:item.name,
+                //     closeOnClickModal:false
+                // }).then(({ value }) => {
+                //     if (value.length == 0) return;
+                //     var dic = {
+                //         'action':3,
+                //         'option_id':item.id,
+                //         'name':value,
+                //         'photo':'',
+                //         'is_next':1,
+                //         'photo_detail':'',
+                //         'intro':''
+                //     };
+                //     this.allEditAndNewAddCommonAction(dic,1);
+                // }).catch(() => {
+                // });
             },
             //新增
             handleInputConfirm() {
@@ -636,7 +757,7 @@
                 })
             },
             objFormatter(data){
-                return data.obj == 1 ? '标题' : data.obj == 2 ? '段落' : data.obj == 3 ? '图片' : data.obj == 4 ? '轮播图' : '其他';
+                return data.obj == 1 ? '大标题' : data.obj == 2 ? '段落' : data.obj == 3 ? '图片' : data.obj == 4 ? '轮播图' : '小标题';
             }
         },
     }
@@ -680,14 +801,14 @@
     }
     .crop-demo-btn{
         position: relative;
-        width: 100px;
-        height: 40px;
-        line-height: 40px;
-        padding: 0 20px;
-        margin-left: 30px;
+        width: 50px;
+        height: 30px;
+        line-height: 30px;
+        padding: 0 10px;
+        margin-left: 5px;
         background-color: #409eff;
         color: #fff;
-        font-size: 14px;
+        font-size: 12px;
         border-radius: 4px;
         box-sizing: border-box;
     }

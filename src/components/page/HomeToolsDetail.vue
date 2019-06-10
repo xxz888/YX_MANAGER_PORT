@@ -61,7 +61,7 @@
                         </div>
                     </div>
                 </template>
-            </el-form-item>
+                 </el-form-item>
 
                 <el-form-item style="width: 50%;" label="详情图片">
                     <template  slot-scope="scope">
@@ -459,7 +459,8 @@
                     'photo':'',
                     'action':1,
                     'father_id':this.father_id,
-                    'is_next':1
+                    'is_next':1,
+                    'photo_detail':''
                 }
                 this.dialogTitle = '新增';
                 this.editVisible=true;
@@ -467,8 +468,13 @@
             saveEdit(){
                 var self = this;
 
-                var boll1 =  this.form.photo.indexOf('http://photo.thegdlife.com') == -1;
-                var boll2 =  this.form.photo_detail.indexOf('http://photo.thegdlife.com') == -1;
+                if (this.form.photo == '' && this.form.photo_detail == ''){
+                    self.saveEditAndAdd();
+                    return;
+                }
+
+                var boll1 =  this.form.photo.indexOf('http://photo.thegdlife.com') == -1 ;
+                var boll2 =  this.form.photo_detail.indexOf('http://photo.thegdlife.com') == -1 ;
 
                 if (boll1 && !boll2){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.form.photo,function (res,key) {
@@ -478,7 +484,7 @@
                 }else if(boll1 && boll2){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.form.photo,function (res,key) {
                         self.form.photo = res;
-                        self.$uploadQiNiuYun.uploadqiniuyun(this.form.photo_detail,function (res1,key) {
+                        self.$uploadQiNiuYun.uploadqiniuyun(self.form.photo_detail,function (res1,key) {
                             self.form.photo_detail = res1;
                             self.saveEditAndAdd();
                         })
