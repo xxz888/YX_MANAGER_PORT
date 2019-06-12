@@ -22,7 +22,9 @@
                     tooltip-effect="dark"
                     border
                     class="table"
-                    ref="multipleTable">
+                    ref="multipleTable"
+                    v-loading="alertLoading"
+        >
                 <el-table-column
                         prop="id"
                         label="id"
@@ -148,6 +150,7 @@
         },
         data() {
             return {
+                alertLoading:false,
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
@@ -216,6 +219,8 @@
                 const self = this;
                 Sortable.create(tbody, {
                     onEnd({ newIndex, oldIndex }) {
+                         self.alertLoading = true;
+
                         var weight1 = self.alertTableData[oldIndex].id;
                         var weight2 = self.alertTableData[newIndex].id;
                         var url = "/api/pub/option_detail/?first_id="+weight2+'&second_id='+weight1;
@@ -227,6 +232,7 @@
                             } else {
                                 self.$message.warning(res.data.message);
                             }
+                            self.alertLoading = false;
                         });
                     }
                 })
@@ -318,6 +324,7 @@
                         'weight':data.weight
                     };
                     if (data.obj == 4){
+                        this.trimSpace(data.detail_list);
                         var detail = data.detail_list.join(',');
                         dic.detail = detail;
                     }
@@ -333,12 +340,21 @@
                     };
 
                     if (data.obj == 4){
+                        this.trimSpace(data.detail_list);
                         var detail = data.detail_list.join(',');
                         dic.detail = detail;
                     }
                 }
                 console.log(dic);
                 this.allAerltEditAndNewAddCommonAction(dic);
+            },
+            trimSpace(array) {
+                for (var i = 0; i < array.length; i++) {
+                    if (array[i] == "" || array[i] == " " || array[i] == null || typeof(array[i]) == "undefined") {
+                        array.splice(i, 1);
+                        i = i - 1;
+                    }
+                }
             },
             allAerltEditAndNewAddCommonAction(dic){
                 var self = this;
