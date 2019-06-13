@@ -1,7 +1,7 @@
 import * as Qiniu from 'qiniu-js'
 import axios from 'axios'
 import $ from 'jquery'
-
+import qiniu from 'qiniu'
 function uploadqiniuyun(params,fun) {
     var base64Arr = params.split(',');
     var imgtype = '';
@@ -27,14 +27,21 @@ function uploadqiniuyun(params,fun) {
     var timestamp = (new Date()).getTime();
     var key = userid + '_image_' + timestamp + '.jpg';
     var url =  '/api/pub/qiniu_token/'+key + '/';
-    axios.get(url,{headers:{
-            "Authorization":"JWT " + localStorage.getItem('token')
-        }}).then((res) =>{
+
+    var accessKey = 'rpLW8CzqDzdgK27Mdp6fdrFjjdJRR-jBmfC1m8P0';
+    var secretKey = 'm6t4wu-bTuHJBmw4h-H99JiogkmfKNfj2N0nvG-K';
+    var mac = new qiniu.auth.digest.Mac(accessKey, secretKey);
+
+    var options = {
+        scope: 'thegdlife',
+    };
+    var putPolicy = new qiniu.rs.PutPolicy(options);
+    var uploadToken=putPolicy.uploadToken(mac);
             var addr = 'http://photo.thegdlife.com/'
             var file = blob_fileImg;
             var formData = new FormData();
             formData.append('file', file);
-            formData.append('token', res.data.token);
+            formData.append('token', uploadToken);
             formData.append('key',key);
             $.ajax({
                 url: 'http://up-z0.qiniup.com/',
@@ -49,7 +56,6 @@ function uploadqiniuyun(params,fun) {
             }).fail(function(err) {
                 console.log('error');
             });
-    })
 
 };
 export default {
