@@ -147,6 +147,9 @@
                 this.$alert( '是否删除标签'+ '【'+item.type + '】', {
                     confirmButtonText: '确定',
                     callback: action => {
+                        if (action == 'cancel'){
+                            return;
+                        }
                         var dic = {
                             'tag_id':item.id,
                             'tag':'',

@@ -109,6 +109,9 @@
                 this.$alert( '是否删除产地'+ '【'+item.site + '】', {
                     confirmButtonText: '确定',
                     callback: action => {
+                        if (action == 'cancel'){
+                            return;
+                        }
                         var dic = {
                             'site_id':item.id,
                             'type':'2',

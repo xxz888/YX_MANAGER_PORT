@@ -121,6 +121,9 @@
                 this.$alert( '是否删除标签'+ '【'+item.tag + '】', {
                     confirmButtonText: '确定',
                     callback: action => {
+                        if (action == 'cancel'){
+                            return;
+                        }
                         if (!self.id){
                             return;
                         }

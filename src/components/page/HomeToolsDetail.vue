@@ -13,7 +13,10 @@
             <div class="handle-box">
                 <el-button type="success" icon="search" @click="addnews">新增</el-button>
             </div>
-            <el-table :data="data"
+            <el-table
+                    row-key="id"
+
+                    :data="data"
                       tooltip-effect="dark"
                       border
                       class="table"
@@ -23,6 +26,7 @@
                 </el-table-column>
                 <el-table-column prop="name" label="NAME"  width="150" align="center">
                 </el-table-column>
+
                 <el-table-column prop="photo" label="展示图" align="center" width="200">
                     <!-- 图片的显示 -->
                     <template  slot-scope="scope">
@@ -52,6 +56,9 @@
                 <el-form-item style="width: 80%;" label="简介">
                     <el-input type="textarea" placeholder="请输入简介" v-model="form.intro"></el-input>
                 </el-form-item>
+                <el-form-item style="width: 80%;" label="权重">
+                    <el-input  placeholder="请输入权重" v-model="form.weight"></el-input>
+                </el-form-item>
                 <el-form-item style="width: 50%;" label="显示图片">
                 <template  slot-scope="scope">
                     <div class="crop-demo">
@@ -78,74 +85,6 @@
                     <el-button @click="editVisible = false">取 消</el-button>
                     <el-button type="primary" @click="saveEdit">确 定</el-button>
                 </span>
-        </el-dialog>
-        <!-- 详情编辑弹出框 -->
-        <el-dialog title="详情信息" :close-on-click-modal="false" :visible.sync="detailVisible" width="95%">
-
-            <el-button type="primary" @click="addObj1">添加标题</el-button>
-            <el-button type="success" @click="addObj2">添加段落</el-button>
-            <el-button type="danger"    @click="addObj3">添加图片</el-button>
-            <el-button type="warning" @click="addObj4">添加轮播图</el-button>
-            <el-table
-                            row-key="id"
-                            :data="alertTableData"
-                            style="width: 100%;margin-top: 20px"
-                            tooltip-effect="dark"
-                            border
-                            class="table"
-                            ref="multipleTable">
-                <el-table-column
-                        prop="id"
-                        label="id"
-                        width="80"
-                        align="center">
-                </el-table-column>
-
-                <el-table-column
-                        prop="obj"
-                        label="类型"
-                        width="100"
-                        align="center"
-                        :formatter="objFormatter">
-                </el-table-column>
-                <el-table-column
-                        prop="detail"
-                        label="Detail"
-                        align="center">
-                    <template slot-scope="scope">
-                        <el-input v-if="scope.row.obj == 1" v-model="scope.row.detail" ></el-input>
-                        <el-input v-if="scope.row.obj == 2" v-model="scope.row.detail"  type="textarea"   ></el-input>
-                        <div      v-if="scope.row.obj == 3" class="crop-demo">
-                            <img :src="scope.row.detail"    v-model="scope.row.detail" class="pre-img-Detail"  >
-                            <div class="crop-demo-btn">添加编辑
-                                <input class="crop-input" type="file" name="image" accept="image/*" @change="setImageDetail($event,scope.$index)"/>
-                            </div>
-                        </div>
-                        <div      v-else>
-                            <el-row :gutter="0">
-                                <el-col v-for="(item,indexTag) in scope.row.detail_list" :span="8">
-                                    <div class="crop-demo">
-                                        <img :src="item"  class="pre-img-Detail">
-                                        <div class="crop-demo-btn">添加编辑
-                                            <input class="crop-input" type="file" name="image" accept="image/*" @change="setImageDetailLunBo($event,scope.$index,indexTag)"/>
-                                        </div>
-                                    </div>
-                                </el-col>
-                            </el-row>
-                        </div>
-                    </template>
-                </el-table-column>
-
-                <el-table-column label="操作" width="150" align="center">
-                    <template slot-scope="scope">
-                        <el-button type="text" icon="el-icon-edit" @click="alertHandleSave(scope.$index, scope.row)">保存</el-button>
-                        <el-button type="text" icon="el-icon-delete" class="red" @click="alertTableDelete(scope.$index, scope.row)">删除</el-button>
-                    </template>
-                </el-table-column>
-            </el-table>
-            <span slot="footer" class="dialog-footer">
-                    <el-button @click="detailVisible = false">关 闭</el-button>
-            </span>
         </el-dialog>
         <!-- 标签管理弹出框 -->
         <el-dialog title="标签管理" :close-on-click-modal="false" :visible.sync="tagVisible" width="90%">
@@ -199,7 +138,8 @@
                     name: '',
                     photo: '',
                     intro:'',
-                    photo_detail:''
+                    photo_detail:'',
+                    weight:''
                 },
                 idx: -1,
                 alertIdx:-1,
@@ -243,96 +183,37 @@
             },
         },
         mounted() {
+            // this.rowDrop();
         },
         methods: {
             //行拖拽
             rowDrop() {
-                const tbody = document.querySelector('.el-dialog .el-dialog__body .el-table__body-wrapper tbody')
+                const tbody = document.querySelector('.el-table__body-wrapper tbody')
                 const self = this;
                 Sortable.create(tbody, {
                     onEnd({ newIndex, oldIndex }) {
-                        var weight1 = self.alertTableData[oldIndex].weight;
-                        var weight2 = self.alertTableData[newIndex].weight;
+                        var weight1 = self.tableData[oldIndex].id;
+                        var weight2 = self.tableData[newIndex].id;
+                        var first_id = weight1;
+                        var second_id = weight2;
 
-                        var data1 =  self.alertTableData[oldIndex];
-                        var dic1 = {
-                            'action':3,
-                            'option_detail_id':data1.id,
-                            'option_id':self.detailId,
-                            'obj':data1.obj,
-                            'detail':data1.detail,
-                            'weight':weight2
-                        };
-                        if (data1.obj == 4){
-                            var detail = data1.detail_list.join(',');
-                            dic1.detail = detail;
+                        if (weight2 == weight1){
+                            self.getDataDetail();
+                            return;
                         }
-
-                        var data2 =  self.alertTableData[newIndex];
-                        var dic2 = {
-                            'action':3,
-                            'option_detail_id':data2.id,
-                            'option_id':self.detailId,
-                            'obj':data2.obj,
-                            'detail':data2.detail,
-                            'weight':weight1
-                        };
-                        if (data2.obj == 4){
-                            var detail = data2.detail_list.join(',');
-                            dic2.detail = detail;
-                        }
-
-
-                        self.allAerltEditAndNewAddCommonAction(dic1);
-                        self.allAerltEditAndNewAddCommonAction(dic2);
-
+                        var url = "/api/pub/option_detail/?first_id="+first_id+'&second_id='+second_id;
+                        self.$axios.get(url,{headers:{
+                                "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
+                            if (res.data.status == 1){
+                                self.$message.success(res.data.message);
+                                self.getDataDetail();
+                            } else {
+                                self.$message.warning(res.data.message);
+                            }
+                        });
                     }
                 })
             },
-            addObj1(){
-
-                var dic = {
-                    'detail': "",
-                    'id': '99999',
-                    'obj':'1',
-                    'option_id': this.detailId,
-                    'weight': this.alertTableData.length+1
-                }
-                this.alertTableData.push(dic);
-            },
-            addObj2(){
-                var dic = {
-                    'detail': "",
-                    'id': '99999',
-                    'obj':'2',
-                    'option_id': this.detailId,
-                    'weight': this.alertTableData.length+1
-                }
-                this.alertTableData.push(dic);
-            },
-            addObj3(){
-                var dic = {
-                    'detail': "",
-                    'id': '99999',
-                    'obj':'3',
-                    'option_id': this.detailId,
-                    'weight': this.alertTableData.length+1
-                }
-                this.alertTableData.push(dic);
-            },
-            addObj4(){
-                var dic = {
-                    'detail': "",
-                    'id': '99999',
-                    'obj':'4',
-                    'option_id': this.detailId,
-                    'weight': this.alertTableData.length+1,
-                    'detail_list':['','','']
-
-                }
-                this.alertTableData.push(dic);
-            },
-
             alertHandleSave(index, row){
                 this.alertIdx = index;
                 const data = this.alertTableData[index];
@@ -364,7 +245,6 @@
                         dic.detail = detail;
                     }
                 }
-                console.log(dic);
                 this.allAerltEditAndNewAddCommonAction(dic);
             },
             allAerltEditAndNewAddCommonAction(dic){
@@ -509,7 +389,8 @@
                         'photo':this.form.photo,
                         'is_next':1,
                         'photo_detail':this.form.photo_detail,
-                        'intro':this.form.intro
+                        'intro':this.form.intro,
+                        'weight':this.form.weight
                     };
                 }else{
                     dic = {
@@ -519,7 +400,9 @@
                         'is_next':1,
                         'option_id':this.form.option_id,
                         'photo_detail':this.form.photo_detail,
-                        'intro':this.form.intro
+                        'intro':this.form.intro,
+                        'weight':this.form.weight
+
                     };
                 }
 
@@ -688,6 +571,9 @@
                 this.$alert( '是否删除标签'+ '【'+item.name + '】', {
                     confirmButtonText: '确定',
                     callback: action => {
+                        if (action == 'cancel'){
+                            return;
+                        }
                         var dic = {
                             'action':2,
                             'option_id':item.id,
@@ -714,6 +600,7 @@
                 this.form.action = 3;
                 this.form.option_id = item.id;
                 this.dialogTitle = '编辑';
+                this.form.weight = item.weight;
                 this.fatherId = null;
                 this.editVisible=true;
 
@@ -750,7 +637,8 @@
                         'photo':'',
                         'is_next':1,
                         'photo_detail':'',
-                        'intro':''
+                        'intro':'',
+                        'weight':0
                     };
                     this.allEditAndNewAddCommonAction(dic);
 

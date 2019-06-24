@@ -25,12 +25,20 @@
                     ref="multipleTable"
                     v-loading="alertLoading"
         >
+
                 <el-table-column
                         prop="id"
                         label="id"
                         width="80"
                         align="center">
                 </el-table-column>
+
+            <el-table-column
+                    prop="weight"
+                    label="weight"
+                    width="80"
+                    align="center">
+            </el-table-column>
 
                 <el-table-column
                         prop="obj"
@@ -85,6 +93,9 @@
                 </el-form-item>
                 <el-form-item style="width: 80%;" label="简介">
                     <el-input type="textarea" placeholder="请输入简介" v-model="form.intro"></el-input>
+                </el-form-item>
+                <el-form-item style="width: 80%;" label="权重">
+                    <el-input  placeholder="请输入权重" v-model="form.weight"></el-input>
                 </el-form-item>
                 <el-form-item style="width: 50%;" label="显示图片">
                     <template  slot-scope="scope">
@@ -165,7 +176,8 @@
                     name: '',
                     photo: '',
                     intro:'',
-                    photo_detail:''
+                    photo_detail:'',
+                    weight:''
                 },
                 idx: -1,
                 alertIdx:-1,
@@ -223,19 +235,33 @@
 
                         var weight1 = self.alertTableData[oldIndex].id;
                         var weight2 = self.alertTableData[newIndex].id;
-                        var url = "/api/pub/option_detail/?first_id="+weight2+'&second_id='+weight1;
+                        var first_id = weight1;
+                        var second_id = weight2;
+
+                        if (weight2 == weight1){
+                            self.alertTableCommonRequest();
+                            return;
+                        }
+                        var url = "/api/pub/option_detail/?first_id="+first_id+'&second_id='+second_id;
                         self.$axios.get(url,{headers:{
                                 "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
                             if (res.data.status == 1){
                                 self.$message.success(res.data.message);
                                 self.alertTableCommonRequest();
+
                             } else {
                                 self.$message.warning(res.data.message);
                             }
-                            self.alertLoading = false;
                         });
                     }
                 })
+            },
+            alertTableCommonRequest(){
+                var self = this;
+                this.$axios.get("/api/pub/option/2/"+this.detailId+'/',{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
+                    setTimeout(function () {self.alertTableData = res.data;self.alertLoading = false;}, 1000);
+                });
             },
             jisuanMaxWeight(){
                 if (this.alertTableData.length == 0){
@@ -345,7 +371,6 @@
                         dic.detail = detail;
                     }
                 }
-                console.log(dic);
                 this.allAerltEditAndNewAddCommonAction(dic);
             },
             trimSpace(array) {
@@ -529,7 +554,8 @@
                         'photo':this.form.photo,
                         'is_next':1,
                         'photo_detail':this.form.photo_detail,
-                        'intro':this.form.intro
+                        'intro':this.form.intro,
+                        'weight':this.form.weight
                     };
                 }else{
                     dic = {
@@ -539,7 +565,8 @@
                         'is_next':1,
                         'option_id':this.form.option_id,
                         'photo_detail':this.form.photo_detail,
-                        'intro':this.form.intro
+                        'intro':this.form.intro,
+                        'weight':this.form.weight
                     };
                 }
 
@@ -574,13 +601,7 @@
                 this.detailId =  this.tableData[index]['id'];
                 this.alertTableCommonRequest();
             },
-            alertTableCommonRequest(){
-                var self = this;
-                this.$axios.get("/api/pub/option/0/"+this.detailId+'/',{headers:{
-                        "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
-                    self.alertTableData = res.data;
-                });
-            },
+
             //封面图片和详情图片
             setImage(e){
                 const file = e.target.files[0];
@@ -689,6 +710,9 @@
                 this.$alert( '是否删除标签'+ '【'+item.name + '】', {
                     confirmButtonText: '确定',
                     callback: action => {
+                        if (action == 'cancel'){
+                            return;
+                        }
                         var dic = {
                             'action':2,
                             'option_id':item.id,
@@ -714,30 +738,10 @@
                 this.form = item;
                 this.form.action = 3;
                 this.form.option_id = item.id;
+                this.form.weight = item.weight;
                 this.dialogTitle = '编辑';
                 this.fatherId = null;
                 this.editVisible=true;
-
-
-                // this.$prompt('请输入新的标签名', '编辑'+ '【'+item.name + '】', {
-                //     confirmButtonText: '确定',
-                //     cancelButtonText: '取消',
-                //     inputValue:item.name,
-                //     closeOnClickModal:false
-                // }).then(({ value }) => {
-                //     if (value.length == 0) return;
-                //     var dic = {
-                //         'action':3,
-                //         'option_id':item.id,
-                //         'name':value,
-                //         'photo':'',
-                //         'is_next':1,
-                //         'photo_detail':'',
-                //         'intro':''
-                //     };
-                //     this.allEditAndNewAddCommonAction(dic,1);
-                // }).catch(() => {
-                // });
             },
             //新增
             handleInputConfirm() {
@@ -751,7 +755,8 @@
                         'photo':'',
                         'is_next':1,
                         'photo_detail':'',
-                        'intro':''
+                        'intro':'',
+                        'weight':0
                     };
                     this.allEditAndNewAddCommonAction(dic);
 
