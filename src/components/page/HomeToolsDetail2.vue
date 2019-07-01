@@ -331,7 +331,7 @@
                     'obj':'4',
                     'option_id': this.detailId,
                     'weight': this.currentWeight,
-                    'detail_list':['','','','','','']
+                    'detail_list':['','','','','','','']
 
                 }
                 this.alertTableData.push(dic);
