@@ -25,15 +25,39 @@
                 <div style="margin: 20px 20px"></div>
                 <div>{{tab.question?toChineseWords(tab.question):''}}</div>
                 <div>
-                    <img   :src="tab.photo1 ? tab.photo1 : tab.pic1"
+                    <img   :src="tab.url_list[0]"
                            class="image"
                            :onerror="defaultImg"
                     >
-                    <img   :src="tab.photo2 ? tab.photo2 : tab.pic2"
+                    <img   :src="tab.url_list[1]"
                            class="image"
                            :onerror="defaultImg"
                     >
-                    <img    :src="tab.photo3 ? tab.photo3 : tab.pic3 "
+                    <img    :src="tab.url_list[2]"
+                            class="image"
+                            :onerror="defaultImg"
+                    >
+                    <img   :src="tab.url_list[3]"
+                           class="image"
+                           :onerror="defaultImg"
+                    >
+                    <img   :src="tab.url_list[4]"
+                           class="image"
+                           :onerror="defaultImg"
+                    >
+                    <img    :src="tab.url_list[5]"
+                            class="image"
+                            :onerror="defaultImg"
+                    >
+                    <img   :src="tab.url_list[6]"
+                           class="image"
+                           :onerror="defaultImg"
+                    >
+                    <img   :src="tab.url_list[7]"
+                           class="image"
+                           :onerror="defaultImg"
+                    >
+                    <img    :src="tab.url_list[8]"
                             class="image"
                             :onerror="defaultImg"
                     >
@@ -120,7 +144,7 @@
                 </el-form-item>
                 <el-form-item v-if="shaituTag" label="晒图内容">
                     <el-input
-                            v-model="addForm.describe"
+                            v-model="addForm.detail"
                             type="textarea"
                             placeholder="请输入晒图内容"
                     ></el-input>
@@ -166,7 +190,7 @@
                         <el-row>
                             <el-col :span="5">
                                 <div class="crop-demo">
-                                    <img  @click="clickImg1" :src="addForm.photo1" :v-model="addForm.photo1" class="pre-img" width="100" height="70">
+                                    <img   :src="addForm.photo1"  class="pre-img" width="100" height="70">
                                     <div class="crop-demo-btn">选择图片1
                                         <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage1"/>
                                     </div>
@@ -174,7 +198,7 @@
                             </el-col>
                             <el-col :span="5">
                                 <div class="crop-demo">
-                                    <img @click="clickImg2" :src="addForm.photo2" :v-model="addForm.photo2" class="pre-img" width="100" height="70">
+                                    <img  :src="addForm.photo2"  class="pre-img" width="100" height="70">
                                     <div class="crop-demo-btn">选择图片2
                                         <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage2"/>
                                     </div>
@@ -182,9 +206,61 @@
                             </el-col>
                             <el-col :span="5">
                                 <div class="crop-demo">
-                                    <img @click="clickImg3" :src="addForm.photo3"  :v-model="addForm.photo3" class="pre-img" width="100" height="70">
+                                    <img  :src="addForm.photo3" class="pre-img" width="100" height="70">
                                     <div class="crop-demo-btn">选择图片3
                                         <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage3"/>
+                                    </div>
+                                </div>
+                            </el-col>
+                            <el-col :span="5">
+                                <div class="crop-demo">
+                                    <img  :src="addForm.photo4" class="pre-img" width="100" height="70">
+                                    <div class="crop-demo-btn">选择图片4
+                                        <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage4"/>
+                                    </div>
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="5">
+                                <div class="crop-demo">
+                                    <img  :src="addForm.photo5" class="pre-img" width="100" height="70">
+                                    <div class="crop-demo-btn">选择图片5
+                                        <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage5"/>
+                                    </div>
+                                </div>
+                            </el-col>
+                            <el-col :span="5">
+                                <div class="crop-demo">
+                                    <img  :src="addForm.photo6" class="pre-img" width="100" height="70">
+                                    <div class="crop-demo-btn">选择图片3
+                                        <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage6"/>
+                                    </div>
+                                </div>
+                            </el-col>
+                            <el-col :span="5">
+                                <div class="crop-demo">
+                                    <img  :src="addForm.photo7" class="pre-img" width="100" height="70">
+                                    <div class="crop-demo-btn">选择图片7
+                                        <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage7"/>
+                                    </div>
+                                </div>
+                            </el-col>
+                            <el-col :span="5">
+                                <div class="crop-demo">
+                                    <img  :src="addForm.photo8" class="pre-img" width="100" height="70">
+                                    <div class="crop-demo-btn">选择图片8
+                                        <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage8"/>
+                                    </div>
+                                </div>
+                            </el-col>
+                        </el-row>
+                        <el-row>
+                            <el-col :span="5">
+                                <div class="crop-demo">
+                                    <img  :src="addForm.photo9" class="pre-img" width="100" height="70">
+                                    <div class="crop-demo-btn">选择图片9
+                                        <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage9"/>
                                     </div>
                                 </div>
                             </el-col>
@@ -238,15 +314,27 @@
                 tagSelectInputOptions2:[],
                 type:'',
                 addForm:{
-                    url:'http://thegdlife.com:8001/users/post/0/0/0/',
+                    url:'http://thegdlife.com:8001/users/post/',
                     request_type:'post',
-                    user_id:'',
+
+                    detail : "",
+                    post_id:'',
                     publish_site : "",
+                    obj:"1",
+
+                    title:"",
                     tag : "",
-                    describe : "",
-                    photo1 : "",
-                    photo2 : "",
-                    photo3 : "",
+                    photo1:"",
+                    photo2:"",
+                    photo3:"",
+                    photo4:"",
+                    photo5:"",
+                    photo6:"",
+                    photo7:"",
+                    photo8:"",
+                    photo9:"",
+                    photo_list:"",
+                    cover:"",
                 },
             };
         },
@@ -259,7 +347,38 @@
         methods: {
             saveAddContent(){
                 this.addForm.tag = this.tagSelectInput2.join(' ');
-                this.addForm.describe = this.toUnicodeWords(this.addForm.describe);
+                this.addForm.detail = this.toUnicodeWords(this.addForm.detail);
+                var url = 'http://photo.thegdlife.com/';
+                if (this.addForm.photo1.indexOf(url) != -1){
+                    this.addForm.photo1 = this.addForm.photo1.split(url)[1];
+                }
+                if (this.addForm.photo2.indexOf(url) != -1){
+                    this.addForm.photo2 = this.addForm.photo2.split(url)[1];
+                }
+                if (this.addForm.photo3.indexOf(url) != -1){
+                    this.addForm.photo3 = this.addForm.photo3.split(url)[1];
+                }
+                if (this.addForm.photo4.indexOf(url) != -1){
+                    this.addForm.photo4 = this.addForm.photo4.split(url)[1];
+                }
+                if (this.addForm.photo5.indexOf(url) != -1){
+                    this.addForm.photo5 = this.addForm.photo5.split(url)[1];
+                }
+                if (this.addForm.photo6.indexOf(url) != -1){
+                    this.addForm.photo6 = this.addForm.photo6.split(url)[1];
+                }
+                if (this.addForm.photo7.indexOf(url) != -1){
+                    this.addForm.photo7 = this.addForm.photo7.split(url)[1];
+                }
+                if (this.addForm.photo8.indexOf(url) != -1){
+                    this.addForm.photo8 = this.addForm.photo8.split(url)[1];
+                }
+                if (this.addForm.photo9.indexOf(url) != -1){
+                    this.addForm.photo9 = this.addForm.photo9.split(url)[1];
+                }
+                this.addForm.photo_list = this.addForm.photo1+ ','+this.addForm.photo2+','+this.addForm.photo3 +
+                    this.addForm.photo4+ ','+this.addForm.photo5+','+this.addForm.photo6+
+                    this.addForm.photo7+ ','+this.addForm.photo8+','+this.addForm.photo9;
                 this.$axios.post("/api/users/transpond/",this.addForm,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then((res)=>{
@@ -284,15 +403,27 @@
                 this.getUserData();
                 this.getFind_tag();
                 this.addForm = {
-                        url:'http://thegdlife.com:8001/users/post/0/0/0/',
+                        url:'http://thegdlife.com:8001/users/post/',
                         request_type:'post',
-                        user_id:'',
-                        publish_site : "",
-                        tag : "",
-                        describe : "",
-                        photo1 : "",
-                        photo2 : "",
-                        photo3 : "",
+
+                    detail : "",
+                    post_id:'',
+                    publish_site : "",
+                    obj:"1",
+
+                    title:"",
+                    tag : "",
+                    photo_list:'',
+                    cover:"",
+                    photo1:'',
+                    photo2:'',
+                    photo3:'',
+                    photo4:"",
+                    photo5:"",
+                    photo6:"",
+                    photo7:"",
+                    photo8:"",
+                    photo9:"",
                 },
                     this.tagSelectInput1 = '';
                 this.tagSelectInput2 = '';
@@ -356,13 +487,13 @@
             },
 
             clickImg1(){
-                this.addForm.photo1='';
+                // this.addForm.photo1='';
             },
             clickImg2(){
-                this.addForm.photo2='';
+                // this.addForm.photo2='';
             },
             clickImg3(){
-                this.addForm.photo3='';
+                // this.addForm.photo3='';
             },
             handleClick(tab, event) {
                 this.currentPage = 1;
@@ -387,15 +518,15 @@
                 var self = this;
                 this.user_id = this.$route.query.user_id;
                 this.xxzloading = true;
-                var url = "/api/users/get_all_post/";
-                var dic = {"is_super":'1','type':'-1'};
-                this.$axios.post(url,dic,{headers:{
+                var url = "/api/users/post/?type=-1&page=" + self.currentPage;
+                this.$axios.get(url,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
                     self.tableData = [];
                     //在这里判断是因为，用户界面直接传id过来，复用了这个界面
                     if (self.user_id && self.user_id.toString().length > 0){
                         for(var item of res.data){
                             if (item.user_id == self.user_id){
+
                                 self.tableData.push(item);
                             }
                         }
@@ -403,6 +534,7 @@
                     } else{
                         self.tableData = res.data;
                     }
+
 
                     self.xxzloading = false;
 
@@ -488,6 +620,7 @@
                 this.$axios.post("/api/users/admin_ptq/6/6/",dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then((res)=>{
+
                     this.delVisible = false;
                     if (res.data.status == 1){
                         this.$message.success(res.data.message);
@@ -568,7 +701,8 @@
                 reader.onload = (event) => {
                     self.addForm.photo2 = event.target.result;
                     self.$uploadQiNiuYun.uploadqiniuyun(self.addForm.photo2,function (res,key) {
-                            self.addForm.photo2 = res;}),
+                        self.addForm.photo2 = res;
+                    }),
                     self.$refs.cropper && self.$refs.cropper.replace(event.target.result);
                 };
                 reader.readAsDataURL(file);
@@ -583,13 +717,109 @@
                 reader.onload = (event) => {
                     self.addForm.photo3 = event.target.result;
                     self.$uploadQiNiuYun.uploadqiniuyun(self.addForm.photo3,function (res,key) {
-                        self.addForm.photo3 = res;}),
+                        self.addForm.photo3 = res;
+                    }),
                     self.$refs.cropper && self.$refs.cropper.replace(event.target.result);
                 };
                 reader.readAsDataURL(file);
             },
 
-
+            setImage4(e){
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var self = this;
+                reader.onload = (event) => {
+                    self.addForm.photo4 = event.target.result;
+                    self.$uploadQiNiuYun.uploadqiniuyun(self.addForm.photo4,function (res,key) {
+                        self.addForm.photo4 = res;
+                    }),
+                    self.$refs.cropper && self.$refs.cropper.replace(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
+            setImage5(e){
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var self = this;
+                reader.onload = (event) => {
+                    self.addForm.photo5 = event.target.result;
+                    self.$uploadQiNiuYun.uploadqiniuyun(self.addForm.photo5,function (res,key) {
+                        self.addForm.photo5 = res;
+                    }),
+                    self.$refs.cropper && self.$refs.cropper.replace(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
+            setImage6(e){
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var self = this;
+                reader.onload = (event) => {
+                    self.addForm.photo6 = event.target.result;
+                    self.$uploadQiNiuYun.uploadqiniuyun(self.addForm.photo6,function (res,key) {
+                        self.addForm.photo6 = res;
+                    }),
+                    self.$refs.cropper && self.$refs.cropper.replace(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
+            setImage7(e){
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var self = this;
+                reader.onload = (event) => {
+                    self.addForm.photo7 = event.target.result;
+                    self.$uploadQiNiuYun.uploadqiniuyun(self.addForm.photo7,function (res,key) {
+                        self.addForm.photo7 = res;
+                    }),
+                    self.$refs.cropper && self.$refs.cropper.replace(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
+            setImage8(e){
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var self = this;
+                reader.onload = (event) => {
+                    self.addForm.photo8 = event.target.result;
+                    self.$uploadQiNiuYun.uploadqiniuyun(self.addForm.photo8,function (res,key) {
+                        self.addForm.photo8 = res;
+                    }),
+                    self.$refs.cropper && self.$refs.cropper.replace(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
+            setImage9(e){
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var self = this;
+                reader.onload = (event) => {
+                    self.addForm.photo9= event.target.result;
+                    self.$uploadQiNiuYun.uploadqiniuyun(self.addForm.photo9,function (res,key) {
+                        self.addForm.photo9 = res;
+                    }),
+                    self.$refs.cropper && self.$refs.cropper.replace(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
 
         }
     }
