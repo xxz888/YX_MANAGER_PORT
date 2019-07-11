@@ -2,6 +2,8 @@
     <div class="container" v-loading="xxzloading">
         <div style="width: 100%;text-align: right" >
             <el-button  type="success" icon="search" @click="addnews">新增晒图</el-button>
+            <el-button  type="danger" icon="search" @click="addwenZhang">新增文章</el-button>
+
         </div>
 
         <el-tabs v-model="activeName" @tab-click="handleClick">
@@ -20,11 +22,12 @@
                     <p style="margin-left: 10px;color:blue;">{{tab.tag}}</p>
                     <p style="margin-left: 10px">{{getLocalTime(tab.publish_time)}}</p>
                     <p style="margin-left: 10px">{{tab.publish_site}}</p>
+                    <p style="margin-left: 10px;color: purple;">{{tab.obj==1?'晒图':'文章'}}</p>
 
                 </template>
                 <div style="margin: 20px 20px"></div>
                 <div>{{tab.question?toChineseWords(tab.question):''}}</div>
-                <div>
+                <div v-if="tab.obj==1">
                     <img   :src="tab.url_list[0]"
                            class="image"
                            :onerror="defaultImg"
@@ -62,7 +65,10 @@
                             :onerror="defaultImg"
                     >
                 </div>
-                <div>评论数:{{tab.comment_number}} 点赞数:{{tab.praise_number?tab.praise_number:tab.answer_number}} </div>
+                <div v-if="tab.obj==2">
+                    <div v-html="tab.detail"></div>
+                </div>
+                <div>评论数:{{tab.comment_number}} 点赞数:{{tab.praise_number}} </div>
                 <div style="color:blue">标签:{{tab.tag}}  </div>
                 <div>时间:{{getLocalTime(tab.publish_time)}}</div>
                 <div>地点:{{tab.publish_site}}</div>
@@ -121,9 +127,6 @@
                     <el-button type="primary" @click="saveEdit">确 定</el-button>
                 </span>
         </el-dialog>
-
-
-
 
 
         <!-- 新增弹出框 -->
@@ -349,36 +352,35 @@
                 this.addForm.tag = this.tagSelectInput2.join(' ');
                 this.addForm.detail = this.toUnicodeWords(this.addForm.detail);
                 var url = 'http://photo.thegdlife.com/';
+                var list = [];
                 if (this.addForm.photo1.indexOf(url) != -1){
-                    this.addForm.photo1 = this.addForm.photo1.split(url)[1];
+                    list.push(this.addForm.photo1.split(url)[1]);
                 }
                 if (this.addForm.photo2.indexOf(url) != -1){
-                    this.addForm.photo2 = this.addForm.photo2.split(url)[1];
+                    list.push(this.addForm.photo2.split(url)[1]);
                 }
                 if (this.addForm.photo3.indexOf(url) != -1){
-                    this.addForm.photo3 = this.addForm.photo3.split(url)[1];
+                    list.push(this.addForm.photo3.split(url)[1]);
                 }
                 if (this.addForm.photo4.indexOf(url) != -1){
-                    this.addForm.photo4 = this.addForm.photo4.split(url)[1];
+                    list.push(this.addForm.photo4.split(url)[1]);
                 }
                 if (this.addForm.photo5.indexOf(url) != -1){
-                    this.addForm.photo5 = this.addForm.photo5.split(url)[1];
+                    list.push(this.addForm.photo5.split(url)[1]);
                 }
                 if (this.addForm.photo6.indexOf(url) != -1){
-                    this.addForm.photo6 = this.addForm.photo6.split(url)[1];
+                    list.push(this.addForm.photo6.split(url)[1]);
                 }
                 if (this.addForm.photo7.indexOf(url) != -1){
-                    this.addForm.photo7 = this.addForm.photo7.split(url)[1];
+                    list.push(this.addForm.photo7.split(url)[1]);
                 }
                 if (this.addForm.photo8.indexOf(url) != -1){
-                    this.addForm.photo8 = this.addForm.photo8.split(url)[1];
+                    list.push(this.addForm.photo8.split(url)[1]);
                 }
                 if (this.addForm.photo9.indexOf(url) != -1){
-                    this.addForm.photo9 = this.addForm.photo9.split(url)[1];
+                    list.push(this.addForm.photo9.split(url)[1]);
                 }
-                this.addForm.photo_list = this.addForm.photo1+ ','+this.addForm.photo2+','+this.addForm.photo3 +
-                    this.addForm.photo4+ ','+this.addForm.photo5+','+this.addForm.photo6+
-                    this.addForm.photo7+ ','+this.addForm.photo8+','+this.addForm.photo9;
+                this.addForm.photo_list = list.join(',');
                 this.$axios.post("/api/users/transpond/",this.addForm,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then((res)=>{
@@ -820,7 +822,15 @@
                 };
                 reader.readAsDataURL(file);
             },
-
+            addwenZhang(){
+                var t = this;
+                this.$router.push({
+                    path:'/UserAdminShaiTuWenZhang',
+                    query:{
+                        'form':t.form,
+                    }
+                })
+            },
         }
     }
 </script>

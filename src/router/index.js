@@ -17,6 +17,11 @@ export default new Router({
 
 
                 {
+                    path: '/UserAdminShaiTuWenZhang',
+                    component: resolve => require(['../components/page/UserAdminShaiTuWenZhang.vue'], resolve),
+                    meta: {title: '发布文章'}
+                },
+                {
                     path: '/HomeToolsDetail2',
                     component: resolve => require(['../components/page/HomeToolsDetail2.vue'], resolve),
                     meta: {title: '指南详情2'}
