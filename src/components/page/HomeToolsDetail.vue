@@ -7,7 +7,7 @@
             </div>
 
             <el-tabs v-model="activeName"  @tab-click="handleClick">
-                <el-tab-pane v-for = 'item in todo' :label="item.name" :name="item.name"></el-tab-pane>
+                <el-tab-pane v-for = 'item in todo' :label="item.name+item.id" :name="item.name"></el-tab-pane>
             </el-tabs>
             <div style="margin: 20px;"></div>
             <div class="handle-box">

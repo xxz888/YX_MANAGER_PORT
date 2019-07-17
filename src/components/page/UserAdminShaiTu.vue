@@ -12,6 +12,8 @@
         <el-collapse accordion>
             <el-collapse-item v-for="tab in tableData">
                 <template slot="title" >
+                    <p style="margin-left: 10px;margin-right: 10px">{{tab.id}}</p>
+
                     <img   :src="getPhoto(tab)"
                            style="width: 35px;height:35px;border-radius:50%"
                            :onerror="defaultImg"
