@@ -3,6 +3,7 @@ module.exports = {
     '@vue/app'
   ],
     plugins: [
+
         [
             "component",
             {
@@ -10,6 +11,6 @@ module.exports = {
                 "styleLibraryName": "theme-chalk"
             },
             "syntax-dynamic-import"
-        ]
+        ],
     ]
 }
