@@ -14,6 +14,7 @@
             <el-button type="danger"    @click="addObj3">添加图片</el-button>
             <el-button type="warning" @click="addObj4">添加轮播图</el-button>
             <el-button type="primary" @click="addObj5">添加小标题</el-button>
+            <el-button type="success" @click="addObj6">添加链接</el-button>
 
         <el-table
                     row-key="id"
@@ -62,7 +63,7 @@
                                 <input class="crop-input" type="file" name="image" accept="image/*" @change="setImageDetail($event,scope.$index)"/>
                             </div>
                         </div>
-                        <div      v-else>
+                        <div      v-if="scope.row.obj == 4" >
                             <el-row :gutter="5">
                                 <el-col style="margin-bottom: 5px" v-for="(item,indexTag) in scope.row.detail_list" :span="8">
                                     <div class="crop-demo">
@@ -74,6 +75,26 @@
                                 </el-col>
                             </el-row>
                         </div>
+                        <div   v-if="scope.row.obj == 6" >
+
+                            <el-menu   :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+                                <el-submenu v-for="(link1Item,link1Index) in linkDataArray" :index="parseInt(link1Index)" >
+                                    <template slot="title">{{link1Item.name}}</template>
+                                    <el-submenu v-for="(link2Item,link2Index) in link1Item.child_list" :index="link1Index + '-' + link2Index">
+                                        <template slot="title">{{link2Item.name}}</template>
+                                        <el-submenu v-for="(link3Item,link3Index) in link2Item.child_list" :index="link1Index + '-' + link2Index + '-' + link3Index">
+                                            <template slot="title">{{link3Item.name}}</template>
+                                            <el-menu-item v-for="(link4Item,link4Index) in link3Item.child_list" :index="link1Index + '-' + link2Index + '-' + link3Index + '-' + link4Index + '|' + scope.$index ">{{link4Item.name}}</el-menu-item>
+                                        </el-submenu>
+                                    </el-submenu>
+                                </el-submenu>
+                            </el-menu>
+
+                            <div class="line"></div>
+                            <div style="text-align: left;font-size: 16px;color: green;margin-top: 10px;margin-bottom: 10px">例子:Tabaco Negro Cubano,2,12-32-46-182;Cuban Black Tobacco,2,12-32-46-182</div>
+                            <el-input v-model="scope.row.detail"></el-input>
+                        </div>
+
                     </template>
                 </el-table-column>
 
@@ -144,7 +165,6 @@
                     @blur="handleInputConfirm"
             >
             </el-input>
-
             <el-button v-else class="button-new-tag" size="small" @click="showInput">+ New Tag</el-button>
         </el-dialog>
     </div>
@@ -205,7 +225,10 @@
                 inputValue:'',
                 inputVisible:false,
                 alertTableData:[],
-                currentWeight:''
+                currentWeight:'',
+                activeIndex: '1',
+                linkDataArray:[],
+
             }
         },
         created() {
@@ -223,8 +246,39 @@
         },
         mounted() {
              this.rowDrop();
+             this.requestLinkDataArray();
         },
         methods: {
+            requestLinkDataArray(){
+                var self = this;
+                var url = "/api/pub/all_option/";
+                this.$axios.get(url,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
+                    console.log(res);
+                    self.linkDataArray = res.data;
+                });
+            },
+
+
+            handleSelect(key, keyPath) {
+                var selectIndexArr = key.split('|')[0].split('-');
+                var dic1 = this.linkDataArray[selectIndexArr[0]];
+                var selectStr1 = dic1.id;
+
+                var dic2 = dic1.child_list[selectIndexArr[1]];
+                var selectStr2 = dic2.id;
+
+                var dic3 = dic2.child_list[selectIndexArr[2]];
+                var selectStr3 = dic3.id;
+
+                var dic4 = dic3.child_list[selectIndexArr[3]];
+                var selectStr4 = dic4.id;
+
+                var index = key.split('|')[1];
+                var allStr = selectStr1 + '-' + selectStr2 + '-' + selectStr3 + '-' + selectStr4;
+                this.alertTableData[index].detail = this.alertTableData[index].detail + allStr;
+
+            },
             //行拖拽
             rowDrop() {
                 const tbody = document.querySelector('.el-table__body-wrapper tbody');
@@ -282,6 +336,17 @@
                     'detail': "",
                     'id': '99999',
                     'obj':'1',
+                    'option_id': this.detailId,
+                    'weight': this.currentWeight
+                }
+                this.alertTableData.push(dic);
+            },
+            addObj6(){
+                this.jisuanMaxWeight();
+                var dic = {
+                    'detail': "",
+                    'id': '99999',
+                    'obj':'6',
                     'option_id': this.detailId,
                     'weight': this.currentWeight
                 }
@@ -518,8 +583,8 @@
             saveEdit(){
                 var self = this;
 
-                var boll1 =  this.form.photo.indexOf('http://photo.thegdlife.com') == -1;
-                var boll2 =  this.form.photo_detail.indexOf('http://photo.thegdlife.com') == -1;
+                var boll1 =  this.form.photo.indexOf('http://photo.lpszn.com') == -1;
+                var boll2 =  this.form.photo_detail.indexOf('http://photo.lpszn.com') == -1;
 
                 if (boll1 && !boll2){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.form.photo,function (res,key) {
@@ -778,7 +843,7 @@
                 })
             },
             objFormatter(data){
-                return data.obj == 1 ? '大标题' : data.obj == 2 ? '段落' : data.obj == 3 ? '图片' : data.obj == 4 ? '轮播图' : '小标题';
+                return data.obj == 1 ? '大标题' : data.obj == 2 ? '段落' : data.obj == 3 ? '图片' : data.obj == 4 ? '轮播图' : data.obj == 5 ? '小标题' : '链接';
             }
         },
     }

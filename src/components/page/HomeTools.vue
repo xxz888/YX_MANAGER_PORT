@@ -148,7 +148,7 @@
             },
             saveEdit(){
                 var self = this;
-                if (this.form.photo.indexOf('http://photo.thegdlife.com') == -1){
+                if (this.form.photo.indexOf('http://photo.lpszn.com') == -1){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.form.photo,function (res,key) {
                         self.form.photo = res;
                         self.saveEditAndAdd();

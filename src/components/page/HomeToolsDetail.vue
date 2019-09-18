@@ -353,8 +353,8 @@
                     return;
                 }
 
-                var boll1 =  this.form.photo.indexOf('http://photo.thegdlife.com') == -1 ;
-                var boll2 =  this.form.photo_detail.indexOf('http://photo.thegdlife.com') == -1 ;
+                var boll1 =  this.form.photo.indexOf('http://photo.lpszn.com') == -1 ;
+                var boll2 =  this.form.photo_detail.indexOf('http://photo.lpszn.com') == -1 ;
 
                 if (boll1 && !boll2){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.form.photo,function (res,key) {

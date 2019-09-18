@@ -3,13 +3,15 @@ import App from './App.vue'
 import router from './router'
 import axios from 'axios';
 import ElementUI from 'element-ui';
+
 import 'element-ui/lib/theme-chalk/index.css'; // 默认主题
-// import '../static/css/theme-green/index.css';       // 浅绿色主题
 import './assets/css/icon.css';
 import './components/common/directives';
+
 import "babel-polyfill";
 import upload_global from './router/upLoadQinNiuYun'
 Vue.prototype.$uploadQiNiuYun = upload_global;
+
 import 'kindeditor/kindeditor-all-min.js'
 import 'kindeditor/themes/default/default.css'
 import VueUeditorWrap from 'vue-ueditor-wrap' // ES6 Module

@@ -136,12 +136,12 @@
                     t.$message.warning('请上传图片');
                     return;
                 }
-                if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
+                if (this.imgSrc.indexOf('http://photo.lpszn.com') == -1){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
                         t.saveAndEditCommon(res,key);
                     })
                 }else{
-                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
+                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.lpszn.com/')[1]);
                 }
             },
             //新增和储存公共方法

@@ -154,12 +154,12 @@
                     t.$message.warning('内容字符超过5000');
                     return;
                 }
-                if (this.imgSrc.indexOf('http://photo.thegdlife.com') == -1){
+                if (this.imgSrc.indexOf('http://photo.lpszn.com') == -1){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.imgSrc,function (res,key) {
                         t.saveAndEditCommon(res,key);
                     })
                 }else{
-                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.thegdlife.com/')[1]);
+                    t.saveAndEditCommon(this.imgSrc,t.imgSrc.split('http://photo.lpszn.com/')[1]);
                 }
             },
             //取消按钮方法

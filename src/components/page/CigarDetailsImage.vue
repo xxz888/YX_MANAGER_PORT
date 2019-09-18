@@ -107,7 +107,7 @@
                 for (let i = 0 ; i <this.imgList1.length;i++){
                     var src = this.imgList1[i].file.src;
                     (function () {
-                        if (src.indexOf('http://photo.thegdlife.com') == -1){
+                        if (src.indexOf('http://photo.lpszn.com') == -1){
                             t.$uploadQiNiuYun.uploadqiniuyun(src,function (res,key) {
                                 t.B_Loading = false;
                                 var dic = {
@@ -209,7 +209,7 @@
                     'cigar_id':t.dic1.id,
                     'photo_url':t.imgList1[index].file.src,
                     'photo_id':t.imgList1[index].file.name,
-                    'qiniu_key':t.imgList1[index].file.src.split('http://photo.thegdlife.com/')[1],
+                    'qiniu_key':t.imgList1[index].file.src.split('http://photo.lpszn.com/')[1],
                     'type':3,           //操作类型(2/新增，3/删除)
                 };
                 t.$axios.post('/api/cigar/ad_cigar_photo_details/',dic,{headers:{
@@ -324,7 +324,7 @@
                 for (let i = 0 ; i <this.imgList.length;i++){
                     var src = this.imgList[i].file.src;
                     (function () {
-                        if (src.indexOf('http://photo.thegdlife.com') == -1){
+                        if (src.indexOf('http://photo.lpszn.com') == -1){
                             t.$uploadQiNiuYun.uploadqiniuyun(src,function (res,key) {
                                 t.B_Loading = false;
                                 var dic = {
@@ -426,7 +426,7 @@
                     'cigar_id':t.dic.id,
                     'photo_url':t.imgList[index].file.src,
                     'photo_id':t.imgList[index].file.name,
-                    'qiniu_key':t.imgList[index].file.src.split('http://photo.thegdlife.com/')[1],
+                    'qiniu_key':t.imgList[index].file.src.split('http://photo.lpszn.com/')[1],
                     'type':3,           //操作类型(2/新增，3/删除)
                 };
                 t.$axios.post('/api/cigar/ad_cigar_photo/',dic,{headers:{

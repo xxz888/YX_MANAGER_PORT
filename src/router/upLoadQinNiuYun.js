@@ -37,7 +37,7 @@ function uploadqiniuyun(params,fun) {
     };
     var putPolicy = new qiniu.rs.PutPolicy(options);
     var uploadToken=putPolicy.uploadToken(mac);
-            var addr = 'http://photo.thegdlife.com/'
+            var addr = 'http://photo.lpszn.com/'
             var file = blob_fileImg;
             var formData = new FormData();
             formData.append('file', file);

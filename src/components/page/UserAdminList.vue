@@ -183,7 +183,7 @@
             },
             saveEdit(){
                 var self = this;
-                if (this.formInline.photo.indexOf('http://photo.thegdlife.com') == -1){
+                if (this.formInline.photo.indexOf('http://photo.lpszn.com') == -1){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.formInline.photo,function (res,key) {
                         self.saveAndEditCommon(res);
                     })

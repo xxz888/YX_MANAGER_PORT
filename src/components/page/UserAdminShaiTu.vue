@@ -353,7 +353,7 @@
             saveAddContent(){
                 this.addForm.tag = this.tagSelectInput2.join(' ');
                 this.addForm.detail = this.toUnicodeWords(this.addForm.detail);
-                var url = 'http://photo.thegdlife.com/';
+                var url = 'http://photo.lpszn.com/';
                 var list = [];
                 if (this.addForm.photo1.indexOf(url) != -1){
                     list.push(this.addForm.photo1.split(url)[1]);

@@ -205,7 +205,7 @@
                     'is_show':'',
                     'intro':'',               //广告内容
                     'type':'3', //操作类型(1/修改，2/新增，3/删除)
-                    'qiniu_key':t.tableData[t.idx].photo.split('http://photo.thegdlife.com/')[1]                          //七牛key
+                    'qiniu_key':t.tableData[t.idx].photo.split('http://photo.lpszn.com/')[1]                          //七牛key
                 };
                 this.$axios.post('/api/cigar/ad_cigar_brand/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
