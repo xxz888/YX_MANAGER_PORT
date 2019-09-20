@@ -239,7 +239,7 @@
         display: block;
         position: absolute;
         left: 0;
-        top: 70px;
+        top: 0;
         bottom:0;
         overflow-y: scroll;
     }

@@ -4,22 +4,23 @@
     <div class="table">
         <div class="handle-box">
             <el-button type="primary" icon="search" @click="tagManager">标签管理</el-button>
-        </div>
-        <el-tabs v-model="activeName"  @tab-click="handleClick">
-            <el-tab-pane v-for = 'item in todo' :label="item.name" :name="item.name"></el-tab-pane>
-        </el-tabs>
-        <div style="margin: 20px;"></div>
-            <el-button type="primary" @click="addObj1">添加大标题</el-button>
+            <el-button style="margin-left: 200px" type="primary" @click="addObj1">添加大标题</el-button>
             <el-button type="success" @click="addObj2">添加段落</el-button>
             <el-button type="danger"    @click="addObj3">添加图片</el-button>
             <el-button type="warning" @click="addObj4">添加轮播图</el-button>
             <el-button type="primary" @click="addObj5">添加小标题</el-button>
             <el-button type="success" @click="addObj6">添加链接</el-button>
+        </div>
+        <el-tabs v-model="activeName"  @tab-click="handleClick">
+            <el-tab-pane v-for = 'item in todo' :label="item.name" :name="item.name"></el-tab-pane>
+        </el-tabs>
+        <div style="margin: 0px;"></div>
+
 
         <el-table
                     row-key="id"
                     :data="alertTableData"
-                    style="width: 100%;margin-top: 20px"
+                    style="width: 100%;margin-top: 0px"
                     tooltip-effect="dark"
                     border
                     class="table"
@@ -77,7 +78,7 @@
                         </div>
                         <div   v-if="scope.row.obj == 6" >
 
-                            <el-menu   :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
+                            <el-menu  style="margin-top: 0px" :default-active="activeIndex" class="el-menu-demo" mode="horizontal" @select="handleSelect">
                                 <el-submenu v-for="(link1Item,link1Index) in linkDataArray" :index="parseInt(link1Index)" >
                                     <template slot="title">{{link1Item.name}}</template>
                                     <el-submenu v-for="(link2Item,link2Index) in link1Item.child_list" :index="link1Index + '-' + link2Index">
@@ -90,8 +91,8 @@
                                 </el-submenu>
                             </el-menu>
 
-                            <div class="line"></div>
-                            <div style="text-align: left;font-size: 16px;color: green;margin-top: 10px;margin-bottom: 10px">例子:Tabaco Negro Cubano,2,12-32-46-182;Cuban Black Tobacco,2,12-32-46-182</div>
+                            <!--<div class="line"></div>-->
+                            <!--<div style="text-align: left;font-size: 16px;color: green;margin-top: 10px;margin-bottom: 10px">例子:Tabaco Negro Cubano,2,12-32-46-182;Cuban Black Tobacco,2,12-32-46-182</div>-->
                             <el-input v-model="scope.row.detail"></el-input>
                         </div>
 

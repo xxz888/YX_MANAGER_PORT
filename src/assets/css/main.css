@@ -20,12 +20,12 @@ a {
     text-decoration: none
 }
 
-
+/*内容高度70px*/
 .content-box {
     position: absolute;
     left: 150px;
     right: 0;
-    top: 70px;
+    top: 0;
     bottom: 0;
     padding-bottom: 30px;
     -webkit-transition: left .3s ease-in-out;
