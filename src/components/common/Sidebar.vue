@@ -78,24 +78,24 @@
                             }
                         ]
                     },
-                    {
-                        index: '4',
-                        title: '新闻相关',
-                        subs: [
-                            {
-                                index: 'HomeAdver',
-                                title: '广告列表'
-                            },
-                            {
-                                index: 'HomeInfo',
-                                title: '资讯列表'
-                            },
-                            {
-                                index: 'CigarAccessories',
-                                title: '文化'
-                            },
-                        ]
-                    },
+                    // {
+                    //     index: '4',
+                    //     title: '新闻相关',
+                    //     subs: [
+                    //         {
+                    //             index: 'HomeAdver',
+                    //             title: '广告列表'
+                    //         },
+                    //         {
+                    //             index: 'HomeInfo',
+                    //             title: '资讯列表'
+                    //         },
+                    //         {
+                    //             index: 'CigarAccessories',
+                    //             title: '文化'
+                    //         },
+                    //     ]
+                    // },
                     {
                         index: '5',
                         title: '发现相关',
@@ -118,21 +118,30 @@
                         index: 'HomeTools',
                         title: '工具指南'
                     },
-
                     {
                         index: '6',
-                        title: '配件',
+                        title: '积分商城',
                         subs: [
                             {
-                                index: 'CigarShop',
-                                title: '配件'
-                            },
-                            {
-                                index: 'CigarShopTags',
-                                title: '配件标签'
+                                index: 'ChouJiang1',
+                                title: '抽奖1'
                             },
                         ]
                     },
+                    // {
+                    //     index: '7',
+                    //     title: '配件',
+                    //     subs: [
+                    //         {
+                    //             index: 'CigarShop',
+                    //             title: '配件'
+                    //         },
+                    //         {
+                    //             index: 'CigarShopTags',
+                    //             title: '配件标签'
+                    //         },
+                    //     ]
+                    // },
 
 
 

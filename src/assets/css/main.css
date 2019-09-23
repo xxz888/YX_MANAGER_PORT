@@ -25,7 +25,7 @@ a {
     position: absolute;
     left: 150px;
     right: 0;
-    top: 0;
+    top: 70px;
     bottom: 0;
     padding-bottom: 30px;
     -webkit-transition: left .3s ease-in-out;
