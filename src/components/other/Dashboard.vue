@@ -6,8 +6,17 @@
                     <div class="user-info">
                         <img src="../../assets/logo.png" class="user-avator" alt="">
                         <div class="user-info-cont">
-                            <div class="user-info-name">{{name}}</div>
+                            <!-- 用户名下拉菜单 -->
+                            <el-dropdown class="user-name" trigger="click" @command="handleCommand">
+                                <span class="el-dropdown-link user-info-name">
+                                 {{name}} <i class="el-icon-caret-bottom"></i>
+                                </span>
+                                <el-dropdown-menu slot="dropdown">
+                                    <el-dropdown-item divided  command="loginout">退出登录</el-dropdown-item>
+                                </el-dropdown-menu>
+                            </el-dropdown>
                             <div>{{role}}</div>
+
                         </div>
                     </div>
                     <div class="user-info-list">本次登录时间：<span>{{currentTime}}</span></div>
@@ -119,6 +128,13 @@
             bus.$off('collapse', this.handleBus);
         },
         methods: {
+            // 用户名下拉菜单选择事件
+            handleCommand(command) {
+                if(command == 'loginout'){
+                    localStorage.removeItem('ms_username')
+                    this.$router.push('/login');
+                }
+            },
             changeDate(){
                 const now = new Date().getTime();
                 this.data.forEach((item, index) => {
