@@ -72,10 +72,10 @@
                                 index: 'UserAdminShaiTu',
                                 title: '晒图'
                             },
-                            {
-                                index: 'UserAdminWenDa',
-                                title: '问答'
-                            }
+                            // {
+                            //     index: 'UserAdminWenDa',
+                            //     title: '问答'
+                            // }
                         ]
                     },
                     // {

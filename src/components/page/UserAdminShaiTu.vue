@@ -7,7 +7,7 @@
         </div>
 
         <el-tabs v-model="activeName" @tab-click="handleClick">
-            <el-tab-pane label="晒图" name="1"></el-tab-pane>
+            <el-tab-pane label="全部" name="1"></el-tab-pane>
         </el-tabs>
         <el-collapse accordion>
             <el-collapse-item v-for="tab in tableData">
@@ -407,7 +407,7 @@
                 this.getUserData();
                 this.getFind_tag();
                 this.addForm = {
-                        url:'http://thegdlife.com:8001/users/post/',
+                        url:'http://lpszn.com/api/users/post/',
                         request_type:'post',
 
                     detail : "",
