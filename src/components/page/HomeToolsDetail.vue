@@ -390,7 +390,8 @@
                         'is_next':1,
                         'photo_detail':this.form.photo_detail,
                         'intro':this.form.intro,
-                        'weight':this.form.weight
+                        'weight':this.form.weight,
+                        'is_lock':'0'
                     };
                 }else{
                     dic = {
@@ -401,7 +402,8 @@
                         'option_id':this.form.option_id,
                         'photo_detail':this.form.photo_detail,
                         'intro':this.form.intro,
-                        'weight':this.form.weight
+                        'weight':this.form.weight,
+                        'is_lock':'0'
 
                     };
                 }
@@ -638,7 +640,8 @@
                         'is_next':1,
                         'photo_detail':'',
                         'intro':'',
-                        'weight':0
+                        'weight':0,
+                        'is_lock':'0'
                     };
                     this.allEditAndNewAddCommonAction(dic);
 

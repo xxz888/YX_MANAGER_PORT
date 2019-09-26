@@ -14,6 +14,7 @@
                 <template slot="title" >
                     <p style="margin-left: 10px;margin-right: 10px">{{tab.id}}</p>
 
+                    <p style="margin-left: 10px;color: blue;">{{tab.is_selection==1?'【精】':''}}</p>
                     <img   :src="getPhoto(tab)"
                            style="width: 35px;height:35px;border-radius:50%"
                            :onerror="defaultImg"
@@ -24,48 +25,26 @@
                     <p style="margin-left: 10px;color:blue;">{{tab.tag}}</p>
                     <p style="margin-left: 10px">{{getLocalTime(tab.publish_time)}}</p>
                     <p style="margin-left: 10px">{{tab.publish_site}}</p>
-                    <p style="margin-left: 10px;color: purple;">{{tab.obj==1?'晒图':'文章'}}</p>
+                    <p style="margin-left: 10px;color: purple;">
+                        {{tab.photo_list.indexOf('_Video_') != -1 ? '视频' : tab.obj==1?'晒图': '文章'}}</p>
 
                 </template>
                 <div style="margin: 20px 20px"></div>
                 <div>{{tab.question?toChineseWords(tab.question):''}}</div>
                 <div v-if="tab.obj==1">
-                    <img   :src="tab.url_list[0]"
+                    <img
+                            v-if="tab.photo_list.indexOf('_Video_') == -1"
                            class="image"
                            :onerror="defaultImg"
-                    >
-                    <img   :src="tab.url_list[1]"
-                           class="image"
-                           :onerror="defaultImg"
-                    >
-                    <img    :src="tab.url_list[2]"
-                            class="image"
-                            :onerror="defaultImg"
-                    >
-                    <img   :src="tab.url_list[3]"
-                           class="image"
-                           :onerror="defaultImg"
-                    >
-                    <img   :src="tab.url_list[4]"
-                           class="image"
-                           :onerror="defaultImg"
-                    >
-                    <img    :src="tab.url_list[5]"
-                            class="image"
-                            :onerror="defaultImg"
-                    >
-                    <img   :src="tab.url_list[6]"
-                           class="image"
-                           :onerror="defaultImg"
-                    >
-                    <img   :src="tab.url_list[7]"
-                           class="image"
-                           :onerror="defaultImg"
-                    >
-                    <img    :src="tab.url_list[8]"
-                            class="image"
-                            :onerror="defaultImg"
-                    >
+                           v-for="imgItem in tab.url_list"
+                           :src="imgItem">
+
+                    <video-player v-else
+                                   class="video-player vjs-custom-skin"
+                                   ref="videoPlayer"
+                                   :playsinline="true"
+                                   :options="playerOptions"
+                    ></video-player>
                 </div>
                 <div v-if="tab.obj==2">
                     <div v-html="tab.detail"></div>
@@ -88,6 +67,8 @@
                 <div  style="text-align: right;width: 100%">
                     <el-button @click="editAction(tab)" type="primary" icon="el-icon-edit" circle></el-button>
                     <el-button @click="delAction(tab)"type="danger" icon="el-icon-delete" circle></el-button>
+                    <el-button v-if="tab.is_selection !=1 " @click="jiaJingAction(tab)" type="success" icon="el-icon-star-on" circle></el-button>
+
                 </div>
             </el-collapse-item>
         </el-collapse>
@@ -289,10 +270,39 @@
 </template>
 
 <script>
+    // 2.组件内引用
+    import { videoPlayer } from 'vue-video-player'
+    import 'video.js/dist/video-js.css'
     export default {
+        components: {
+            videoPlayer
+        },
         name: "UserAdminShaiTu",
         data() {
             return {
+                playerOptions : {
+                    playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
+                    autoplay: false, //如果true,浏览器准备好时开始回放。
+                    muted: false, // 默认情况下将会消除任何音频。
+                    loop: false, // 导致视频一结束就重新开始。
+                    preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+                    language: 'zh-CN',
+                    aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+                    fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+                    sources: [{
+                        src: 'http://photo.lpszn.com/50_Video_1569479851000.mp4',  // 路径
+                        type: 'video/mp4'  // 类型
+                    }],
+                    poster: "http://photo.lpszn.com/50_image_15694798520000.png", //你的封面地址
+                    // width: document.documentElement.clientWidth,
+                    notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+                    controlBar: {
+                        timeDivider: true,
+                        durationDisplay: true,
+                        remainingTimeDisplay: false,
+                        fullscreenToggle: true  //全屏按钮
+                    }
+                },
                 defaultImg:'this.src="' + require('../../assets/img_moren.png') + '"',
                 activeName: '1',
                 checked: true,
@@ -341,6 +351,7 @@
                     photo_list:"",
                     cover:"",
                 },
+
             };
         },
         created(){
@@ -350,6 +361,30 @@
             '$route':'getParams'
         },
         methods: {
+            jiaJingAction(tab){
+
+                this.$alert( '是否加精', {
+                    confirmButtonText: '确定',
+                    callback: action => {
+                        var post_id = tab.id;
+                        var type = tab.obj == 1 ? 1 : 2;
+                        if ((tab.url_list[0]).indexOf("_Video_")!=-1){
+                            type = 2;
+                        }
+                        var url = "/api/users/selection_post/?post_id=" + post_id + "&type=" + type;
+                        this.$axios.get(url,{headers:{
+                                "Authorization":"JWT " + localStorage.getItem('token')
+                            }}).then((res)=>{
+                            if (res.data.status == 1){
+                                this.$message.success(res.data.message);
+                                this.getData();
+                            } else {
+                                this.$message.warning(res.data.message);
+                            }
+                        })
+                    }
+                });
+            },
             saveAddContent(){
                 this.addForm.tag = this.tagSelectInput2.join(' ');
                 this.addForm.detail = this.toUnicodeWords(this.addForm.detail);

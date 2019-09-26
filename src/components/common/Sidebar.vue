@@ -70,7 +70,7 @@
                             },
                             {
                                 index: 'UserAdminShaiTu',
-                                title: '晒图'
+                                title: '发现'
                             },
                             // {
                             //     index: 'UserAdminWenDa',

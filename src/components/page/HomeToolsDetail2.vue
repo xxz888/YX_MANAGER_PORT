@@ -12,7 +12,9 @@
             <el-button type="success" @click="addObj6">添加链接</el-button>
         </div>
         <el-tabs v-model="activeName"  @tab-click="handleClick">
-            <el-tab-pane v-for = 'item in todo' :label="item.name" :name="item.name"></el-tab-pane>
+            <el-tab-pane  v-for = '(item,index) in todo' >
+                <span slot="label"><i v-if="item.is_lock==1" class="el-icon-goods"></i> {{item.name}}</span>
+            </el-tab-pane>
         </el-tabs>
         <div style="margin: 0px;"></div>
 
@@ -119,6 +121,9 @@
                 <el-form-item style="width: 80%;" label="权重">
                     <el-input  placeholder="请输入权重" v-model="form.weight"></el-input>
                 </el-form-item>
+                <el-form-item style="width: 80%;" label="加锁">
+                    <el-input  placeholder="0不加锁、1加锁" v-model="form.is_lock"></el-input>
+                </el-form-item>
                 <el-form-item style="width: 50%;" label="显示图片">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
@@ -182,6 +187,7 @@
         },
         data() {
             return {
+                activeName: 0,
                 alertLoading:false,
                 tableData: [],
                 cur_page: 1,
@@ -198,7 +204,8 @@
                     photo: '',
                     intro:'',
                     photo_detail:'',
-                    weight:''
+                    weight:'',
+                    is_lock:''
                 },
                 idx: -1,
                 alertIdx:-1,
@@ -315,7 +322,13 @@
                 var self = this;
                 this.$axios.get("/api/pub/option/2/"+this.detailId+'/',{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
-                    setTimeout(function () {self.alertTableData = res.data;self.alertLoading = false;}, 1000);
+                            if (res.data.status){
+                                setTimeout(function () {self.alertTableData = [];self.alertLoading = false;}, 0);
+
+                            } else{
+                                setTimeout(function () {self.alertTableData = res.data;self.alertLoading = false;}, 0);
+
+                            }
                 });
             },
             jisuanMaxWeight(){
@@ -576,7 +589,8 @@
                     'photo':'',
                     'action':1,
                     'father_id':this.father_id,
-                    'is_next':1
+                    'is_next':1,
+                    'is_lock':'0'
                 }
                 this.dialogTitle = '新增';
                 this.editVisible=true;
@@ -621,7 +635,8 @@
                         'is_next':1,
                         'photo_detail':this.form.photo_detail,
                         'intro':this.form.intro,
-                        'weight':this.form.weight
+                        'weight':this.form.weight,
+                        'is_lock':this.form.is_lock
                     };
                 }else{
                     dic = {
@@ -632,7 +647,8 @@
                         'option_id':this.form.option_id,
                         'photo_detail':this.form.photo_detail,
                         'intro':this.form.intro,
-                        'weight':this.form.weight
+                        'weight':this.form.weight,
+                        'is_lock':this.form.is_lock
                     };
                 }
 
@@ -741,12 +757,12 @@
             },
             //tab切换
             handleClick(tab, event) {
-                var string = event.target.getAttribute('id').split('-')[1];
-                for (var i = 0 ; i < this.todo.length ; i ++){
-                    if (string == this.todo[i].name){
-                        this.detailId = this.todo[i].id;
-                    }
-                }
+                // var string = event.target.getAttribute('id').split('-')[1];
+                // for (var i = 0 ; i < this.todo.length ; i ++){
+                //     if (string == this.todo[tab.index].name){
+                        this.detailId = this.todo[tab.index].id;
+                //     }
+                // }
                 this.alertTableCommonRequest();
             },
             handleSelectionChange(val) {
@@ -822,7 +838,8 @@
                         'is_next':1,
                         'photo_detail':'',
                         'intro':'',
-                        'weight':0
+                        'weight':0,
+                        'is_lock':'0'
                     };
                     this.allEditAndNewAddCommonAction(dic);
 

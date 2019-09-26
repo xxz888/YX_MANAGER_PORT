@@ -1,6 +1,9 @@
 
         <template>
             <div>
+
+
+
                 <el-form  :inline="true" :model="formInline" class="demo-form-inline">
                     <el-row>
                         <el-col :span="3">
@@ -72,7 +75,7 @@
                     <el-table-column prop="photo" label="头像" align="center" width="50">
                         <!-- 图片的显示 -->
                         <template  slot-scope="scope">
-                            <img :src="scope.row.photo"
+                            <img :src="getImgUrl(scope.row.photo)"
                                  :onerror="defaultImg"
                                   style="width: 35px;height:35px;border-radius:50%" class="pre-img"/>
                         </template>
@@ -214,6 +217,15 @@
                     this.getData();
                 },
                 methods: {
+                    newYunYingUser(){
+
+                    },
+                    getImgUrl(key){
+                        if (key && key!='' && key.indexOf('base64')==-1 && key.indexOf(this.$QiNiuUrl)==-1){
+                            return this.$QiNiuUrl + key;
+                        }
+                        return key;
+                    },
                     birthdayFormatter(val){
                         if (val.birthday == '(null)'){
                             return ''

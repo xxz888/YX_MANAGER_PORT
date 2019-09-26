@@ -178,7 +178,8 @@
                         'is_next':1,
                         'option_id':this.form.option_id,
                         'photo_detail':'',
-                        'intro':''
+                        'intro':'',
+                        'is_lock':'0'
                     };
                 }
 

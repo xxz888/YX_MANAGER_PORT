@@ -1,5 +1,8 @@
 <template>
     <div>
+
+        <el-button style="margin-bottom: 20px" type="primary" @click="newYunYingUser">新建运营用户</el-button>
+
         <el-table
                 :data="tableData"
                 border
@@ -10,10 +13,10 @@
                     label="序号"
                     width="50">
             </el-table-column>
-            <el-table-column prop="photo" label="头像" align="center" width="50">
+            <el-table-column prop="photo" label="头像" align="center" width="70">
                 <!-- 图片的显示 -->
                 <template  slot-scope="scope">
-                    <img :src="scope.row.photo"
+                    <img :src="getImgUrl(scope.row.photo)"
                          :onerror="defaultImg"
                          style="width: 35px;height:35px;border-radius:50%" class="pre-img"/>
                 </template>
@@ -101,11 +104,14 @@
                     <el-input v-model="formInline.site" placeholder="地址"></el-input>
                 </el-form-item>
 
+                <el-form-item style="width: 50%;" label="个性签名">
+                    <el-input v-model="formInline.character" placeholder="个性签名"></el-input>
+                </el-form-item>
 
                 <el-form-item style="width: 50%;" label="头像">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
-                            <img :src="formInline.photo"  class="pre-img" width="100" height="70" >
+                            <img :src="getImgUrl(formInline.photo)"  class="pre-img" >
                             <div class="crop-demo-btn">选择图片
                                 <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
                             </div>
@@ -137,6 +143,7 @@
                     photo:'',
                     birthday:'',
                     site:'',
+                    character:''
                 },
                 form: {
                     birthday: '',
@@ -167,6 +174,24 @@
             this.getData();
         },
         methods: {
+            newYunYingUser(){
+                this.formInline = {
+                    user_id:'',
+                    username: '',
+                    gender: '',
+                    photo:'',
+                    birthday:'',
+                    site:'',
+                    character:''
+                };
+                this.editVisible = true;
+            },
+            getImgUrl(key){
+                if (key && key!='' && key.indexOf('base64')==-1 && key.indexOf(this.$QiNiuUrl)==-1){
+                    return this.$QiNiuUrl + key;
+                }
+                return key;
+            },
             //封面图片
             setImage(e){
                 const file = e.target.files[0];
@@ -183,7 +208,7 @@
             },
             saveEdit(){
                 var self = this;
-                if (this.formInline.photo.indexOf('http://photo.lpszn.com') == -1){
+                if (this.formInline.photo.indexOf("_image_") == -1){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.formInline.photo,function (res,key) {
                         self.saveAndEditCommon(res);
                     })
@@ -193,17 +218,22 @@
             },
             saveAndEditCommon(photo){
 
-                var self = this;
-                this.formInline.photo = photo;
-                this.formInline.gender =
+                    var self = this;
+                    this.formInline.photo = photo;
+                    this.formInline.gender =
                     this.formInline.gender == '男' ? '1' :
                     this.formInline.gender == '女' ? '0' : this.formInline.gender;
 
-                            this.$axios.post('/api/users/admin_user/',this.formInline,{headers:{
+                this.formInline.photo = this.formInline.photo.indexOf(this.$QiNiuUrl)==-1 ? this.formInline.photo : this.formInline.photo.split(this.$QiNiuUrl)[1];
+
+
+
+                var url = this.formInline.user_id ?  "/api/users/admin_user/" : "/api/users/admin_register/"
+                   this.$axios.post(url,this.formInline,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
 
-                    if (this.formInline.mobile == localStorage.getItem('token')) {
+                    if (self.formInline.mobile == localStorage.getItem('token')) {
                         localStorage.setItem('token',res.data.token);
                     }
                     self.$message.success(res.data.message);
@@ -249,7 +279,7 @@
                 this.formInline.birthday = item.birthday;
                 this.formInline.site = item.site;
                 this.formInline.gender = item.gender==0?"女":"男";
-
+                this.formInline.character = item.character;
 
                 this.editVisible = true;
             },
