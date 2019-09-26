@@ -62,15 +62,15 @@
                     },
                     {
                         index: '3',
-                        title: '管理相关',
+                        title: '管理运营',
                         subs: [
                             {
                                 index: 'UserAdminList',
-                                title: '列表'
+                                title: '管运列表'
                             },
                             {
                                 index: 'UserAdminShaiTu',
-                                title: '发现'
+                                title: '发现列表'
                             },
                             // {
                             //     index: 'UserAdminWenDa',
