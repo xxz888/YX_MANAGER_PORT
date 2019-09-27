@@ -13,13 +13,17 @@
                       border  class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
-                <el-table-column prop="name" label="NAME"  width="150" align="center">
-                </el-table-column>
-                <el-table-column prop="photo" label="展示图" align="center" width="300">
+                <el-table-column prop="photo" label="展示图" align="center" width="150">
                     <!-- 图片的显示 -->
                     <template  slot-scope="scope">
-                        <img :src="getImgUrl(scope.row.photo)"  width="150" height="100" class="pre-img1"/>
+                        <img :src="getImgUrl(scope.row.photo)"  width="200" height="100" class="pre-img"/>
                     </template>
+                </el-table-column>
+                <el-table-column prop="name" label="分类(商品)名"  width="250" align="center">
+                </el-table-column>
+                <el-table-column prop="label" label="标签"  width="100" align="center">
+                </el-table-column>
+                <el-table-column prop="weight" label="权重"  width="100" align="center">
                 </el-table-column>
                 <el-table-column label="操作" width="250" align="center">
                     <template slot-scope="scope">
@@ -44,14 +48,19 @@
         <!-- 编辑弹出框 -->
         <el-dialog :title="dialogTitle" :close-on-click-modal="false" :visible.sync="editVisible" width="70%">
             <el-form label-width="100px" label-height = auto :model="form">
-                <el-form-item style="width: 50%;" label="NAME">
+                <el-form-item style="width: 50%;" label="商品名称">
                     <el-input placeholder="请输入名称" v-model="form.name"></el-input>
                 </el-form-item>
-
+                <el-form-item style="width: 50%;" label="标签">
+                    <el-input placeholder="请输入标签" v-model="form.label"></el-input>
+                </el-form-item>
+                <el-form-item style="width: 50%;" label="权重">
+                    <el-input placeholder="请输入权重" v-model="form.weight"></el-input>
+                </el-form-item>
                 <el-form-item style="width: 50%;" label="显示图">
                     <template  slot-scope="scope">
                         <div class="crop-demo">
-                            <img :src="getImgUrl(form.photo)"  class="pre-img" width="100" height="70" >
+                            <img :src="getImgUrl(form.photo)"  class="pre-img" width="70" height="70" >
                             <div class="crop-demo-btn">选择图片
                                 <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
                             </div>
@@ -77,31 +86,19 @@
                 tableData: [],
                 cur_page: 1,
                 multipleSelection: [],
-                select_cate: '',
-                select_word: '',
-                del_list: [],
-                is_search: false,
                 editVisible: false,
                 delVisible: false,
-                form: {
-                    id: '',
-                    name: '',
-                    photo: '',
-                },
-                idx: -1,
-                fileList: [],
-                imgSrc: '',
-                cropImg: '',
                 dialogVisible: false,
-                checked:'',
-                base64Array:[],
-                tab_index:'',
-                count:'',
-                content:'',
-                todo:[],
+                dialogTitle:'',
                 currentPage:1,
-                type:'',
-                dialogTitle:''
+                form : {
+                'type':'1',
+                'name':'',
+                'label':'',
+                'photo':'',
+                'weight':'',
+                'commodify_id':'',
+                }
             }
         },
         created() {
@@ -139,19 +136,19 @@
             //增加按钮，弹出框
             addnews(){
                 this.form = {
-                    'id':'',
+                    'type':'1',
                     'name':'',
+                    'label':'',
                     'photo':'',
-                    'action':1,
-                    'father_id':'0',
-                    'is_next':1
+                    'weight':'',
+                    'commodify_id':'0',
                 }
                 this.dialogTitle = '新增';
                 this.editVisible=true;
             },
             saveEdit(){
                 var self = this;
-                if (this.form.photo.indexOf(this.$QiNiuUrl) == -1 ){
+                if (this.form.photo.indexOf(this.$QiNiuUrl) == -1 && this.form.photo.indexOf("_image_") == -1){
                     this.$uploadQiNiuYun.uploadqiniuyun(this.form.photo,function (res,key) {
                         self.form.photo = res;
                         self.saveEditAndAdd();
@@ -163,34 +160,30 @@
             },
             saveEditAndAdd(){
                 var dic;
-                if (this.form.father_id){
+                var id =  this.form.id;
+                if (id && id.length!=0){
                     dic = {
-                        'action':this.form.action,
-                        'father_id':this.form.father_id,
+                        'type':'3',
+                        'classify_id':this.form.id,
                         'name':this.form.name,
+                        'label':this.form.label,
                         'photo':this.form.photo.indexOf(this.$QiNiuUrl)==-1?this.form.photo:this.form.photo.split(this.$QiNiuUrl)[1],
-                        'is_next':1,
-                        'photo_detail':'',
-                        'intro':'',
-                        'weight':'1'
+                        'weight':this.form.weight,
+                        'commodify_id':'0',
                     };
                 }else{
                     dic = {
-                        'action':this.form.action,
+                        'type':'1',
                         'name':this.form.name,
+                        'label':this.form.label,
                         'photo':this.form.photo.indexOf(this.$QiNiuUrl)==-1?this.form.photo:this.form.photo.split(this.$QiNiuUrl)[1],
-                        'is_next':1,
-                        'option_id':this.form.option_id,
-                        'photo_detail':'',
-                        'intro':'',
-                        'is_lock':'0',
-                        'weight':'1'
-
+                        'weight':this.form.weight,
+                        'commodify_id':'0',
                     };
                 }
 
                 var self = this;
-                this.$axios.post("/api/pub/option/6/6/",dic,{headers:{
+                this.$axios.post("/api/shop/integral_classify/",dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then((res)=>{
                     if (res.data.status == 1){
@@ -213,10 +206,10 @@
                     type: 'warning'
                 }).then(() => {
                     var dic = {
-                        'action':2,
-                        'option_id':item.id,
+                        'type':'2',
+                        'classify_id':item.id,
                     };
-                    self.$axios.post("/api/pub/option/6/6/",dic,{headers:{
+                    self.$axios.post("/api/shop/integral_classify/",dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then((res)=>{
                         if (res.data.status == 1){
@@ -253,25 +246,18 @@
             //请求
             getData() {
                 var self = this;
-                this.$axios.get("/api/pub/option/1/0/",{headers:{
+                this.$axios.get("/api/shop/integral_classify/",{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
-                    self.tableData = res.data;
+                    self.tableData = res.data.data;
                 });
             },
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
-            getLocalTime(nS) {
-                return new Date(parseInt(nS) * 1000).toLocaleString().replace(/年|月/g, "-").replace(/日/g, " ");
-            },
-            data_formatter(value){
-                return this.getLocalTime(value.date);
-            },
 
 
 
-
-    },
+        },
     }
 
 </script>
@@ -281,18 +267,6 @@
         margin-bottom: 20px;
     }
 
-    .handle-select {
-        width: 120px;
-    }
-
-    .handle-input {
-        width: 300px;
-        display: inline-block;
-    }
-    .del-dialog-cnt{
-        font-size: 16px;
-        text-align: center
-    }
     .table{
         width: 100%;
         font-size: 14px;
@@ -303,9 +277,6 @@
     }
     .green{
         color: #58B92D;
-    }
-    .mr10{
-        margin-right: 10px;
     }
     .crop-demo{
         display: flex;
@@ -335,7 +306,7 @@
     }
 
     .pre-img{
-        width: 200px;
+        width: 100px;
         height: 100px;
         background: #f8f8f8;
         border: 1px solid #eee;

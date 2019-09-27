@@ -711,12 +711,18 @@
             },
             getPhoto(tab){
                 if (tab.photo){
-                    return tab.photo;
+                    return this.getImgUrl(tab.photo);
                 }
                 if (tab.user_photo){
-                    return tab.user_photo;
+                    return this.getImgUrl(tab.user_photo);
                 }
                 return '';
+            },
+            getImgUrl(key){
+                if (key && key!='' && key.indexOf('base64')==-1 && key.indexOf(this.$QiNiuUrl)==-1){
+                    return this.$QiNiuUrl + key;
+                }
+                return key;
             },
             setImage1(e){
                 const file = e.target.files[0];

@@ -11,14 +11,10 @@ import './components/common/directives';
 import "babel-polyfill";
 import upload_global from './router/upLoadQinNiuYun'
 Vue.prototype.$uploadQiNiuYun = upload_global;
+Vue.prototype.$getImgUrl = upload_global;
 
-import 'kindeditor/kindeditor-all-min.js'
-import 'kindeditor/themes/default/default.css'
-import VueUeditorWrap from 'vue-ueditor-wrap' // ES6 Module
-Vue.use(VueUeditorWrap);
+
 Vue.config.productionTip = false
-/* eslint-disable no-new */
-
 Vue.use(ElementUI, {
     size: 'small'
 });

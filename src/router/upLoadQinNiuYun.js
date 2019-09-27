@@ -58,6 +58,18 @@ function uploadqiniuyun(params,fun) {
             });
 
 };
+
+function getImgUrl(key,fun){
+    var resultUrl = '';
+    if (key && key!='' && key.indexOf('base64')==-1 && key.indexOf('http://photo.lpszn.com/')==-1){
+        resultUrl = 'http://photo.lpszn.com/' + key;
+    }else{
+        resultUrl = key;
+    }
+    fun(resultUrl);
+};
+
 export default {
-    uploadqiniuyun
+    uploadqiniuyun,
+    getImgUrl
 }

@@ -62,7 +62,6 @@
                 <div class="upload">
                     <div class="upload_warp">
                         <div class="upload_warp_left" @click="fileClick">
-                            <img src="../../assets/img/upload.png">
                         </div>
                         <div class="upload_warp_right" @drop="drop($event)" @dragenter="dragenter($event)" @dragover="dragover($event)">
                             或者将文件拖到此处
@@ -78,7 +77,7 @@
                                 <div class="upload_warp_img_div_text">
                                     {{item.file.name}}
                                 </div>
-                                <img src="../../assets/img/del.png" class="upload_warp_img_div_del" @click="fileDel(index)">
+                                <img  class="upload_warp_img_div_del" @click="fileDel(index)">
                             </div>
                             <img :src="item.file.src">
                         </div>

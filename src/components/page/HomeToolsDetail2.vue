@@ -177,14 +177,11 @@
 </template>
 
 <script>
-    import VueUeditorWrap from 'vue-ueditor-wrap' // ES6 Module
     import Sortable from 'sortablejs'
 
     export default {
         name: 'HomeToolsDetail2',
-        components: {
-            VueUeditorWrap
-        },
+
         data() {
             return {
                 activeName: 0,

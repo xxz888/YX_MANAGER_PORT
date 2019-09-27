@@ -35,23 +35,14 @@
 </template>
 
 <script>
-    import VueUeditorWrap from 'vue-ueditor-wrap' // ES6 Module
 
     export default {
         name: "CigarAccessories_Edit",
-        components: {
-            VueUeditorWrap
-        },
+
         data(){
             return{
                 form:{},
-                myConfig: {
-                    // 编辑器不自动被内容撑高
-                    autoHeightEnabled: true,
-                    serverUrl: 'http://35.201.165.105:8000/controller.php',
-                    UEDITOR_HOME_URL: "/UEditor/",
-                    initialFrameWidth: '100%',
-                },
+
                 idx: -1,
                 fileList: [],
                 imgSrc: '',

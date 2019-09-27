@@ -46,20 +46,20 @@
                         index: 'UserList',
                         title: '用户列表'
                     },
-                    {
-                        index: '2',
-                        title: '雪茄相关',
-                        subs: [
-                            {
-                                index: 'CigarInfo',
-                                title: '雪茄品牌'
-                            },
-                            {
-                                index: 'CigarBrandSite',
-                                title: '产地名称'
-                            },
-                        ]
-                    },
+                    // {
+                    //     index: '2',
+                    //     title: '雪茄相关',
+                    //     subs: [
+                    //         {
+                    //             index: 'CigarInfo',
+                    //             title: '雪茄品牌'
+                    //         },
+                    //         {
+                    //             index: 'CigarBrandSite',
+                    //             title: '产地名称'
+                    //         },
+                    //     ]
+                    // },
                     {
                         index: '3',
                         title: '管理运营',
@@ -67,10 +67,6 @@
                             {
                                 index: 'UserAdminList',
                                 title: '管运列表'
-                            },
-                            {
-                                index: 'UserAdminShaiTu',
-                                title: '发现列表'
                             },
                             // {
                             //     index: 'UserAdminWenDa',
@@ -101,13 +97,14 @@
                         title: '发现相关',
                         subs: [
                             {
+                                index: 'UserAdminShaiTu',
+                                title: '发现列表'
+                            },
+                            {
                                 index: 'UsersFindTag',
                                 title: '发现标签'
                             },
-                            {
-                                index: 'UsersFindContent',
-                                title: '发现内容'
-                            },
+
                             {
                                 index: 'MoreTagList',
                                 title: '更多标签'
@@ -125,6 +122,10 @@
                             {
                                 index: 'ChouJiang1',
                                 title: '抽奖1'
+                            },
+                            {
+                                index: 'JiFenShop',
+                                title: '积分商城'
                             },
                         ]
                     },

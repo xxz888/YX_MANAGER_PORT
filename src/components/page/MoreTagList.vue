@@ -45,13 +45,10 @@
 </template>
 
 <script>
-    import VueUeditorWrap from 'vue-ueditor-wrap' // ES6 Module
 
     export default {
         name: 'MoreTagList',
-        components: {
-            VueUeditorWrap
-        },
+
         data() {
             return {
                 tableData: [],

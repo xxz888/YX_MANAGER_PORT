@@ -1,9 +1,9 @@
+// 修改babel.config.js
 module.exports = {
-  presets: [
-    '@vue/app'
-  ],
-    plugins: [
-
+    "presets": [
+        "@vue/app"
+    ],
+    "plugins": [
         [
             "component",
             {
@@ -11,6 +11,6 @@ module.exports = {
                 "styleLibraryName": "theme-chalk"
             },
             "syntax-dynamic-import"
-        ],
+        ]
     ]
 }
