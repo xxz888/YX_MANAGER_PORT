@@ -13,12 +13,12 @@
                     label="序号"
                     width="50">
             </el-table-column>
-            <el-table-column prop="photo" label="头像" align="center" width="70">
+            <el-table-column prop="photo" label="头像" align="center" width="80">
                 <!-- 图片的显示 -->
                 <template  slot-scope="scope">
                     <img :src="getImgUrl(scope.row.photo)"
                          :onerror="defaultImg"
-                         style="width: 35px;height:35px;border-radius:50%" class="pre-img"/>
+                         style="width: 50px;height:50px;border-radius:50%" class="pre-img"/>
                 </template>
             </el-table-column>
             <el-table-column

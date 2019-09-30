@@ -169,7 +169,7 @@
                         'label':this.form.label,
                         'photo':this.form.photo.indexOf(this.$QiNiuUrl)==-1?this.form.photo:this.form.photo.split(this.$QiNiuUrl)[1],
                         'weight':this.form.weight,
-                        'commodify_id':'0',
+                        'commodify_id':'1',
                     };
                 }else{
                     dic = {
@@ -224,9 +224,11 @@
             handleDetail(index, row){
                 this.idx = index;
                 const item = this.tableData[index];
-                localStorage.setItem('xxzTools',item.id);
                 this.$router.push({
-                    path:'/HomeToolsDetail',
+                    path:'/JiFenShopDetail',
+                    query:{
+                        'id':item.id,
+                    }
                 })
             },
             //封面图片

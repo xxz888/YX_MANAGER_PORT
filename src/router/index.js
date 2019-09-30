@@ -26,12 +26,16 @@ export default new Router({
                     component: resolve => require(['../components/shopping/JiFenShop.vue'], resolve),
                     meta: {title: '积分商城'}
                 },
-
-                // {
-                //     path: '/UserAdminShaiTuWenZhang',
-                //     component: resolve => require(['../components/page/UserAdminShaiTuWenZhang.vue'], resolve),
-                //     meta: {title: '发布文章'}
-                // },
+                {
+                    path: '/JiFenShopDetail',
+                    component: resolve => require(['../components/shopping/JiFenShopDetail.vue'], resolve),
+                    meta: {title: '积分商城详情'}
+                },
+                {
+                    path: '/UserAdminShaiTuWenZhang',
+                    component: resolve => require(['../components/page/UserAdminShaiTuWenZhang.vue'], resolve),
+                    meta: {title: '发布文章'}
+                },
                 {
                     path: '/HomeToolsDetail2',
                     component: resolve => require(['../components/page/HomeToolsDetail2.vue'], resolve),

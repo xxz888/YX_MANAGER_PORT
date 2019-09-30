@@ -121,7 +121,7 @@
                         subs: [
                             {
                                 index: 'ChouJiang1',
-                                title: '抽奖1'
+                                title: '积分抽奖'
                             },
                             {
                                 index: 'JiFenShop',
