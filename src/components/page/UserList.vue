@@ -1,9 +1,6 @@
 
         <template>
             <div>
-
-
-
                 <el-form  :inline="true" :model="formInline" class="demo-form-inline">
                     <el-row>
                         <el-col :span="3">
@@ -72,12 +69,12 @@
                             label="序号"
                             width="50">
                     </el-table-column>
-                    <el-table-column prop="photo" label="头像" align="center" width="50">
+                    <el-table-column prop="photo" label="头像" align="center" width="80">
                         <!-- 图片的显示 -->
                         <template  slot-scope="scope">
                             <img :src="getImgUrl(scope.row.photo)"
                                  :onerror="defaultImg"
-                                  style="width: 35px;height:35px;border-radius:50%" class="pre-img"/>
+                                 style="width: 50px;height:50px;border-radius:50%" class="pre-img"/>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -109,12 +106,12 @@
                             label="手机"
                             width="110">
                     </el-table-column>
-                    <el-table-column
-                            align="center"
-                            prop="weixin_name"
-                            label="微信名称"
-                            width="130">
-                    </el-table-column>
+                    <!--<el-table-column-->
+                            <!--align="center"-->
+                            <!--prop="weixin_name"-->
+                            <!--label="微信名称"-->
+                            <!--width="130">-->
+                    <!--</el-table-column>-->
                     <!--<el-table-column-->
                             <!--align="center"-->
                             <!--prop="weibo_name"-->
@@ -149,6 +146,7 @@
                             align="center"
                             fixed="right"
                             label="操作"
+                            width="200"
                             >
                         <template slot-scope="scope">
                             <el-button @click="seeDetailInfo(scope.row)"  type ='primary' size="small">查看</el-button>
@@ -332,5 +330,11 @@
         </script>
 
         <style scoped>
-
+            .pre-img{
+                width: 100px;
+                height: 100px;
+                background: #f8f8f8;
+                border: 1px solid #eee;
+                border-radius: 5px;
+            }
         </style>
