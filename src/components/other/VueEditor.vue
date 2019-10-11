@@ -11,7 +11,7 @@
                 Vue-Quill-Editor：基于Quill、适用于Vue2的富文本编辑器。
                 访问地址：<a href="https://github.com/surmon-china/vue-quill-editor" target="_blank">vue-quill-editor</a>
             </div>
-            <quill-editor ref="myTextEditor" v-model="content" :options="editorOption"></quill-editor>
+            <quill-editor @change="onEditorChange($event)" ref="myTextEditor" v-model="content" :options="editorOption"></quill-editor>
             <el-button class="editor-btn" type="primary" @click="submit">提交</el-button>
         </div>
     </div>
@@ -36,8 +36,8 @@
             quillEditor
         },
         methods: {
-            onEditorChange({ editor, html, text }) {
-                this.content = html;
+            onEditorChange(event) {
+            alert(event);
             },
             submit(){
                 console.log(this.content);

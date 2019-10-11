@@ -129,6 +129,21 @@
                             },
                         ]
                     },
+
+                    // {
+                    //     index: '3-2',
+                    //     title: '三级菜单',
+                    //     subs: [
+                    //         {
+                    //             index: 'editor',
+                    //             title: '富文本编辑器'
+                    //         },
+                    //         {
+                    //             index: 'markdown',
+                    //             title: 'markdown编辑器'
+                    //         },
+                    //     ]
+                    // },
                     // {
                     //     index: '7',
                     //     title: '配件',

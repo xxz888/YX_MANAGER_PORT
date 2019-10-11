@@ -169,7 +169,7 @@
                         'label':this.form.label,
                         'photo':this.form.photo.indexOf(this.$QiNiuUrl)==-1?this.form.photo:this.form.photo.split(this.$QiNiuUrl)[1],
                         'weight':this.form.weight,
-                        'commodify_id':'1',
+                        'commodify_id':'0',
                     };
                 }else{
                     dic = {

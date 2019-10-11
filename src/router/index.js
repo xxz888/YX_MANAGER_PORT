@@ -192,7 +192,12 @@ export default new Router({
                     component: resolve => require(['../components/page/MoreTagList.vue'], resolve),
                     meta: { title: '更多标签' }
                 },
-
+                {
+                    // 富文本编辑器组件
+                    path: '/quill-editor-qiniu',
+                    component: resolve => require(['../components/other/quill-editor-qiniu.vue'], resolve),
+                    meta: { title: '富文本编辑器' }
+                },
                 //
                 // {
                 //     path: '/icon',
