@@ -127,6 +127,11 @@
                                 index: 'JiFenShop',
                                 title: '积分商城'
                             },
+                            {
+                                index: 'DingDanList',
+                                title: '订单列表'
+                            },
+
                         ]
                     },
 

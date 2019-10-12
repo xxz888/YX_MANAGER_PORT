@@ -17,6 +17,11 @@ export default new Router({
             meta: { title: '自述文件' },
             children:[
                 {
+                    path: '/DingDanList',
+                    component: resolve => require(['../components/shopping/DingDanList.vue'], resolve),
+                    meta: {title: '订单列表'}
+                },
+                {
                     path: '/ChouJiang1',
                     component: resolve => require(['../components/shopping/ChouJiang1.vue'], resolve),
                     meta: {title: '抽奖'}

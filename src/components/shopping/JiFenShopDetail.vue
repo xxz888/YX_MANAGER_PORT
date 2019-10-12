@@ -23,7 +23,7 @@
                 </el-table-column>
                 <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
-                <el-table-column prop="name" label="名称"   align="center">
+                <el-table-column prop="name" label="名称" width="200"  align="center">
                 </el-table-column>
                 <el-table-column prop="integral" label="积分"  width="100" align="center">
                 </el-table-column>
@@ -35,14 +35,10 @@
                         <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                     </template>
                 </el-table-column>
-                <el-table-column label="图片信息" width="200" align="center">
+                <el-table-column label="图片信息"  align="center">
                     <template slot-scope="scope">
-<<<<<<< HEAD
                         <el-button type="text" icon="el-icon-edit"   @click="fengMianImageAction(scope.$index, scope.row)">商品图片</el-button>
-=======
                         <el-button type="text" icon="el-icon-edit"  v-if="scope.row.checked == 1" @click="fengMianImageAction(scope.$index, scope.row)">封面图片</el-button>
->>>>>>> dca1ba302afaca3c7d83d894cc352a7b67b9fe3e
-
                         <el-button type="text" icon="el-icon-edit" class="green"  @click="fengMianImageAction1(scope.$index, scope.row)">详情图片</el-button>
                     </template>
                 </el-table-column>
