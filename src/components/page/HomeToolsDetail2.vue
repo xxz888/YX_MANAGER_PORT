@@ -112,9 +112,26 @@
         <!-- 编辑弹出框 -->
         <el-dialog :title="dialogTitle" :close-on-click-modal="false" :visible.sync="editVisible" width="70%">
             <el-form label-width="100px" label-height = auto :model="form">
-                <el-form-item style="width: 50%;" label="NAME">
+                <el-form-item style="width: 50%;" label="名称">
                     <el-input placeholder="请输入名称" v-model="form.name"></el-input>
                 </el-form-item>
+                <el-form-item style="width: 50%;" label="类型">
+                    <el-input placeholder="请输入类型" v-model="form.type"></el-input>
+                    原创文章填0 引用文章填1
+                </el-form-item>
+                <el-form-item v-if="form.type==1" style="width: 80%;" label="选择文章">
+                    <el-button type="text" @click="getWenZhangData">选择文章</el-button>
+                    <el-input :disabled="false" v-model="selectWenZhang"></el-input>
+
+                    <el-dialog :modal="false" top=0 title="选择文章" :visible.sync="WenZhangTableVisible">
+                        <el-table @row-dblclick	="handleRowDbClick" :data="gridData">
+                            <el-table-column property="id" label="ID" width="50"></el-table-column>
+                            <el-table-column property="user_name" label="姓名" width="150"></el-table-column>
+                            <el-table-column property="title" label="标题"></el-table-column>
+                        </el-table>
+                    </el-dialog>
+                </el-form-item>
+
                 <el-form-item style="width: 80%;" label="简介">
                     <el-input type="textarea" placeholder="请输入简介" v-model="form.intro"></el-input>
                 </el-form-item>
@@ -184,7 +201,6 @@
 
         data() {
             return {
-                activeName: 0,
                 alertLoading:false,
                 tableData: [],
                 cur_page: 1,
@@ -202,7 +218,9 @@
                     intro:'',
                     photo_detail:'',
                     weight:'',
-                    is_lock:''
+                    is_lock:'',
+                    type:'',
+                    post_id:''
                 },
                 idx: -1,
                 alertIdx:-1,
@@ -233,7 +251,9 @@
                 currentWeight:'',
                 activeIndex: '1',
                 linkDataArray:[],
-
+                WenZhangTableVisible:false,
+                gridData: [{}],
+                selectWenZhang:""
             }
         },
         created() {
@@ -254,6 +274,51 @@
              this.requestLinkDataArray();
         },
         methods: {
+            handleRowDbClick(item){
+                this.form.post_id = item.id;
+                this.form.photo = this.$QiNiuUrl + item.cover;
+                this.form.intro = item.title;
+                this.selectWenZhang = item.id +' '+ item.user_name + ' ' +  item.title;
+                this.WenZhangTableVisible = false;
+
+                item.sectionTitle = this.activeName;
+
+                    var dic = {
+                        'detail': JSON.stringify(item),
+                        'obj':'1',
+                        'option_id': this.form.id,
+                        'weight': 1,
+                        'action':1,
+                        'ratio':99999
+                    }
+                    var self = this;
+                    this.$axios.post("/api/pub/option_detail/",dic,{headers:{
+                            "Authorization":"JWT " + localStorage.getItem('token')
+                        }}).then((res)=>{
+                        if (res.data.status == 1){
+                            self.$message.success(res.data.message);
+                            self.alertTableCommonRequest();
+                        } else {
+                            self.$message.warning(res.data.message);
+                        }
+                    })
+
+            },
+
+            getWenZhangData(){
+                var self = this;
+                var url = "/api/users/post/?type=1&page=1";
+                this.$axios.get(url,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
+                        self.gridData = [];
+                        for(var item of res.data){
+                            if (item.obj != 1){
+                                self.gridData.push(item);
+                            }
+                        }
+                        self.WenZhangTableVisible = true;
+                })
+            },
             requestLinkDataArray(){
                 var self = this;
                 var url = "/api/pub/all_option/";
@@ -633,7 +698,9 @@
                         'photo_detail':this.form.photo_detail,
                         'intro':this.form.intro,
                         'weight':this.form.weight,
-                        'is_lock':this.form.is_lock
+                        'is_lock':this.form.is_lock,
+                        'type':this.form.type,
+                        'post_id':this.form.post_id,
                     };
                 }else{
                     dic = {
@@ -645,7 +712,10 @@
                         'photo_detail':this.form.photo_detail,
                         'intro':this.form.intro,
                         'weight':this.form.weight,
-                        'is_lock':this.form.is_lock
+                        'is_lock':this.form.is_lock,
+                        'type':this.form.type,
+                        'post_id':this.form.post_id,
+
                     };
                 }
 
@@ -754,12 +824,9 @@
             },
             //tab切换
             handleClick(tab, event) {
-                // var string = event.target.getAttribute('id').split('-')[1];
-                // for (var i = 0 ; i < this.todo.length ; i ++){
-                //     if (string == this.todo[tab.index].name){
-                        this.detailId = this.todo[tab.index].id;
-                //     }
-                // }
+                this.detailId = this.todo[tab.index].id;
+                this.activeName = this.todo[tab.index].name;
+
                 this.alertTableCommonRequest();
             },
             handleSelectionChange(val) {
@@ -839,7 +906,6 @@
                         'is_lock':'0'
                     };
                     this.allEditAndNewAddCommonAction(dic);
-
                 }
             },
             allEditAndNewAddCommonAction(dic){

@@ -561,7 +561,7 @@
                 var self = this;
                 this.user_id = this.$route.query.user_id;
                 this.xxzloading = true;
-                var url = "/api/users/post/?type=-1&page=" + self.currentPage;
+                var url = "/api/users/post/?type=1&page=" + self.currentPage;
                 this.$axios.get(url,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
                     self.tableData = [];

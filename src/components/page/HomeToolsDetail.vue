@@ -387,7 +387,10 @@
                         'photo_detail':this.form.photo_detail,
                         'intro':this.form.intro,
                         'weight':this.form.weight,
-                        'is_lock':'0'
+                        'is_lock':0,
+                        'ratio':1,
+                        'type':0,
+                        'post_id':0
                     };
                 }else{
                     dic = {
@@ -399,7 +402,10 @@
                         'photo_detail':this.form.photo_detail,
                         'intro':this.form.intro,
                         'weight':this.form.weight,
-                        'is_lock':'0'
+                        'is_lock':0,
+                        'ratio':1,
+                        'type':0,
+                        'post_id':0
 
                     };
                 }
