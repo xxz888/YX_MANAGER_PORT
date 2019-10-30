@@ -1,7 +1,7 @@
 <template>
 
 
-    <div class="table">
+    <div class="table" style="height: 200%">
         <div class="handle-box">
             <el-button type="primary" icon="search" @click="tagManager">标签管理</el-button>
             <el-button style="margin-left: 200px" type="primary" @click="addObj1">添加大标题</el-button>
@@ -94,7 +94,7 @@
                             </el-menu>
 
                             <!--<div class="line"></div>-->
-                            <!--<div style="text-align: left;font-size: 16px;color: green;margin-top: 10px;margin-bottom: 10px">例子:Tabaco Negro Cubano,2,12-32-46-182;Cuban Black Tobacco,2,12-32-46-182</div>-->
+                            <div style="text-align: left;font-size: 16px;color: green;margin-top: 10px;margin-bottom: 10px">例子:关键字+下标+文章的ID;关键字+下标+文章的ID<br>Tabaco Negro Cubano,2,12-32-46-182;Cuban Black Tobacco,2,12-32-46-182</div>
                             <el-input v-model="scope.row.detail"></el-input>
                         </div>
 
@@ -903,7 +903,9 @@
                         'photo_detail':'',
                         'intro':'',
                         'weight':0,
-                        'is_lock':'0'
+                        'is_lock':'0',
+                        'type':'0',
+                        'post_id':'0',
                     };
                     this.allEditAndNewAddCommonAction(dic);
                 }

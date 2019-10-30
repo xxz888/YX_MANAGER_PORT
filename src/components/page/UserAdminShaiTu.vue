@@ -391,7 +391,6 @@
             },
             saveAddContent(){
                 this.addForm.tag = this.tagSelectInput2.join(' ');
-                this.addForm.detail = this.toUnicodeWords(this.addForm.detail);
                 var url = 'http://photo.lpszn.com/';
                 var list = [];
                 if (this.addForm.photo1.indexOf(url) != -1){
@@ -616,17 +615,7 @@
                 }
                 return str;
             },
-            toUnicodeWords(str){
-                var unid='\\u';
-                for(let i=0,len=str.length;i<len;i++){
-                    if(i<len-1){
-                        unid+=str.charCodeAt(i).toString(16)+'\\u';
-                    }else if(i===len-1){
-                        unid+=str.charCodeAt(i).toString(16);
-                    }
-                }
-                return unid;
-            },
+
             saveEdit(){
                 var post_type;
                 for (var i = 0 ;i < this.options.length ;i++){

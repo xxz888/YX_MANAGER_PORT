@@ -71,16 +71,19 @@ quill-editor整合七牛云上传https://github.com/NextBoy/skill/issues/2
                     }
                 },
                 qiniuForm:{
-                    'key': '123',
-                    'token': '132',
-                    'domain':'123'
+                    'key': '',
+                    'token': '',
+                    'domain':''
                 },
             }
         },
+        components: {
+            quillEditor
+        },
         props:{
-            token:"123", //七牛云上传的token,类型为String
-            domain:"123", //七牛云上传的域地址,类型为String
-            uploadUrl:"123"  //从七牛云上拿到自己的上传地址,类型为String
+            token:String, //七牛云上传的token,类型为String
+            domain:String, //七牛云上传的域地址,类型为String
+            uploadUrl:String  //从七牛云上拿到自己的上传地址,类型为String
         },
         methods:{
             //上传图片之前
@@ -149,7 +152,7 @@ quill-editor整合七牛云上传https://github.com/NextBoy/skill/issues/2
 
 <style scoped>
     .editor{
-        min-height: 200px;
-        margin-bottom: 60px;
+        /*min-height: 200px;*/
+        /*margin-bottom: 60px;*/
     }
 </style>

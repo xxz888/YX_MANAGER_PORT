@@ -1,5 +1,3 @@
-import * as Qiniu from 'qiniu-js'
-import axios from 'axios'
 import $ from 'jquery'
 import qiniu from 'qiniu'
 function uploadqiniuyun(params,fun) {

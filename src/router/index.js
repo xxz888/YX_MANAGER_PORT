@@ -224,18 +224,18 @@ export default new Router({
                 //     component: resolve => require(['../components/other/BaseForm.vue'], resolve),
                 //     meta: { title: '基本表单' }
                 // },
-                // {
-                //     // 富文本编辑器组件
-                //     path: '/editor',
-                //     component: resolve => require(['../components/other/VueEditor.vue'], resolve),
-                //     meta: { title: '富文本编辑器' }
-                // },
-                // {
-                //     // markdown组件
-                //     path: '/markdown',
-                //     component: resolve => require(['../components/other/Markdown.vue'], resolve),
-                //     meta: { title: 'markdown编辑器' }
-                // },
+                {
+                    // 富文本编辑器组件
+                    path: '/editor',
+                    component: resolve => require(['../components/other/VueEditor.vue'], resolve),
+                    meta: { title: '富文本编辑器' }
+                },
+                {
+                    // markdown组件
+                    path: '/markdown',
+                    component: resolve => require(['../components/other/Markdown.vue'], resolve),
+                    meta: { title: 'markdown编辑器' }
+                },
                 // {
                 //     // 图片上传组件
                 //     path: '/upload',
