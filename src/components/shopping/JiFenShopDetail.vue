@@ -318,8 +318,10 @@
                 });
             },
             handleCheckChange(val,index){
-                if (!val  && this.tableData[index].id == this.startDic.commodify_id) {
-                    return;
+                var commodify_id = this.tableData[index].id ;
+                //取消封面
+                if (this.tableData[index].id == this.startDic.commodify_id) {
+                    commodify_id = '0';
                 }
                 var dic = {
                     'type':'3',
@@ -328,7 +330,7 @@
                     'label':this.startDic.label,
                     'photo':this.startDic.photo,
                     'weight':this.startDic.weight,
-                    'commodify_id':this.tableData[index].id,
+                    'commodify_id':commodify_id,
                 };
                 var self = this;
                 this.$axios.post("/api/shop/integral_classify/",dic,{headers:{

@@ -126,10 +126,7 @@
                 })
             },
             getParmters(){
-                this.startId = localStorage.getItem('xxzTools');
-                if (this.startId){
-                    this.getData();
-                }
+                this.getData();
             },
             //分页切换取值
             handleCurrentChange(val) {
