@@ -11,22 +11,21 @@
             </el-tabs>
             <div style="margin: 20px;"></div>
             <div class="handle-box">
-                <el-button type="primary" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>
-                <el-input v-model="select_word" placeholder="筛选关键词" class="handle-input mr10"></el-input>
-                <el-button type="primary" icon="search" @click="search">搜索</el-button>
                 <el-button type="success" icon="search" @click="addnews">新增</el-button>
             </div>
+
             <el-table :data="data"  tooltip-effect="dark"
                       border  class="table" ref="multipleTable" @selection-change="handleSelectionChange">
-                <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
                 <el-table-column prop="tag" label="TAG"  width="200" align="center">
                 </el-table-column>
-                <el-table-column label="操作" width="150" align="center">
+                <el-table-column label="操作" width="250" align="center">
                     <template slot-scope="scope">
                         <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                         <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+                        <el-button type="text" icon="el-icon-star-off" :class="scope.row.sum == 0 ? 'green':'gray'" @click="handleSetHotTag(scope.$index, scope.row)">{{scope.row.sum == 0 ? '设置为热门':'取消热门'}}</el-button>
+
                     </template>
                 </el-table-column>
             </el-table>
@@ -111,6 +110,27 @@
                 this.currentPage = val;
                 this.getData();
             },
+            //设置热门按钮
+            handleSetHotTag(index, row){
+                var dic = {
+                    'tag':row.tag,
+                    'tag_type':row.type,
+                    'tag_id':row.id,
+                    'type':'2',
+                    'photo':'',
+                    'sum':row.sum == 0 ? '1' : '0'
+                };
+                this.$axios.post("/api/users/iu_tag/",dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then((res)=>{
+                    if (res.data.status == 1){
+                        this.$message.success(res.data.message);
+                        this.getData();
+                    } else {
+                        this.$message.warning(res.data.message);
+                    }
+                })
+            },
             //编辑按钮,弹出框
             handleEdit(index, row) {
                 this.idx = index;
@@ -127,6 +147,8 @@
                         'tag_type':item.type,
                         'tag_id':item.id,
                         'type':'2',
+                        'sum':'0',
+                        'photo':''
                     };
                     this.$axios.post("/api/users/iu_tag/",dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
@@ -155,6 +177,8 @@
                         'tag_type':self.type,
                         'tag_id':'',
                         'type':'1',
+                        'photo':'',
+                        'sum':'0'
                     };
                     this.$axios.post("/api/users/iu_tag/",dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
@@ -186,6 +210,8 @@
                         'tag_type':item.type,
                         'tag_id':item.id,
                         'type':'3',
+                        'photo':'',
+                        'sum':'0'
                     };
                     self.$axios.post("/api/users/iu_tag/",dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
@@ -267,44 +293,10 @@
     .red{
         color: #ff0000;
     }
+    .gray{
+        color:#6f7180;
+    }
     .green{
         color: #58B92D;
-    }
-    .mr10{
-        margin-right: 10px;
-    }
-    .crop-demo{
-        display: flex;
-        align-items: flex-end;
-    }
-    .crop-demo-btn{
-        position: relative;
-        width: 100px;
-        height: 40px;
-        line-height: 40px;
-        padding: 0 20px;
-        margin-left: 30px;
-        background-color: #409eff;
-        color: #fff;
-        font-size: 14px;
-        border-radius: 4px;
-        box-sizing: border-box;
-    }
-    .crop-input{
-        position: absolute;
-        width: 100px;
-        height: 40px;
-        left: 0;
-        top: 0;
-        opacity: 0;
-        cursor: pointer;
-    }
-
-    .pre-img{
-        width: 100px;
-        height: 100px;
-        background: #f8f8f8;
-        border: 1px solid #eee;
-        border-radius: 5px;
     }
 </style>

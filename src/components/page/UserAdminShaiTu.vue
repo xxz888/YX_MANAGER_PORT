@@ -390,7 +390,11 @@
                 });
             },
             saveAddContent(){
-                this.addForm.tag = this.tagSelectInput2.join(' ');
+                var newTagSelectInput2 = [];
+                for (var i = 0;i<this.tagSelectInput2.length;i++){
+                    newTagSelectInput2.push('#'+this.tagSelectInput2[i]);
+                }
+                this.addForm.tag = newTagSelectInput2.join(' ');
                 var url = 'http://photo.lpszn.com/';
                 var list = [];
                 if (this.addForm.photo1.indexOf(url) != -1){

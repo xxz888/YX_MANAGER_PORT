@@ -220,8 +220,10 @@
 
                     var self = this;
                     this.formInline.photo = photo;
-                    this.formInline.gender =
-                    this.formInline.gender == '男' ? 1 : 0;
+                    if (this.formInline.gender == '男'  || this.formInline.gender == '女'){
+                        this.formInline.gender = this.formInline.gender == '男' ? 1 : 0;
+                    }
+
 
                 this.formInline.photo = this.formInline.photo.indexOf(this.$QiNiuUrl)==-1 ? this.formInline.photo : this.formInline.photo.split(this.$QiNiuUrl)[1];
 

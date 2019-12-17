@@ -127,7 +127,7 @@
                         if (!self.id){
                             return;
                         }
-                        var dic = {'tag_id':item.id,'tag':item.tag,'type':'3','tag_type':self.id};
+                        var dic = {'tag_id':item.id,'tag':item.tag,'type':'3','tag_type':self.id,'sum':'0','photo':''};
                         this.$axios.post("/api/users/iu_tag/",dic,{headers:{
                                 "Authorization":"JWT " + localStorage.getItem('token')
                             }}).then((res)=>{
@@ -163,7 +163,7 @@
                     if (!self.id){
                         return;
                     }
-                    var dic = {'tag_id':item.id,'tag':value,'type':'2','tag_type':self.id};
+                    var dic = {'tag_id':item.id,'tag':value,'type':'2','tag_type':self.id,'sum':'0','photo':''};
                     this.$axios.post("/api/users/iu_tag/",dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then((res)=>{
@@ -182,7 +182,7 @@
                 let inputValue = this.inputValue;
 
                 if (inputValue) {
-                    var dic = {'tag_id':'','tag':inputValue,'type':'1','tag_type':this.id};
+                    var dic = {'tag_id':'','tag':inputValue,'type':'1','tag_type':this.id,'sum':'0','photo':''};
                     this.$axios.post("/api/users/iu_tag/",dic,{headers:{
                             "Authorization":"JWT " + localStorage.getItem('token')
                         }}).then((res)=>{
