@@ -120,11 +120,13 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="用户">
-                    <el-select v-model="addForm.username" placeholder="请选择用户" @change="userSelectInputAction">
+                    <el-select v-model="username" filterable placeholder="请选择用户" @change="userSelectInputAction">
                         <el-option
                                 v-for="item in userTableData"
                                 :key="item.username"
-                                :value="item.username">
+                                :value="item.username"
+                                :label="item.username"
+                        >
                         </el-option>
                     </el-select>
                 </el-form-item>
@@ -280,12 +282,13 @@
         name: "UserAdminShaiTu",
         data() {
             return {
-
+                username:'',
                 defaultImg:'this.src="' + require('../../assets/img_moren.png') + '"',
                 activeName: '1',
                 checked: true,
                 tableData:[],
-                userTableData:[],
+                userTableData:[
+                ],
                 page:'1',
                 delVisible:false,
                 editVisible:false,
@@ -314,7 +317,7 @@
                     post_id:'',
                     publish_site : "",
                     obj:"1",
-
+                    user_name:'',
                     title:"",
                     tag : "",
                     photo1:"",
@@ -485,6 +488,7 @@
                     self.tagSelectInputOptions1 = res.data;
                     self.type = this.tagSelectInputOptions1[0].id;
                 });
+
             },
             //选择分类2级
             tagSelectInput1Action(event){

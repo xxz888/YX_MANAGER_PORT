@@ -2,6 +2,18 @@
 <template>
     <div>
         <el-form ref="form" :model="form" label-width="100px" label-height = auto>
+            <el-form-item label="用户">
+                <el-select v-model="username" filterable placeholder="请选择用户" @change="userSelectInputAction">
+                    <el-option
+                            v-for="item in userTableData"
+                            :key="item.username"
+                            :value="item.username"
+                            :label="item.username"
+                    >
+                    </el-option>
+                </el-select>
+            </el-form-item>
+
             <el-form-item label="标题">
                 <el-input type="textarea" v-model="title"></el-input>
             </el-form-item>
@@ -63,6 +75,9 @@
                 form:{
 
                 },
+                user_id:'',
+                username:'',
+                userTableData:[],
                 content: '',
                 editorOption:{
                     placeholder:'请填写正文',
@@ -86,12 +101,27 @@
             }
         },
 
-
+        created(){
+            this.getUserData();
+        },
         methods: {
+            userSelectInputAction(event){
+                for (var i = 0 ;i < this.userTableData.length;i++){
+                    if (this.userTableData[i].username == event){
+                        this.user_id =  this.userTableData[i].id;
+                    }
+                }
+            },
+            //请求管理员用户信息
+            getUserData(){
+                this.$axios.get("/api/users/admin_user/",{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
+                    this.userTableData = res.data;
+                })
+            },
             onEditorChange(event) {
                 // alert(event);
                 console.log(event);
-
             },
             //内容上传图片
             fileImage(e) {
@@ -113,7 +143,10 @@
             //新增和储存公共方法
             saveEdit() {
                 var self = this;
+
                 var dic = {
+                    url:"http://lpszn.com/api/users/post/",
+                    request_type: "post",
                     detail:self.content,
                     post_id : "",
                     publish_site : "",
@@ -122,8 +155,18 @@
                     tag : "",
                     photo_list : "",
                     cover : self.imgSrc.split(this.$QiNiuUrl)[1],
+                    user_id:self.user_id,
+                    photo1:'',
+                    photo2:'',
+                    photo3:'',
+                    photo4:'',
+                    photo5:'',
+                    photo6:'',
+                    photo7:'',
+                    photo8:'',
+                    photo9:'',
                 };
-                self.$axios.post('/api/users/post/',dic,{headers:{
+                self.$axios.post('/api/users/transpond/',dic,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then(res=>{
                     self.$message.success(res.data.message);
