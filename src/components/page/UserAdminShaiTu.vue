@@ -116,7 +116,10 @@
         <el-dialog title="新增" :close-on-click-modal="false" :visible.sync="addVisible" width="80%">
             <el-form label-width="100px" label-height = auto>
                 <el-form-item label="类型">
-                    <el-select v-model="selectShaiTuInput" disabled placeholder="晒图">
+                    <el-select v-model="selectShaiTuInput"  @change="changeType" placeholder="晒图">
+                        <el-option key="1" value="晒图"></el-option>
+                        <el-option key="2" value="视频"></el-option>
+
                     </el-select>
                 </el-form-item>
                 <el-form-item label="用户">
@@ -130,11 +133,11 @@
                         </el-option>
                     </el-select>
                 </el-form-item>
-                <el-form-item v-if="shaituTag" label="晒图内容">
+                <el-form-item v-if="shaituTag" label="晒图视频内容">
                     <el-input
                             v-model="addForm.detail"
                             type="textarea"
-                            placeholder="请输入晒图内容"
+                            placeholder="请输入晒图视频内容"
                     ></el-input>
                 </el-form-item>
 
@@ -157,23 +160,11 @@
 
                 </el-form-item>
 
-                <el-form-item v-if="wendaTag" label="问答提问">
-                    <el-input
-                            type="textarea"
-                            placeholder="请输入问答提问"
-                    ></el-input>
-                </el-form-item>
-                <el-form-item v-if="wendaTag" label="问答回答" >
-                    <el-input
-                            type="textarea"
-                            placeholder="请输入问答回答"
-                    ></el-input>
-                </el-form-item>
 
                 <el-form-item label="地点">
                     <el-input v-model="addForm.publish_site" placeholder="请输入地点"></el-input>
                 </el-form-item>
-                <el-form-item label="图片">
+                <el-form-item v-if="!selectType" label="图片">
                     <template slot-scope="scope">
                         <el-row>
                             <el-col :span="5">
@@ -256,9 +247,37 @@
 
                     </template>
                 </el-form-item>
+                <el-form-item v-if="selectType" label="视频上传" prop="Video">
+
+                    <template slot-scope="scope">
+
+                        <el-row>
+                            <el-col :span="5">
+                                <video-player
+                                        id="upvideo"
+                                        class="video-player vjs-custom-skin videoFrame"
+                                        ref="videoPlayer"
+                                        :playsinline="true"
+                                        :options="fengmianplayerOptions"
+                                ></video-player>
+                                <div class="crop-demo-btn">选择视频
+                                    <input class="crop-input" type="file" name="image" accept="video/*" @change="setVideo"/>
+                                </div>
+                            </el-col>
+                            <el-col :span="5">
+                                <div class="crop-demo">
+                                    <img   :src="addForm.cover"  class="pre-img" width="100" height="70">
+                                    <div class="crop-demo-btn">选择封面
+                                        <input class="crop-input" type="file" name="image" accept="image/*" @change="setImagefengmian"/>
+                                    </div>
+                                </div>
+                            </el-col>
+                        </el-row>
+
+                    </template>
 
 
-
+                </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
                     <el-button @click="addVisible = false">取 消</el-button>
@@ -282,6 +301,32 @@
         name: "UserAdminShaiTu",
         data() {
             return {
+                    fengmianplayerOptions :
+                        {
+                    playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
+                    autoplay: false, //如果true,浏览器准备好时开始回放。
+                    muted: false, // 默认情况下将会消除任何音频。
+                    loop: false, // 导致视频一结束就重新开始。
+                    preload: 'auto', // 建议浏览器在<video>加载元素后是否应该开始下载视频数据。auto浏览器选择最佳行为,立即开始加载视频（如果浏览器支持）
+                    language: 'zh-CN',
+                    aspectRatio: '16:9', // 将播放器置于流畅模式，并在计算播放器的动态大小时使用该值。值应该代表一个比例 - 用冒号分隔的两个数字（例如"16:9"或"4:3"）
+                    fluid: true, // 当true时，Video.js player将拥有流体大小。换句话说，它将按比例缩放以适应其容器。
+                    sources: [
+                        {src:'',type:'video/mp4'}
+                    ],
+                    poster:"", //你的封面地址
+                    // width: document.documentElement.clientWidth,
+                    notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
+                    controlBar: {
+                        timeDivider: true,
+                        durationDisplay: true,
+                        remainingTimeDisplay: false,
+                        fullscreenToggle: true  //全屏按钮
+                    }
+                },
+                videoFlag:false , //是否显示进度条
+                videoUploadPercent:"", //进度条的进度，
+                isShowUploadVideo:false, //显示上传按钮
                 username:'',
                 defaultImg:'this.src="' + require('../../assets/img_moren.png') + '"',
                 activeName: '1',
@@ -306,6 +351,7 @@
                 selectShaiTuInput:'',
                 tagSelectInput1:'',
                 tagSelectInput2:'',
+                selectType:false,
                 tagSelectInputOptions1:[],
                 tagSelectInputOptions2:[],
                 type:'',
@@ -342,6 +388,40 @@
             '$route':'getParams'
         },
         methods: {
+            setVideo(e){
+
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                var self = this;
+                reader.onload = (event) => {
+                    self.xxzloading = true;
+                    self.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function (res,key) {
+                        self.xxzloading = false;
+                        self.fengmianplayerOptions.sources = res;
+                        var url = 'http://photo.lpszn.com/';
+                        if (res.indexOf(url) != -1){
+                            self.addForm.photo_list = res.split(url)[1];
+                        }
+                    }),
+                    self.$refs.cropper && self.$refs.cropper.replace(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
+            setImagefengmian(e){
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var self = this;
+                reader.onload = (event) => {
+                    self.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function (res,key) {
+                        self.addForm.cover = res;
+                    }),
+                    self.$refs.cropper && self.$refs.cropper.replace(event.target.result);
+                };
+                reader.readAsDataURL(file);
+            },
             changeplayerOptions(tab){
 
                 var playerOptions = {
@@ -427,7 +507,16 @@
                 if (this.addForm.photo9.indexOf(url) != -1){
                     list.push(this.addForm.photo9.split(url)[1]);
                 }
-                this.addForm.photo_list = list.join(',');
+                if (this.addForm.photo_list.concat('mp4')){
+
+                }else {
+                    this.addForm.photo_list = list.join(',');
+                }
+                if(this.addForm.cover.length != 0){
+                    if (this.addForm.cover.indexOf(url) != -1){
+                        this.addForm.cover = this.addForm.cover.split(url)[1];
+                    }
+                }
                 this.$axios.post("/api/users/transpond/",this.addForm,{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')
                     }}).then((res)=>{
@@ -502,20 +591,13 @@
                     this.tagSelectInputOptions2 = res.data;
                 })
             },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+            changeType(event){
+                if (event == '视频'){
+                    this.selectType = true;
+                } else{
+                    this.selectType = false;
+                }
+            },
 
 
 
@@ -721,6 +803,7 @@
                 }
                 return key;
             },
+
             setImage1(e){
                 const file = e.target.files[0];
                 if (!file.type.includes('image/')) {
@@ -866,6 +949,7 @@
                 };
                 reader.readAsDataURL(file);
             },
+
             addwenZhang(){
                 var t = this;
                 this.$router.push({
@@ -912,5 +996,9 @@
         top: 0;
         opacity: 0;
         cursor: pointer;
+    }
+    .videoFrame{
+        width: 150px;
+        height: 112px;
     }
 </style>
