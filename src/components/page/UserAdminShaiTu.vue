@@ -113,7 +113,7 @@
 
 
         <!-- 新增弹出框 -->
-        <el-dialog title="新增" :close-on-click-modal="false" :visible.sync="addVisible" width="80%">
+        <el-dialog :before-close='cancleAddContent' title="新增" :close-on-click-modal="false" :visible.sync="addVisible" width="80%">
             <el-form label-width="100px" label-height = auto>
                 <el-form-item label="类型">
                     <el-select v-model="selectShaiTuInput"  @change="changeType" placeholder="晒图">
@@ -280,7 +280,7 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                    <el-button @click="addVisible = false">取 消</el-button>
+                    <el-button @click="cancleAddContent">取 消</el-button>
                     <el-button type="primary" @click="saveAddContent">确 定</el-button>
                 </span>
         </el-dialog>
@@ -453,6 +453,7 @@
                 this.$alert( '是否加精', {
                     confirmButtonText: '确定',
                     callback: action => {
+                        if (action=='cancel'){return};
                         var post_id = tab.id;
                         var type = tab.obj == 1 ? 1 : 2;
                         if ((tab.url_list[0]).indexOf("_Video_")!=-1){
@@ -507,9 +508,7 @@
                 if (this.addForm.photo9.indexOf(url) != -1){
                     list.push(this.addForm.photo9.split(url)[1]);
                 }
-                if (this.addForm.photo_list.concat('mp4')){
-
-                }else {
+                if (!this.selectType){
                     this.addForm.photo_list = list.join(',');
                 }
                 if(this.addForm.cover.length != 0){
@@ -524,10 +523,17 @@
                     if (res.data.status == 1){
                         this.$message.success(res.data.message);
                         this.getData();
+
                     } else {
                         this.$message.warning(res.data.message);
                     }
+                    this.$router.go(0);
+
                 })
+            },
+            cancleAddContent(){
+                this.addVisible = true;
+                this.$router.go(0);
             },
             userSelectInputAction(event){
                 for (var i = 0 ;i < this.userTableData.length;i++){
@@ -541,14 +547,12 @@
                 this.getUserData();
                 this.getFind_tag();
                 this.addForm = {
-                        url:'http://lpszn.com/api/users/post/',
-                        request_type:'post',
-
+                    url:'http://lpszn.com/api/users/post/',
+                    request_type:'post',
                     detail : "",
                     post_id:'',
                     publish_site : "",
                     obj:"1",
-
                     title:"",
                     tag : "",
                     photo_list:'',
@@ -563,8 +567,10 @@
                     photo8:"",
                     photo9:"",
                 },
+
                     this.tagSelectInput1 = '';
-                this.tagSelectInput2 = '';
+                     this.tagSelectInput2 = '';
+                this.type = '';
                 this.addVisible = true;
             },
             //选择分类1级
@@ -586,9 +592,10 @@
                         this.type =  this.tagSelectInputOptions1[i].id;
                     }
                 }
+                var self = this;
                 this.$axios.get("/api/users/tag/" + this.type + '/1/',{headers:{
                         "Authorization":"JWT " + localStorage.getItem('token')}}).then((res)=>{
-                    this.tagSelectInputOptions2 = res.data;
+                    self.tagSelectInputOptions2 = res.data;
                 })
             },
             changeType(event){

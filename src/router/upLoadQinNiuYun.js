@@ -23,8 +23,8 @@ function uploadqiniuyun(params,fun) {
 
     var userid = localStorage.getItem('id');
     var timestamp = (new Date()).getTime();
-    var xxztype = imgtype.concat('video') ? ('.'+imgtype.split('/')[1]) : '.jpg';
-    var xxzVideoOrImg = imgtype.concat('video') ? '_Video_' : '_image_';
+    var xxztype = imgtype.indexOf('video') == -1 ?  '.jpg' : '.mp4';
+    var xxzVideoOrImg = imgtype.indexOf('video') == -1 ?'_image_' :'_Video_'  ;
     var key = userid + xxzVideoOrImg + timestamp + xxztype;
     var url =  '/api/pub/qiniu_token/'+key + '/';
 
