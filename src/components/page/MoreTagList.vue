@@ -18,11 +18,23 @@
                       border  class="table" ref="multipleTable" @selection-change="handleSelectionChange">
                 <el-table-column prop="id" label="ID"  width="50" align="center">
                 </el-table-column>
+                <el-table-column prop="photo" label="图片"  width="150" align="center">
+                    <template  slot-scope="scope">
+                        <img :src="$QiNiuUrl + scope.row.photo" class="pre-img"/>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="tag" label="TAG"  width="200" align="center">
                 </el-table-column>
-                <el-table-column label="操作" width="250" align="center">
+                <el-table-column label="操作" width="300" align="center">
                     <template slot-scope="scope">
                         <el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
+                        <el-button type="text" class="warningColor" icon="el-icon-picture" @click="handleEditImage(scope.$index, scope.row)">图片</el-button>
+                        <input  type="file"
+                                ref="fileInput"
+                                accept="image/*"
+                                @change="getFile"
+                                style="display: none"
+                        >
                         <el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
                         <el-button type="text" icon="el-icon-star-off" :class="scope.row.sum == 0 ? 'green':'gray'" @click="handleSetHotTag(scope.$index, scope.row)">{{scope.row.sum == 0 ? '设置为热门':'取消热门'}}</el-button>
 
@@ -83,6 +95,7 @@
                 todo:[],
                 currentPage:1,
                 type:'',
+                currentEditDic:{}
             }
         },
         created() {
@@ -142,28 +155,53 @@
                     inputValue:item.tag,
                 }).then(({ value }) => {
                     if (value.length == 0) return;
-                    var dic = {
-                        'tag':value,
-                        'tag_type':item.type,
-                        'tag_id':item.id,
-                        'type':'2',
-                        'sum':'0',
-                        'photo':''
-                    };
-                    this.$axios.post("/api/users/iu_tag/",dic,{headers:{
-                            "Authorization":"JWT " + localStorage.getItem('token')
-                        }}).then((res)=>{
-                        if (res.data.status == 1){
-                            this.$message.success(res.data.message);
-                            this.getData();
-                        } else {
-                            this.$message.warning(res.data.message);
-                        }
-                    })
+                    self.editRequest(value,item,item.photo);
                 }).catch(() => {
                 });
 
             },
+            editRequest(value,item,photo){
+                var dic = {
+                    'tag':value,
+                    'tag_type':item.type,
+                    'tag_id':item.id,
+                    'type':'2',
+                    'sum':'0',
+                    'photo':photo
+                };
+                this.$axios.post("/api/users/iu_tag/",dic,{headers:{
+                        "Authorization":"JWT " + localStorage.getItem('token')
+                    }}).then((res)=>{
+                    if (res.data.status == 1){
+                        this.$message.success(res.data.message);
+                        this.getData();
+                    } else {
+                        this.$message.warning(res.data.message);
+                    }
+                })
+            },
+            //图片弹出框
+            handleEditImage(index, row){
+                this.currentEditDic = this.tableData[index];
+                this.$refs.fileInput.click();
+            },
+            //第三步: 文件选择后, 后在页面上显示出来    转base64位的操作
+            getFile (e) {
+                const file = e.target.files[0];
+                if (!file.type.includes('image/')) {
+                    return;
+                }
+                const reader = new FileReader();
+                var t = this;
+                reader.onload = (event) => {
+                    this.$uploadQiNiuYun.uploadqiniuyun(event.target.result,function (res,key) {
+                        console.log(key);
+                        t.editRequest(t.currentEditDic.tag,t.currentEditDic,key);
+                    })
+                };
+                reader.readAsDataURL(file);
+
+            } ,
             //增加按钮，弹出框
             addnews(){
                 var self = this;
@@ -298,5 +336,15 @@
     }
     .green{
         color: #58B92D;
+    }
+    .warningColor{
+        color:#E6A23C;
+    }
+    .pre-img{
+        width: 100px;
+        height: 100px;
+        background: #f8f8f8;
+        border: 1px solid #eee;
+        border-radius: 5px;
     }
 </style>

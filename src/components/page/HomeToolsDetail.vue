@@ -65,7 +65,7 @@
                         <img :src="form.photo"  class="pre-img"  >
                         <div class="crop-demo-btn">选择图片
                             <input class="crop-input" type="file" name="image" accept="image/*" @change="setImage"/>
-                        </div>
+                    </div>
                     </div>
                 </template>
                  </el-form-item>
